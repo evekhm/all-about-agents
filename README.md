@@ -2,6 +2,12 @@
 
 Architecture notes, system-design mental models, and governance blueprints for production AI agents.
 
+## Read Online
+
+- **Series home:** <https://evekhm.github.io/all-about-agents/>
+- **Episode 01 — Securing the Agent-to-Database Connection:** [web page](https://evekhm.github.io/all-about-agents/ep01_securing_agent_to_database.html) · [PDF](https://evekhm.github.io/all-about-agents/ep01_securing_agent_to_database.pdf)
+- **Episode 02 — A Mental Model for Designing Agentic Systems:** [web page](https://evekhm.github.io/all-about-agents/ep02_designing_agentic_systems.html) · [PDF](https://evekhm.github.io/all-about-agents/ep02_designing_agentic_systems.pdf)
+
 ## Topic: Agentic Governance
 
 ### [Episode 01 — Securing the Agent-to-Database Connection](https://evekhm.github.io/all-about-agents/ep01_securing_agent_to_database.html) ([PDF](ep01_securing_agent_to_database.pdf))
