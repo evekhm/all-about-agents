@@ -240,7 +240,7 @@
     padding-top: 10px;
     border-top: 1px solid var(--line-2);
     font-family: var(--mono);
-    font-size: 12px;
+    font-size: 13.5px;
     color: var(--muted);
   }
   .legend-items {
@@ -267,9 +267,9 @@
   .node-bad { fill: var(--stop-soft); stroke: var(--stop); stroke-width: 1.8; }
   .node-violet { fill: var(--violet-soft); stroke: var(--violet); stroke-width: 1.8; }
 
-  .t-zone { font-family: var(--mono); font-size: 11px; font-weight: 700; fill: var(--muted); letter-spacing: 0.08em; }
-  .t-title { font-family: var(--sans); font-size: 15px; font-weight: 700; fill: var(--ink); }
-  .t-sub { font-family: var(--sans); font-size: 12px; fill: var(--muted); }
+  .t-zone { font-family: var(--mono); font-size: 12.8px; font-weight: 700; fill: var(--muted); letter-spacing: 0.08em; }
+  .t-title { font-family: var(--sans); font-size: 16.2px; font-weight: 700; fill: var(--ink); }
+  .t-sub { font-family: var(--sans); font-size: 13.8px; fill: var(--muted); }
   .t-mono { font-family: var(--mono); font-size: 11.5px; font-weight: 600; fill: var(--ink); }
 
   .edge-line { stroke: var(--ink); stroke-width: 2; fill: none; }
@@ -760,12 +760,12 @@
     border: 2px solid var(--cyan);
     border-radius: 3px;
   }
-  svg .t-b { font-family: var(--sans); font-size: 15px; font-weight: 700; fill: var(--ink); }
-  svg .t-s { font-family: var(--sans); font-size: 13px; fill: var(--muted); }
+  svg .t-b { font-family: var(--sans); font-size: 16px; font-weight: 700; fill: var(--ink); }
+  svg .t-s { font-family: var(--sans); font-size: 14px; fill: var(--muted); }
   svg .t-c { text-anchor: middle; }
   svg .t-e { text-anchor: end; }
   svg .zone-ours { fill: none; stroke: var(--cyan); stroke-width: 1.5; stroke-dasharray: 8 5; }
-  svg .zl { font-family: var(--mono); font-size: 12px; letter-spacing: 0.09em; fill: var(--muted); font-weight: 700; }
+  svg .zl { font-family: var(--mono); font-size: 13.2px; letter-spacing: 0.09em; fill: var(--muted); font-weight: 700; }
   svg .b-ext { fill: var(--panel); stroke: var(--muted); stroke-width: 1.4; stroke-dasharray: 5 4; }
   svg .b-code { fill: var(--good-soft); stroke: var(--good); stroke-width: 1.8; }
   svg .b-model { fill: var(--violet-soft); stroke: var(--violet); stroke-width: 1.8; }
@@ -837,10 +837,10 @@
   svg g.stg-prev { opacity: 0.72; }
   svg g.stg-new > rect { stroke-width: 3px !important; filter: drop-shadow(0 0 6px color-mix(in srgb, var(--good) 42%, transparent)); }
   svg g.stg-new > path, svg g.stg-new > line { stroke-width: 2.6px !important; }
-  svg .t-m-g { font-family: var(--mono); font-size: 11.5px; font-weight: 700; fill: var(--good); }
-  svg .t-m-v { font-family: var(--mono); font-size: 10.5px; font-weight: 700; fill: var(--violet); }
-  svg .t-m-c { font-family: var(--mono); font-size: 10.5px; font-weight: 700; fill: var(--cyan); }
-  svg .t-m-r { font-family: var(--mono); font-size: 11px; font-weight: 700; fill: var(--stop); }
+  svg .t-m-g { font-family: var(--mono); font-size: 12.6px; font-weight: 700; fill: var(--good); }
+  svg .t-m-v { font-family: var(--mono); font-size: 12px; font-weight: 700; fill: var(--violet); }
+  svg .t-m-c { font-family: var(--mono); font-size: 12px; font-weight: 700; fill: var(--cyan); }
+  svg .t-m-r { font-family: var(--mono); font-size: 12.8px; font-weight: 700; fill: var(--stop); }
   svg .b-sbx { fill: var(--panel-2); stroke: var(--cyan); stroke-width: 1.6; stroke-dasharray: 6 4; }
   .fig-caption a { color: var(--cyan); }
   @media print {
@@ -865,9 +865,11 @@
     <a href="#problem">Scenario</a>
     <a href="#stage-1">Stages 1–3 · Plumbing</a>
     <a href="#stage-4">Stages 4–6 · Agents &amp; Safety</a>
+    <a href="ref/ep02-full-architecture.html">Full Architecture</a>
     <a href="#gcp">Google Cloud</a>
     <a href="#cheatsheet">Cheat Sheet</a>
     <a href="#ep01-bridge">Episode 01 Bridge</a>
+    <a href="#conclusion">Conclusion</a>
     <a href="#appendix-adk">Appendix</a>
     <a href="#references">References</a>
     <button class="theme-btn" id="theme-toggle" type="button">◑ Switch to Dark Mode</button>
@@ -882,27 +884,32 @@
       <div>
         <span class="sec-badge">All About Agents · System Design · Progressive Build</span>
         <h1>A Mental Model for Designing Agentic Systems</h1>
-        <p>Starting from three black-box wishes and growing them—question by question—into a reliable hybrid architecture.</p>
+        <p>Growing a simple sequence of AI agents into a reliable architecture for asynchronous, event-driven workflows.</p>
         <p style="font-family:var(--mono);font-size:12px;">By Eva Khmelinskaya · November 2026 · about 30 minutes to read</p>
       </div>
     </div>
     <div class="sheet-b">
       <div class="post-prose">
         <p>
-          It is tempting to treat an AI agent as a genie in a bottle: you state a wish, and the result appears. As frontier models improve and earn trust in everyday work, handing them a vague goal and watching them figure out the steps becomes routine. The more capable they get, the easier it is to carry that habit into system design and draw each agent as an autonomous black box that just works.
+          As frontier language models get better in everyday interactive work, handing them a high-level goal and letting them work out the steps becomes routine. Carrying that habit into system design makes it easy to sketch an architecture as a sequence of autonomous black boxes, naming what each agent should accomplish while leaving control flow, state, failure recovery, and security unspecified. At the same time, new frameworks, SDKs, and agent protocols arrive constantly, while the architectural questions underneath that churn change far more slowly. My goal with this episode is to build muscle memory for the new set of questions we need to ask and answer when working with agent-based systems, and to turn them into a generic approach that applies across domains and problem types.
         </p>
         <p>
-          At the same time, the tooling around these models moves fast. New frameworks, SDKs, and APIs keep arriving, and there is always another interface to learn. Underneath that churn, the architectural questions change far more slowly. Like <a href="ep01_securing_agent_to_database.html">Episode 01</a>, this episode starts with the simplest possible diagram and grows it across six stages—adding only the boxes and boundaries that a set of design questions forces onto the page.
+          In this episode, we will look into the type of systems that wake up asynchronously on an external event, such as a webhook, a monitoring alert, an incoming document, or a scheduled feed. Once triggered, the system has to make sense of unstructured, potentially untrusted input, gather context across external stores and tools, check its proposed result against domain rules, and prepare or apply an external state change safely under traffic bursts, duplicate deliveries, and mid-run crashes. That same problem shape comes up across domains: resolving supplier invoice mismatches, triaging production incidents, reviewing updated client filings, or repairing failing builds.
         </p>
-        <h3>Design Scenario</h3>
         <p>
-          This episode is framed around a thirty-minute design exercise—intentionally tight. Thirty minutes is enough to sketch every stage and go deep on one or two, so you focus on structural invariants.
+          Classical software handles the predictable parts of that pipeline whenever inputs arrive in fixed schemas and rules are known up front. It breaks down at two boundaries: <strong>interpreting unstructured, noisy inputs</strong> that resist static parsers, and <strong>exploring an open-ended solution space</strong> where the next lookup or candidate change depends on what the previous step uncovered. Language models earn their place at those two points, while deterministic code owns the guarantees around them: containment, queueing, deduplication, leases, verification, and write credentials. Production systems combine both in a <strong>hybrid architecture</strong> that embeds scoped <strong>agents</strong> inside deterministic <strong>workflows</strong> (<a href="https://www.anthropic.com/research/building-effective-agents" target="_blank" rel="noopener">Anthropic</a>, <a href="https://github.com/humanlayer/12-factor-agents" target="_blank" rel="noopener">12-Factor Agents</a>, <a href="https://docs.cloud.google.com/architecture/choose-design-pattern-agentic-ai-system" target="_blank" rel="noopener">Google Cloud</a>): <em>proposing</em> a diagnosis or candidate fix uses a model, whereas <em>verifying</em> that proposal against schemas, policies, and test suites, and committing the side effect once, stays in deterministic code.
+        </p>
+        <p>
+          We will walk through one example of such a system, starting from the simplest whiteboard sketch and growing it across six stages:
+        </p>
+        <div class="scenario-callout">
+          <strong>Scenario:</strong> Design a self-healing code repository system with three agents: an agent that detects issues, an agent that suggests a fix, and an agent that opens a pull request with the fix. It handles <code>10,000</code> deployments a day across <code>20</code> to <code>30</code> repositories, of which <code>1%</code> fail.
+        </div>
+        <p>
+          Sketched straight onto a whiteboard, that scenario looks like <a href="#fig-first-design"><em>Figure 1</em></a>, with three autonomous agents wired end to end:
         </p>
       </div>
       <div class="diagram-frame" id="fig-first-design">
-        <div class="scenario-callout" style="margin: 0 0 16px;">
-          <strong>Scenario:</strong> Design a self-healing code repository system with three agents: an agent that detects issues, an agent that suggests a fix, and an agent that opens a pull request with the fix. It is expected to handle <code>10,000</code> deployments a day across <code>20</code> to <code>30</code> repositories, of which <code>1%</code> fail.
-        </div>
         <svg viewBox="0 0 880 180" role="img" aria-label="Figure 1: the scenario as given, three agents in a row">
           <defs>
             <marker id="f1-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--ink)"/></marker>
@@ -940,14 +947,21 @@
       </div>
       <div class="post-prose">
         <div class="scenario-callout">
-          <strong>Challenge yourself before reading on.</strong> Take a few minutes and look at <a href="#fig-first-design"><em>Figure 1</em></a>. Which steps genuinely need a language model, what is missing around those three boxes, and what questions would you want answered before calling the design finished?
+          <strong>Challenge yourself before reading on.</strong> Take a few minutes with <a href="#fig-first-design"><em>Figure 1</em></a>. Which of those three boxes genuinely need a language model, what is missing around them, and what questions would you want answered when sketching out an initial design?
         </div>
-        <h3>Why Use a Language Model at All—and Why Wrap It in Code</h3>
         <p>
-          Before adding a single box to <a href="#fig-first-design"><em>Figure 1</em></a>, ask why plain deterministic software cannot solve the problem on its own. Classical code excels whenever inputs arrive in fixed schemas and every transformation from input to action can be written ahead of time as explicit rules. It breaks down at two boundaries that recur across domains: <strong>interpreting unstructured, noisy inputs</strong> whose phrasing and format vary too widely for static parsers or regular expressions, and <strong>exploring an open-ended solution space</strong> where the next lookup or candidate change depends on what the previous step uncovered. Language models earn their place in an architecture at those two points, because non-deterministic reasoning generalizes across unfamiliar inputs and synthesizes candidate actions that could never be enumerated in advance as rules.
+          We grow <a href="#fig-first-design"><em>Figure 1</em></a> across six stages:
         </p>
+        <ul>
+          <li><strong>Stage 1 · Framing and Urgent Containment:</strong> normalize wake-up triggers and separate sub-second rollback from asynchronous repair.</li>
+          <li><strong>Stage 2 · Reliable Intake:</strong> buffer incoming events behind a stateless receiver and a durable queue.</li>
+          <li><strong>Stage 3 · Coordination and Recovery:</strong> guard against duplicate runs, outage storms, bad releases, and mid-run crashes.</li>
+          <li><strong>Stage 4 · Opening the Black Boxes:</strong> separate plain-code steps from model steps inside one deterministic harness.</li>
+          <li><strong>Stage 5 · Handoffs and State:</strong> pass small typed contracts between steps and control who writes to state and memory.</li>
+          <li><strong>Stage 6 · Isolation and Rollout:</strong> sandbox untrusted execution and gate rollout on offline replays and live metrics.</li>
+        </ul>
         <p>
-          At the same time, the exact property that gives a model that reach—probabilistic generation over open-ended context—makes it the wrong mechanism for system invariants such as deduplication, storm limits, lease ownership, self-grading, or holding write credentials. Production systems combine both in a <strong>hybrid architecture</strong> that embeds scoped <strong>agents</strong> inside deterministic <strong>workflows</strong>. <a href="https://www.anthropic.com/research/building-effective-agents" target="_blank" rel="noopener">Anthropic</a> draws the same line between workflows, where code fixes the path, and agents, where the model chooses it, and advises adding autonomy only when a simpler design falls short. <a href="https://github.com/humanlayer/12-factor-agents" target="_blank" rel="noopener">12-Factor Agents</a> reports that most products sold as agents are mostly deterministic code with model steps at chosen points, and <a href="https://docs.cloud.google.com/architecture/choose-design-pattern-agentic-ai-system" target="_blank" rel="noopener">Google Cloud</a> suggests a non-agentic design when the work is predictable or highly structured. That split rests on a general asymmetry: <em>proposing</em> a structured interpretation or candidate fix from messy context is hard to write as rules, whereas <em>verifying</em> whether a candidate output satisfies schema, policy, and test suites—and committing the side effect once—is exact in deterministic code. The following sections expand the initial <a href="#fig-first-design"><em>Figure 1</em></a> across six stages.
+          To read the assembled system end to end on one page without the incremental build, open <a href="ref/ep02-full-architecture.html#platform-agnostic">the standalone full architecture &amp; component walkthrough</a> or <a href="ref/ep02-full-architecture.html#gcp">the full architecture mapped to Google Cloud</a> (also reached at the end of the build in <a href="#fig-skeleton"><em>Figure 7</em></a> and <a href="#fig-gcp"><em>Figure 8</em></a>).
         </p>
       </div>
     </div>
@@ -957,8 +971,8 @@
   <section class="sheet" id="stage-1">
     <div class="sheet-h">
       <div>
-        <span class="sec-badge">Stage 1 of 6 · Questions 1–3 · Framing &amp; Fast Containment</span>
-        <h2>Separate Urgent Containment from Asynchronous Agent Work</h2>
+        <span class="sec-badge">Outer Deterministic Shell</span>
+        <h2>Stage 1 · Framing and Urgent Containment</h2>
         <p>Define what wakes the system up, check the real event rate, and take live bleeding off the agent path.</p>
       </div>
     </div>
@@ -966,8 +980,13 @@
       <div class="beat">Where we are</div>
       <div class="post-prose">
         <p>
-          <a href="#fig-first-design"><em>Figure 1</em></a> starts at "Failed deploy" as if every failure arrives in one format and production can wait minutes while an agent reads logs and runs tests. Answering Questions 1 to 3 adds normalized triggers and a separate, model-free fast path in <a href="#fig-s1"><em>Figure 2</em></a>.
+          <a href="#fig-first-design"><em>Figure 1</em></a> starts with a single box labeled "Failed deploy." Questions 1 to 3 clarify three things behind that box:
         </p>
+        <ul>
+          <li><strong>Trigger sources and payload size:</strong> failure signals arrive from separate systems (CI runners, canary controllers, error-rate alarms), often backed by tens of megabytes of logs.</li>
+          <li><strong>Filtered volume and per-run cost:</strong> only the <code>1%</code> of deployments that fail (<code>100</code>/day out of <code>10,000</code>) trigger a run, while unbounded agent loops inside each run can still multiply token spend.</li>
+          <li><strong>Containment vs. repair latency:</strong> a bad canary affecting live users requires rollback in seconds, whereas reading code and running test suites takes minutes.</li>
+        </ul>
       </div>
       <div class="qb" id="q1" style="margin-top:20px;">
         <div class="qh"><div class="n">1</div><h3>What wakes the system up, and what is in the wake-up message?</h3></div>
@@ -995,8 +1014,13 @@
           <div class="c"><span class="lab">In the self-healing repo</span><ul><li>The deployment controller rolls back the failing canary in seconds without calling a model.</li><li>Agents work afterward on a branch to prepare a draft PR.</li></ul></div>
         </div>
       </div>
+      <div class="post-prose" style="margin-top:18px;">
+        <p>
+          Putting Questions 1 to 3 onto the diagram produces <a href="#fig-s1"><em>Figure 2</em></a>. Upstream sources emit a small pointer-based wake-up event; urgent production impact branches immediately along the top green fast path to existing deterministic rollback controls; and the three purple agent boxes move onto an asynchronous minutes-scale repair path governed by per-case step and cost caps.
+        </p>
+      </div>
       <div class="diagram-frame" id="fig-s1">
-        <svg viewBox="0 0 1200 390" role="img" aria-label="Figure 2 — Stage 1 of 6 (Q1–Q3): Normalized triggers and a model-free fast path added above the initial sequence.">
+        <svg viewBox="0 0 1200 390" role="img" aria-label="Figure 2 — Stage 1 · Framing and Urgent Containment: Normalized triggers and a model-free fast path added above the initial sequence.">
           <defs>
             <marker id="ps1-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--ink)"/></marker>
             <marker id="ps1-mut" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--muted)"/></marker>
@@ -1006,53 +1030,53 @@
           </defs>
           <g class="stg-new">
             <rect class="b-ext" x="20" y="66" width="170" height="92" rx="7"/>
-            <text class="t-b" x="32" y="90" style="font-size:14px">Triggers</text>
-            <text class="t-s" x="32" y="111" style="font-size:12.5px">events, alerts, users</text>
-            <text class="t-s" x="32" y="130" style="font-size:12px">pointer to raw data</text>
+            <text class="t-b" x="32" y="90" style="font-size:15.8px">Triggers</text>
+            <text class="t-s" x="32" y="111" style="font-size:14px">events, alerts, users</text>
+            <text class="t-s" x="32" y="130" style="font-size:13.4px">pointer to raw data</text>
             <rect class="b-ext" x="760" y="66" width="420" height="92" rx="7"/>
-            <text class="t-b" x="774" y="90" style="font-size:14px">Fast path · existing control · no model</text>
-            <text class="t-s" x="774" y="112" style="font-size:12.5px">rollback, block, drain, fall back</text>
-            <text class="t-s" x="774" y="134" style="font-size:12px">contains live impact in seconds, before agents run</text>
+            <text class="t-b" x="774" y="90" style="font-size:15.8px">Fast path · existing control · no model</text>
+            <text class="t-s" x="774" y="112" style="font-size:14px">rollback, block, drain, fall back</text>
+            <text class="t-s" x="774" y="134" style="font-size:13.4px">contains live impact in seconds, before agents run</text>
             <path class="flow-g" d="M105 66 V32 H970 V62" marker-end="url(#ps1-good)"/>
-            <text class="t-b t-c" x="540" y="24" style="font-size:13.5px">if something is on fire right now (seconds)</text>
+            <text class="t-b t-c" x="540" y="24" style="font-size:15.2px">if something is on fire right now (seconds)</text>
           </g>
           <g class="stg-new">
             <path class="flow" d="M105 158 V232 H104 V262" marker-end="url(#ps1-ink)"/>
-            <text class="t-s" x="118" y="218" style="font-size:12px">async wake-up event</text>
+            <text class="t-s" x="118" y="218" style="font-size:13.4px">async wake-up event</text>
           </g>
           <g class="stg-prev">
             <rect class="node-card" x="20" y="266" width="168" height="104" rx="8"/>
-            <text class="t-b" x="104" y="294" text-anchor="middle" style="font-size:14px">Failed deploy</text>
-            <text class="t-s" x="104" y="316" text-anchor="middle" style="font-size:12px">normalized event</text>
+            <text class="t-b" x="104" y="294" text-anchor="middle" style="font-size:15.8px">Failed deploy</text>
+            <text class="t-s" x="104" y="316" text-anchor="middle" style="font-size:13.4px">normalized event</text>
             <path class="flow" d="M188 318 H208" marker-end="url(#ps1-ink)"/>
           </g>
           <g class="stg-prev">
             <rect class="b-model" x="212" y="266" width="200" height="104" rx="8"/>
-            <text class="t-b" x="312" y="294" text-anchor="middle" style="font-size:14px">Agent 1 · Detect</text>
-            <text class="t-s" x="312" y="316" text-anchor="middle" style="font-size:12px">Detects the issue</text>
-            <text class="t-s" x="312" y="335" text-anchor="middle" style="font-size:12px">behind the failure</text>
+            <text class="t-b" x="312" y="294" text-anchor="middle" style="font-size:15.8px">Agent 1 · Detect</text>
+            <text class="t-s" x="312" y="316" text-anchor="middle" style="font-size:13.4px">Detects the issue</text>
+            <text class="t-s" x="312" y="335" text-anchor="middle" style="font-size:13.4px">behind the failure</text>
             <path class="flow" d="M412 318 H476" marker-end="url(#ps1-ink)"/>
             <rect class="b-model" x="480" y="266" width="210" height="104" rx="8"/>
-            <text class="t-b" x="585" y="294" text-anchor="middle" style="font-size:14px">Agent 2 · Suggest fix</text>
-            <text class="t-s" x="585" y="316" text-anchor="middle" style="font-size:12px">Works out a fix</text>
-            <text class="t-s" x="585" y="335" text-anchor="middle" style="font-size:12px">for the code</text>
+            <text class="t-b" x="585" y="294" text-anchor="middle" style="font-size:15.8px">Agent 2 · Suggest fix</text>
+            <text class="t-s" x="585" y="316" text-anchor="middle" style="font-size:13.4px">Works out a fix</text>
+            <text class="t-s" x="585" y="335" text-anchor="middle" style="font-size:13.4px">for the code</text>
             <path class="flow" d="M690 318 H756" marker-end="url(#ps1-ink)"/>
             <rect class="b-model" x="760" y="266" width="204" height="104" rx="8"/>
-            <text class="t-b" x="862" y="294" text-anchor="middle" style="font-size:14px">Agent 3 · Open PR</text>
-            <text class="t-s" x="862" y="316" text-anchor="middle" style="font-size:12px">Opens a pull request</text>
-            <text class="t-s" x="862" y="335" text-anchor="middle" style="font-size:12px">with the fix</text>
+            <text class="t-b" x="862" y="294" text-anchor="middle" style="font-size:15.8px">Agent 3 · Open PR</text>
+            <text class="t-s" x="862" y="316" text-anchor="middle" style="font-size:13.4px">Opens a pull request</text>
+            <text class="t-s" x="862" y="335" text-anchor="middle" style="font-size:13.4px">with the fix</text>
             <path class="flow" d="M964 318 H1010" marker-end="url(#ps1-ink)"/>
             <rect class="b-ext" x="1014" y="266" width="166" height="104" rx="8"/>
-            <text class="t-b" x="1097" y="294" text-anchor="middle" style="font-size:14px">Repo</text>
-            <text class="t-s" x="1097" y="316" text-anchor="middle" style="font-size:12px">pull request</text>
+            <text class="t-b" x="1097" y="294" text-anchor="middle" style="font-size:15.8px">Repo</text>
+            <text class="t-s" x="1097" y="316" text-anchor="middle" style="font-size:13.4px">pull request</text>
           </g>
           <g class="stg-new">
-            <text class="t-s" x="1180" y="186" text-anchor="end" style="font-size:12px">agent path: repair, minutes, asynchronous</text>
-            <text class="t-s" x="1180" y="204" text-anchor="end" style="font-size:12px">real load = volume × filter rate</text>
-            <text class="t-s" x="1180" y="222" text-anchor="end" style="font-size:12px">step and cost cap per case</text>
+            <text class="t-s" x="1180" y="186" text-anchor="end" style="font-size:13.4px">agent path: repair, minutes, asynchronous</text>
+            <text class="t-s" x="1180" y="204" text-anchor="end" style="font-size:13.4px">real load = volume × filter rate</text>
+            <text class="t-s" x="1180" y="222" text-anchor="end" style="font-size:13.4px">step and cost cap per case</text>
           </g>
         </svg>
-        <div class="fig-caption"><span>Figure 2 — Stage 1 of 6 (Q1–Q3): Normalized triggers and a model-free fast path added above the initial sequence.</span>
+        <div class="fig-caption"><span>Figure 2 — Stage 1 · Framing and Urgent Containment: Normalized triggers and a model-free fast path added above the initial sequence.</span>
           <div class="legend-items"><span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good);border-width:2.2px;box-shadow:0 0 5px var(--good)"></i> <b>Bold glow = Added in this stage</b></span><span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> Unexamined black-box agent</span></div>
         </div>
       </div>
@@ -1065,8 +1089,8 @@
   <section class="sheet" id="stage-2">
     <div class="sheet-h">
       <div>
-        <span class="sec-badge">Stage 2 of 6 · Question 4 · Reliable Intake &amp; Terminal Ack</span>
-        <h2>Decouple Callers from Slow Runs with a Receiver and Queue</h2>
+        <span class="sec-badge">Outer Deterministic Shell</span>
+        <h2>Stage 2 · Reliable Intake</h2>
         <p>Authenticate fast at the edge, buffer work durably, and acknowledge only when a run finishes.</p>
       </div>
     </div>
@@ -1074,7 +1098,7 @@
       <div class="beat">Where we are</div>
       <div class="post-prose">
         <p>
-          Webhooks from CI or monitoring time out after a few seconds, whereas testing a candidate fix takes minutes. Inserting a stateless receiver, a durable queue, and a terminal acknowledgement (<code>ack</code>) path in <a href="#fig-s2"><em>Figure 3</em></a> prevents dropped events.
+          In <a href="#fig-s1"><em>Figure 2</em></a>, upstream triggers still deliver events directly to the worker. In production that direct wire fails under three routine conditions: CI and monitoring webhooks time out after a few seconds while reproducing a bug and running tests takes minutes; a broken shared dependency fires a burst of failures at once; and an unauthenticated public endpoint accepts spoofed requests or noisy passing-build events. Question 4 decouples fast webhook edge handling from slow asynchronous execution.
         </p>
       </div>
       <div class="qb" id="q4" style="margin-top:20px;">
@@ -1085,8 +1109,13 @@
           <div class="c"><span class="lab">In the self-healing repo</span><ul><li>Webhook receiver → durable queue → worker.</li><li>HMAC/OIDC check, reply in &lt;100 ms, <code>ack</code> at <code>PR_OPENED</code> / <code>SKIP</code> / <code>ESCALATED</code>, DLQ after 5 crashes.</li></ul></div>
         </div>
       </div>
+      <div class="post-prose" style="margin-top:18px;">
+        <p>
+          <a href="#fig-s2"><em>Figure 3</em></a> inserts two components on the intake path. A stateless <strong>Ingress / Receiver</strong> verifies the sender signature, filters incoming webhooks down to failure events, computes the failure fingerprint, enqueues the pointer event, and returns <code>200</code> in under 100 milliseconds. Behind it, a durable <strong>Queue</strong> buffers bursts and holds each message until the worker records a terminal outcome and sends <code>ack</code> along the dashed return arrow, routing repeated crash-loops to a dead-letter queue.
+        </p>
+      </div>
       <div class="diagram-frame" id="fig-s2">
-        <svg viewBox="0 0 1200 390" role="img" aria-label="Figure 3 — Stage 2 of 6 (Q4): Stateless receiver, durable queue, and terminal ack decouple callers from slow runs.">
+        <svg viewBox="0 0 1200 390" role="img" aria-label="Figure 3 — Stage 2 · Reliable Intake: Stateless receiver, durable queue, and terminal ack decouple callers from slow runs.">
           <defs>
             <marker id="ps2-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--ink)"/></marker>
             <marker id="ps2-mut" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--muted)"/></marker>
@@ -1096,61 +1125,61 @@
           </defs>
           <g class="stg-prev">
             <rect class="b-ext" x="20" y="66" width="170" height="92" rx="7"/>
-            <text class="t-b" x="32" y="90" style="font-size:14px">Triggers</text>
-            <text class="t-s" x="32" y="111" style="font-size:12.5px">events, alerts, users</text>
-            <text class="t-s" x="32" y="130" style="font-size:12px">pointer to raw data</text>
+            <text class="t-b" x="32" y="90" style="font-size:15.8px">Triggers</text>
+            <text class="t-s" x="32" y="111" style="font-size:14px">events, alerts, users</text>
+            <text class="t-s" x="32" y="130" style="font-size:13.4px">pointer to raw data</text>
             <rect class="b-ext" x="760" y="66" width="420" height="92" rx="7"/>
-            <text class="t-b" x="774" y="90" style="font-size:14px">Fast path · existing control · no model</text>
-            <text class="t-s" x="774" y="112" style="font-size:12.5px">rollback, block, drain, fall back</text>
-            <text class="t-s" x="774" y="134" style="font-size:12px">contains live impact in seconds, before agents run</text>
+            <text class="t-b" x="774" y="90" style="font-size:15.8px">Fast path · existing control · no model</text>
+            <text class="t-s" x="774" y="112" style="font-size:14px">rollback, block, drain, fall back</text>
+            <text class="t-s" x="774" y="134" style="font-size:13.4px">contains live impact in seconds, before agents run</text>
             <path class="flow-g" d="M105 66 V32 H970 V62" marker-end="url(#ps2-good)"/>
-            <text class="t-b t-c" x="540" y="24" style="font-size:13.5px">if something is on fire right now (seconds)</text>
+            <text class="t-b t-c" x="540" y="24" style="font-size:15.2px">if something is on fire right now (seconds)</text>
           </g>
           <g class="stg-new">
             <rect class="b-code" x="236" y="66" width="184" height="92" rx="7"/>
-            <text class="t-b" x="248" y="90" style="font-size:14px">Ingress / Receiver</text>
-            <text class="t-s" x="248" y="110" style="font-size:12px">authenticate, filter,</text>
-            <text class="t-s" x="248" y="127" style="font-size:12px">fingerprint, reply 200</text>
-            <text class="t-s" x="248" y="144" style="font-size:11.5px">stateless receiver</text>
+            <text class="t-b" x="248" y="90" style="font-size:15.8px">Ingress / Receiver</text>
+            <text class="t-s" x="248" y="110" style="font-size:13.4px">authenticate, filter,</text>
+            <text class="t-s" x="248" y="127" style="font-size:13.4px">fingerprint, reply 200</text>
+            <text class="t-s" x="248" y="144" style="font-size:13px">stateless receiver</text>
             <rect class="b-store" x="466" y="66" width="174" height="92" rx="7"/>
-            <text class="t-b" x="478" y="90" style="font-size:14px">Queue</text>
-            <text class="t-s" x="478" y="110" style="font-size:12px">holds work until ack,</text>
-            <text class="t-s" x="478" y="127" style="font-size:12px">backoff + dead-letter</text>
-            <text class="t-s" x="478" y="144" style="font-size:11.5px">durable queue</text>
+            <text class="t-b" x="478" y="90" style="font-size:15.8px">Queue</text>
+            <text class="t-s" x="478" y="110" style="font-size:13.4px">holds work until ack,</text>
+            <text class="t-s" x="478" y="127" style="font-size:13.4px">backoff + dead-letter</text>
+            <text class="t-s" x="478" y="144" style="font-size:13px">durable queue</text>
             <path class="flow" d="M190 112 H232" marker-end="url(#ps2-ink)"/>
             <path class="flow" d="M420 112 H462" marker-end="url(#ps2-ink)"/>
             <path class="flow" d="M540 158 V210 H295 V262" marker-end="url(#ps2-ink)"/>
-            <text class="t-s t-c" x="417" y="201" style="font-size:12px">worker pulls one item</text>
+            <text class="t-s t-c" x="417" y="201" style="font-size:13.4px">worker pulls one item</text>
             <path class="flow-d" d="M890 266 V204 H596 V162" marker-end="url(#ps2-mut)"/>
-            <text class="t-s t-c" x="752" y="195" style="font-size:12px">ack at terminal exit</text>
+            <text class="t-s t-c" x="752" y="195" style="font-size:13.4px">ack at terminal exit</text>
           </g>
           <g class="stg-prev">
             <rect class="b-model" x="212" y="266" width="200" height="104" rx="8"/>
-            <text class="t-b" x="312" y="294" text-anchor="middle" style="font-size:14px">Agent 1 · Detect</text>
-            <text class="t-s" x="312" y="316" text-anchor="middle" style="font-size:12px">Detects the issue</text>
-            <text class="t-s" x="312" y="335" text-anchor="middle" style="font-size:12px">behind the failure</text>
+            <text class="t-b" x="312" y="294" text-anchor="middle" style="font-size:15.8px">Agent 1 · Detect</text>
+            <text class="t-s" x="312" y="316" text-anchor="middle" style="font-size:13.4px">Detects the issue</text>
+            <text class="t-s" x="312" y="335" text-anchor="middle" style="font-size:13.4px">behind the failure</text>
             <path class="flow" d="M412 318 H476" marker-end="url(#ps2-ink)"/>
             <rect class="b-model" x="480" y="266" width="210" height="104" rx="8"/>
-            <text class="t-b" x="585" y="294" text-anchor="middle" style="font-size:14px">Agent 2 · Suggest fix</text>
-            <text class="t-s" x="585" y="316" text-anchor="middle" style="font-size:12px">Works out a fix</text>
-            <text class="t-s" x="585" y="335" text-anchor="middle" style="font-size:12px">for the code</text>
+            <text class="t-b" x="585" y="294" text-anchor="middle" style="font-size:15.8px">Agent 2 · Suggest fix</text>
+            <text class="t-s" x="585" y="316" text-anchor="middle" style="font-size:13.4px">Works out a fix</text>
+            <text class="t-s" x="585" y="335" text-anchor="middle" style="font-size:13.4px">for the code</text>
             <path class="flow" d="M690 318 H756" marker-end="url(#ps2-ink)"/>
             <rect class="b-model" x="760" y="266" width="204" height="104" rx="8"/>
-            <text class="t-b" x="862" y="294" text-anchor="middle" style="font-size:14px">Agent 3 · Open PR</text>
-            <text class="t-s" x="862" y="316" text-anchor="middle" style="font-size:12px">Opens a pull request</text>
-            <text class="t-s" x="862" y="335" text-anchor="middle" style="font-size:12px">with the fix</text>
+            <text class="t-b" x="862" y="294" text-anchor="middle" style="font-size:15.8px">Agent 3 · Open PR</text>
+            <text class="t-s" x="862" y="316" text-anchor="middle" style="font-size:13.4px">Opens a pull request</text>
+            <text class="t-s" x="862" y="335" text-anchor="middle" style="font-size:13.4px">with the fix</text>
             <path class="flow" d="M964 318 H1010" marker-end="url(#ps2-ink)"/>
             <rect class="b-ext" x="1014" y="266" width="166" height="104" rx="8"/>
-            <text class="t-b" x="1097" y="294" text-anchor="middle" style="font-size:14px">Repo</text>
-            <text class="t-s" x="1097" y="316" text-anchor="middle" style="font-size:12px">pull request</text>
+            <text class="t-b" x="1097" y="294" text-anchor="middle" style="font-size:15.8px">Repo</text>
+            <text class="t-s" x="1097" y="316" text-anchor="middle" style="font-size:13.4px">pull request</text>
           </g>
           <g class="stg-prev">
-            <text class="t-s" x="1180" y="186" text-anchor="end" style="font-size:12px">agent path: repair, minutes, asynchronous</text>
-            <text class="t-s" x="1180" y="204" text-anchor="end" style="font-size:12px">real load = volume × filter rate</text>
-            <text class="t-s" x="1180" y="222" text-anchor="end" style="font-size:12px">step and cost cap per case</text>
+            <text class="t-s" x="1180" y="186" text-anchor="end" style="font-size:13.4px">agent path: repair, minutes, asynchronous</text>
+            <text class="t-s" x="1180" y="204" text-anchor="end" style="font-size:13.4px">real load = volume × filter rate</text>
+            <text class="t-s" x="1180" y="222" text-anchor="end" style="font-size:13.4px">step and cost cap per case</text>
           </g>
         </svg>
-        <div class="fig-caption"><span>Figure 3 — Stage 2 of 6 (Q4): Stateless receiver, durable queue, and terminal ack decouple callers from slow runs.</span>
+        <div class="fig-caption"><span>Figure 3 — Stage 2 · Reliable Intake: Stateless receiver, durable queue, and terminal ack decouple callers from slow runs.</span>
           <div class="legend-items"><span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good);border-width:2.2px;box-shadow:0 0 5px var(--good)"></i> <b>Bold glow = Added in this stage</b></span><span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good)"></i> Plain code</span><span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> Unexamined black-box agent</span><span><i class="swatch-dot" style="background:var(--amber-soft);border-color:var(--amber)"></i> Queue / store</span></div>
         </div>
       </div>
@@ -1163,8 +1192,8 @@
   <section class="sheet" id="stage-3">
     <div class="sheet-h">
       <div>
-        <span class="sec-badge">Stage 3 of 6 · Questions 5–8 · Coordination, Storms &amp; Crash Recovery</span>
-        <h2>Guard Against Duplicates, Outage Storms, and Mid-Run Crashes</h2>
+        <span class="sec-badge">Outer Deterministic Shell</span>
+        <h2>Stage 3 · Coordination and Recovery</h2>
         <p>One transactional coordination store gives the worker a lock, an expiring lease, a fencing check, a storm breaker, and a kill switch.</p>
       </div>
     </div>
@@ -1200,7 +1229,7 @@
         <div class="qh"><div class="n">7</div><h3>How does a person stop it, right now?</h3></div>
         <div class="q3">
           <div class="a"><span class="lab">Skip it and…</span><ul><li>A bad prompt or model release keeps producing wrong output until a fix is deployed.</li><li>Stopping means killing workers by hand, and work in flight is lost.</li></ul></div>
-          <div class="b"><span class="lab">Decide</span><ul><li>Add a manual <strong>kill switch</strong>: one flag in the coordination store that an operator sets, for one target or for all of them.</li><li>Read it at the start of every run and again before every external write, so it takes effect within one step and without a deployment.</li><li>Record incoming cases as <code>PARKED</code> in the coordination store and <code>ack</code> the queue (or pause subscription pull) so parked work avoids dead-letter retries and resumes when cleared. The fast containment path keeps running.</li></ul></div>
+          <div class="b"><span class="lab">Decide</span><ul><li>Add a manual <strong>kill switch</strong>: an operational toggle acting as a manually-managed circuit breaker (<a href="https://martinfowler.com/articles/feature-toggles.html" target="_blank" rel="noopener">Hodgson</a>)—one flag in the coordination store that an operator sets for one target or for all of them.</li><li>Read it at the start of every run and again right before every external write, closing the pause gap between tool selection and execution (<a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-06-launch-pause-resume.md" target="_blank" rel="noopener">12-Factor Agents, Factor 6</a>) so it takes effect within one step through configuration alone.</li><li>Record incoming cases as <code>PARKED</code> in the coordination store and <code>ack</code> the queue (or pause subscription pull) so parked work avoids dead-letter retries and resumes when cleared. The fast containment path keeps running.</li></ul></div>
           <div class="c"><span class="lab">In the self-healing repo</span><ul><li>One flag per repo, and one for all repos, in the coordination database.</li><li>On-call sets it when reviewers start rejecting PRs after a prompt change; parked failures resume when it is cleared.</li></ul></div>
         </div>
       </div>
@@ -1213,8 +1242,13 @@
           <div class="c"><span class="lab">In the self-healing repo</span><ul><li>120-second lease renewed every 30 seconds; after an unacknowledged crash the queue redelivers the event.</li><li>Lease generation checked right before opening the draft PR.</li></ul></div>
         </div>
       </div>
+      <div class="post-prose" style="margin-top:18px;">
+        <p>
+          Questions 5 to 8 add the two green-glowing coordination blocks on the left of <a href="#fig-s3"><em>Figure 4</em></a>. Every pulled message enters the plain-code <strong>Dispatcher / Guard</strong> before any agent runs: it checks the operator kill switch, queries the 5-minute distinct-repo storm count, and atomically claims a 120-second lease in the <strong>Coordination store</strong>, while a second dashed check verifies the kill switch, lease fencing epoch, and idempotency key right before writing to the repository.
+        </p>
+      </div>
       <div class="diagram-frame" id="fig-s3">
-        <svg viewBox="0 0 1200 538" role="img" aria-label="Figure 4 — Stage 3 of 6 (Q5–Q8): Dispatcher guard, storm breaker, kill switch, and expiring case lease added.">
+        <svg viewBox="0 0 1200 538" role="img" aria-label="Figure 4 — Stage 3 · Coordination and Recovery: Dispatcher guard, storm breaker, kill switch, and expiring case lease added.">
           <defs>
             <marker id="ps3-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--ink)"/></marker>
             <marker id="ps3-mut" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--muted)"/></marker>
@@ -1224,76 +1258,76 @@
           </defs>
           <g class="stg-prev">
             <rect class="b-ext" x="20" y="66" width="170" height="92" rx="7"/>
-            <text class="t-b" x="32" y="90" style="font-size:14px">Triggers</text>
-            <text class="t-s" x="32" y="111" style="font-size:12.5px">events, alerts, users</text>
-            <text class="t-s" x="32" y="130" style="font-size:12px">pointer to raw data</text>
+            <text class="t-b" x="32" y="90" style="font-size:15.8px">Triggers</text>
+            <text class="t-s" x="32" y="111" style="font-size:14px">events, alerts, users</text>
+            <text class="t-s" x="32" y="130" style="font-size:13.4px">pointer to raw data</text>
             <rect class="b-ext" x="760" y="66" width="420" height="92" rx="7"/>
-            <text class="t-b" x="774" y="90" style="font-size:14px">Fast path · existing control · no model</text>
-            <text class="t-s" x="774" y="112" style="font-size:12.5px">rollback, block, drain, fall back</text>
-            <text class="t-s" x="774" y="134" style="font-size:12px">contains live impact in seconds, before agents run</text>
+            <text class="t-b" x="774" y="90" style="font-size:15.8px">Fast path · existing control · no model</text>
+            <text class="t-s" x="774" y="112" style="font-size:14px">rollback, block, drain, fall back</text>
+            <text class="t-s" x="774" y="134" style="font-size:13.4px">contains live impact in seconds, before agents run</text>
             <path class="flow-g" d="M105 66 V32 H970 V62" marker-end="url(#ps3-good)"/>
-            <text class="t-b t-c" x="540" y="24" style="font-size:13.5px">if something is on fire right now (seconds)</text>
+            <text class="t-b t-c" x="540" y="24" style="font-size:15.2px">if something is on fire right now (seconds)</text>
           </g>
           <g class="stg-prev">
             <rect class="b-code" x="236" y="66" width="184" height="92" rx="7"/>
-            <text class="t-b" x="248" y="90" style="font-size:14px">Ingress / Receiver</text>
-            <text class="t-s" x="248" y="110" style="font-size:12px">authenticate, filter,</text>
-            <text class="t-s" x="248" y="127" style="font-size:12px">fingerprint, reply 200</text>
-            <text class="t-s" x="248" y="144" style="font-size:11.5px">stateless receiver</text>
+            <text class="t-b" x="248" y="90" style="font-size:15.8px">Ingress / Receiver</text>
+            <text class="t-s" x="248" y="110" style="font-size:13.4px">authenticate, filter,</text>
+            <text class="t-s" x="248" y="127" style="font-size:13.4px">fingerprint, reply 200</text>
+            <text class="t-s" x="248" y="144" style="font-size:13px">stateless receiver</text>
             <rect class="b-store" x="466" y="66" width="174" height="92" rx="7"/>
-            <text class="t-b" x="478" y="90" style="font-size:14px">Queue</text>
-            <text class="t-s" x="478" y="110" style="font-size:12px">holds work until ack,</text>
-            <text class="t-s" x="478" y="127" style="font-size:12px">backoff + dead-letter</text>
-            <text class="t-s" x="478" y="144" style="font-size:11.5px">durable queue</text>
+            <text class="t-b" x="478" y="90" style="font-size:15.8px">Queue</text>
+            <text class="t-s" x="478" y="110" style="font-size:13.4px">holds work until ack,</text>
+            <text class="t-s" x="478" y="127" style="font-size:13.4px">backoff + dead-letter</text>
+            <text class="t-s" x="478" y="144" style="font-size:13px">durable queue</text>
             <path class="flow" d="M190 112 H232" marker-end="url(#ps3-ink)"/>
             <path class="flow" d="M420 112 H462" marker-end="url(#ps3-ink)"/>
             <path class="flow" d="M540 158 V210 H104 V262" marker-end="url(#ps3-ink)"/>
-            <text class="t-s t-c" x="322" y="201" style="font-size:12px">worker pulls one item</text>
+            <text class="t-s t-c" x="322" y="201" style="font-size:13.4px">worker pulls one item</text>
             <path class="flow-d" d="M890 266 V204 H596 V162" marker-end="url(#ps3-mut)"/>
-            <text class="t-s t-c" x="752" y="195" style="font-size:12px">ack at terminal exit</text>
+            <text class="t-s t-c" x="752" y="195" style="font-size:13.4px">ack at terminal exit</text>
           </g>
           <g class="stg-new">
             <rect class="b-code" x="20" y="266" width="168" height="108" rx="8"/>
-            <text class="t-b" x="104" y="292" text-anchor="middle" style="font-size:14px">Dispatcher / Guard</text>
-            <text class="t-s" x="104" y="313" text-anchor="middle" style="font-size:12px">kill switch &amp; 5-min storm,</text>
-            <text class="t-s" x="104" y="331" text-anchor="middle" style="font-size:12px">claims 120s case lease</text>
+            <text class="t-b" x="104" y="292" text-anchor="middle" style="font-size:15.8px">Dispatcher / Guard</text>
+            <text class="t-s" x="104" y="313" text-anchor="middle" style="font-size:13.4px">kill switch &amp; 5-min storm,</text>
+            <text class="t-s" x="104" y="331" text-anchor="middle" style="font-size:13.4px">claims 120s case lease</text>
             <path class="flow" d="M188 320 H224" marker-end="url(#ps3-ink)"/>
             <path class="flow-d" d="M104 374 V426" marker-end="url(#ps3-mut)"/>
             <path class="flow-d" d="M890 374 V412 H104"/>
-            <text class="t-s" x="120" y="406" style="font-size:11.5px">kill-switch check, atomic claim, lease, fencing &amp; idempotency key before write</text>
+            <text class="t-s" x="120" y="406" style="font-size:13px">kill-switch check, atomic claim, lease, fencing &amp; idempotency key before write</text>
             <rect class="b-store" x="20" y="430" width="336" height="90" rx="7"/>
-            <text class="t-b" x="32" y="453" style="font-size:14px">Coordination store &amp; kill switch</text>
-            <text class="t-s" x="32" y="472" style="font-size:12px">Kill switch (operator) · storm count → pause</text>
-            <text class="t-s" x="32" y="490" style="font-size:12px">One row per case: state, lock, lease, fence</text>
-            <text class="t-s" x="32" y="508" style="font-size:12px">Duplicate or finished case → skip + ack</text>
+            <text class="t-b" x="32" y="453" style="font-size:15.8px">Coordination store &amp; kill switch</text>
+            <text class="t-s" x="32" y="472" style="font-size:13.4px">Kill switch (operator) · storm count → pause</text>
+            <text class="t-s" x="32" y="490" style="font-size:13.4px">One row per case: state, lock, lease, fence</text>
+            <text class="t-s" x="32" y="508" style="font-size:13.4px">Duplicate or finished case → skip + ack</text>
           </g>
           <g class="stg-prev">
             <rect class="b-model" x="228" y="266" width="204" height="108" rx="8"/>
-            <text class="t-b" x="330" y="294" text-anchor="middle" style="font-size:14px">Agent 1 · Detect</text>
-            <text class="t-s" x="330" y="316" text-anchor="middle" style="font-size:12px">still an unsplit</text>
-            <text class="t-s" x="330" y="335" text-anchor="middle" style="font-size:12px">black-box agent</text>
+            <text class="t-b" x="330" y="294" text-anchor="middle" style="font-size:15.8px">Agent 1 · Detect</text>
+            <text class="t-s" x="330" y="316" text-anchor="middle" style="font-size:13.4px">still an unsplit</text>
+            <text class="t-s" x="330" y="335" text-anchor="middle" style="font-size:13.4px">black-box agent</text>
             <path class="flow" d="M432 320 H492" marker-end="url(#ps3-ink)"/>
             <rect class="b-model" x="496" y="266" width="214" height="108" rx="8"/>
-            <text class="t-b" x="603" y="294" text-anchor="middle" style="font-size:14px">Agent 2 · Suggest fix</text>
-            <text class="t-s" x="603" y="316" text-anchor="middle" style="font-size:12px">still an unsplit</text>
-            <text class="t-s" x="603" y="335" text-anchor="middle" style="font-size:12px">black-box agent</text>
+            <text class="t-b" x="603" y="294" text-anchor="middle" style="font-size:15.8px">Agent 2 · Suggest fix</text>
+            <text class="t-s" x="603" y="316" text-anchor="middle" style="font-size:13.4px">still an unsplit</text>
+            <text class="t-s" x="603" y="335" text-anchor="middle" style="font-size:13.4px">black-box agent</text>
             <path class="flow" d="M710 320 H770" marker-end="url(#ps3-ink)"/>
             <rect class="b-model" x="774" y="266" width="204" height="108" rx="8"/>
-            <text class="t-b" x="876" y="294" text-anchor="middle" style="font-size:14px">Agent 3 · Open PR</text>
-            <text class="t-s" x="876" y="316" text-anchor="middle" style="font-size:12px">still an unsplit</text>
-            <text class="t-s" x="876" y="335" text-anchor="middle" style="font-size:12px">black-box agent</text>
+            <text class="t-b" x="876" y="294" text-anchor="middle" style="font-size:15.8px">Agent 3 · Open PR</text>
+            <text class="t-s" x="876" y="316" text-anchor="middle" style="font-size:13.4px">still an unsplit</text>
+            <text class="t-s" x="876" y="335" text-anchor="middle" style="font-size:13.4px">black-box agent</text>
             <path class="flow" d="M978 320 H1010" marker-end="url(#ps3-ink)"/>
             <rect class="b-ext" x="1014" y="266" width="166" height="108" rx="8"/>
-            <text class="t-b" x="1097" y="294" text-anchor="middle" style="font-size:14px">Repo</text>
-            <text class="t-s" x="1097" y="316" text-anchor="middle" style="font-size:12px">pull request</text>
+            <text class="t-b" x="1097" y="294" text-anchor="middle" style="font-size:15.8px">Repo</text>
+            <text class="t-s" x="1097" y="316" text-anchor="middle" style="font-size:13.4px">pull request</text>
           </g>
           <g class="stg-prev">
-            <text class="t-s" x="1180" y="186" text-anchor="end" style="font-size:12px">agent path: repair, minutes, asynchronous</text>
-            <text class="t-s" x="1180" y="204" text-anchor="end" style="font-size:12px">real load = volume × filter rate</text>
-            <text class="t-s" x="1180" y="222" text-anchor="end" style="font-size:12px">step and cost cap per case</text>
+            <text class="t-s" x="1180" y="186" text-anchor="end" style="font-size:13.4px">agent path: repair, minutes, asynchronous</text>
+            <text class="t-s" x="1180" y="204" text-anchor="end" style="font-size:13.4px">real load = volume × filter rate</text>
+            <text class="t-s" x="1180" y="222" text-anchor="end" style="font-size:13.4px">step and cost cap per case</text>
           </g>
         </svg>
-        <div class="fig-caption"><span>Figure 4 — Stage 3 of 6 (Q5–Q8): Dispatcher guard, storm breaker, kill switch, and expiring case lease added.</span>
+        <div class="fig-caption"><span>Figure 4 — Stage 3 · Coordination and Recovery: Dispatcher guard, storm breaker, kill switch, and expiring case lease added.</span>
           <div class="legend-items"><span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good);border-width:2.2px;box-shadow:0 0 5px var(--good)"></i> <b>Bold glow = Added in this stage</b></span><span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good)"></i> Plain code</span><span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> Unexamined black-box agent</span><span><i class="swatch-dot" style="background:var(--amber-soft);border-color:var(--amber)"></i> Queue / store</span></div>
         </div>
       </div>
@@ -1306,8 +1340,8 @@
   <section class="sheet" id="stage-4">
     <div class="sheet-h">
       <div>
-        <span class="sec-badge">Stage 4 of 6 · Question 9 · Autonomy Split, Dual-LLM &amp; Harness</span>
-        <h2>Open the Black Boxes: Dual-LLM Separation, Verifier, and Plain-Code Gate</h2>
+        <span class="sec-badge">Inside the Worker &amp; Rollout</span>
+        <h2>Stage 4 · Opening the Black Boxes</h2>
         <p>Give every step the lowest autonomy that works, separate untrusted reading from tool use, and wire control flow in code.</p>
       </div>
     </div>
@@ -1343,10 +1377,12 @@
       </div>
 
       <div class="post-prose">
-        <p>The <a href="#appendix-adk">appendix</a> sketches this graph in code with ADK 2.x.</p>
+        <p>
+          <a href="#fig-s4"><em>Figure 5</em></a> opens the three purple black boxes inside one deterministic worker harness. <strong>Agent 1</strong> becomes a single-call toolless <strong>Quarantined LLM</strong> where raw untrusted log text stops; <strong>Agent 2</strong> becomes the bounded <strong>Privileged LLM</strong> tool loop; a plain-code <strong>Verifier</strong> steps between Agent 2 and the output to run an independent test suite on the candidate patch; and <strong>Agent 3</strong> turns green as a plain-code <strong>Act gate</strong> holding the repository token. The <a href="#appendix-adk">appendix</a> sketches this graph in code with ADK 2.x.
+        </p>
       </div>
       <div class="diagram-frame" id="fig-s4">
-        <svg viewBox="0 0 1200 546" role="img" aria-label="Figure 5 — Stage 4 of 6 (Q9): Black boxes split into Quarantined LLM, Privileged LLM, plain-code Verifier, and Act gate.">
+        <svg viewBox="0 0 1200 546" role="img" aria-label="Figure 5 — Stage 4 · Opening the Black Boxes: Black boxes split into Quarantined LLM, Privileged LLM, plain-code Verifier, and Act gate.">
           <defs>
             <marker id="ps4-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--ink)"/></marker>
             <marker id="ps4-mut" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--muted)"/></marker>
@@ -1356,98 +1392,98 @@
           </defs>
           <g class="stg-prev">
             <rect class="b-ext" x="20" y="66" width="170" height="92" rx="7"/>
-            <text class="t-b" x="32" y="90" style="font-size:14px">Triggers</text>
-            <text class="t-s" x="32" y="111" style="font-size:12.5px">events, alerts, users</text>
-            <text class="t-s" x="32" y="130" style="font-size:12px">pointer to raw data</text>
+            <text class="t-b" x="32" y="90" style="font-size:15.8px">Triggers</text>
+            <text class="t-s" x="32" y="111" style="font-size:14px">events, alerts, users</text>
+            <text class="t-s" x="32" y="130" style="font-size:13.4px">pointer to raw data</text>
             <rect class="b-ext" x="760" y="66" width="420" height="92" rx="7"/>
-            <text class="t-b" x="774" y="90" style="font-size:14px">Fast path · existing control · no model</text>
-            <text class="t-s" x="774" y="112" style="font-size:12.5px">rollback, block, drain, fall back</text>
-            <text class="t-s" x="774" y="134" style="font-size:12px">contains live impact in seconds, before agents run</text>
+            <text class="t-b" x="774" y="90" style="font-size:15.8px">Fast path · existing control · no model</text>
+            <text class="t-s" x="774" y="112" style="font-size:14px">rollback, block, drain, fall back</text>
+            <text class="t-s" x="774" y="134" style="font-size:13.4px">contains live impact in seconds, before agents run</text>
             <path class="flow-g" d="M105 66 V32 H970 V62" marker-end="url(#ps4-good)"/>
-            <text class="t-b t-c" x="540" y="24" style="font-size:13.5px">if something is on fire right now (seconds)</text>
+            <text class="t-b t-c" x="540" y="24" style="font-size:15.2px">if something is on fire right now (seconds)</text>
           </g>
           <g class="stg-prev">
             <rect class="b-code" x="236" y="66" width="184" height="92" rx="7"/>
-            <text class="t-b" x="248" y="90" style="font-size:14px">Ingress / Receiver</text>
-            <text class="t-s" x="248" y="110" style="font-size:12px">authenticate, filter,</text>
-            <text class="t-s" x="248" y="127" style="font-size:12px">fingerprint, reply 200</text>
-            <text class="t-s" x="248" y="144" style="font-size:11.5px">stateless receiver</text>
+            <text class="t-b" x="248" y="90" style="font-size:15.8px">Ingress / Receiver</text>
+            <text class="t-s" x="248" y="110" style="font-size:13.4px">authenticate, filter,</text>
+            <text class="t-s" x="248" y="127" style="font-size:13.4px">fingerprint, reply 200</text>
+            <text class="t-s" x="248" y="144" style="font-size:13px">stateless receiver</text>
             <rect class="b-store" x="466" y="66" width="174" height="92" rx="7"/>
-            <text class="t-b" x="478" y="90" style="font-size:14px">Queue</text>
-            <text class="t-s" x="478" y="110" style="font-size:12px">holds work until ack,</text>
-            <text class="t-s" x="478" y="127" style="font-size:12px">backoff + dead-letter</text>
-            <text class="t-s" x="478" y="144" style="font-size:11.5px">durable queue</text>
+            <text class="t-b" x="478" y="90" style="font-size:15.8px">Queue</text>
+            <text class="t-s" x="478" y="110" style="font-size:13.4px">holds work until ack,</text>
+            <text class="t-s" x="478" y="127" style="font-size:13.4px">backoff + dead-letter</text>
+            <text class="t-s" x="478" y="144" style="font-size:13px">durable queue</text>
             <path class="flow" d="M190 112 H232" marker-end="url(#ps4-ink)"/>
             <path class="flow" d="M420 112 H462" marker-end="url(#ps4-ink)"/>
             <path class="flow" d="M540 158 V210 H104 V262" marker-end="url(#ps4-ink)"/>
-            <text class="t-s t-c" x="322" y="201" style="font-size:12px">worker pulls one item</text>
+            <text class="t-s t-c" x="322" y="201" style="font-size:13.4px">worker pulls one item</text>
             <path class="flow-d" d="M907 266 V204 H596 V162" marker-end="url(#ps4-mut)"/>
-            <text class="t-s t-c" x="752" y="195" style="font-size:12px">ack at terminal exit</text>
+            <text class="t-s t-c" x="752" y="195" style="font-size:13.4px">ack at terminal exit</text>
           </g>
           <g class="stg-prev">
             <rect class="b-code" x="20" y="266" width="164" height="108" rx="8"/>
-            <text class="t-b" x="102" y="290" text-anchor="middle" style="font-size:14px">Dispatcher / Guard</text>
-            <text class="t-m-g" x="102" y="309" text-anchor="middle" style="font-size:10.5px">PLAIN CODE</text>
-            <text class="t-s" x="102" y="327" text-anchor="middle" style="font-size:12px">kill switch &amp; storm,</text>
-            <text class="t-s" x="102" y="343" text-anchor="middle" style="font-size:12px">claims 120s lease</text>
+            <text class="t-b" x="102" y="290" text-anchor="middle" style="font-size:15.8px">Dispatcher / Guard</text>
+            <text class="t-m-g" x="102" y="309" text-anchor="middle" style="font-size:11.8px">PLAIN CODE</text>
+            <text class="t-s" x="102" y="327" text-anchor="middle" style="font-size:13.4px">kill switch &amp; storm,</text>
+            <text class="t-s" x="102" y="343" text-anchor="middle" style="font-size:13.4px">claims 120s lease</text>
             <path class="flow" d="M184 320 H204" marker-end="url(#ps4-ink)"/>
           </g>
           <g class="stg-new">
             <rect class="b-model" x="208" y="266" width="174" height="108" rx="8"/>
-            <text class="t-b" x="295" y="290" text-anchor="middle" style="font-size:14px">Quarantined LLM</text>
+            <text class="t-b" x="295" y="290" text-anchor="middle" style="font-size:15.8px">Quarantined LLM</text>
             <text class="t-m-v" x="295" y="309" text-anchor="middle">AGENT 1 · NO TOOLS</text>
-            <text class="t-s" x="295" y="327" text-anchor="middle" style="font-size:12px">1 call, fixed schema</text>
-            <text class="t-s" x="295" y="343" text-anchor="middle" style="font-size:11.5px">untrusted text stops</text>
+            <text class="t-s" x="295" y="327" text-anchor="middle" style="font-size:13.4px">1 call, fixed schema</text>
+            <text class="t-s" x="295" y="343" text-anchor="middle" style="font-size:13px">untrusted text stops</text>
             <path class="flow" d="M382 320 H412" marker-end="url(#ps4-ink)"/>
 
             <rect class="b-model" x="416" y="266" width="178" height="108" rx="8"/>
-            <text class="t-b" x="505" y="290" text-anchor="middle" style="font-size:14px">Privileged LLM</text>
+            <text class="t-b" x="505" y="290" text-anchor="middle" style="font-size:15.8px">Privileged LLM</text>
             <text class="t-m-v" x="505" y="309" text-anchor="middle">AGENT 2 · TOOL LOOP</text>
-            <text class="t-s" x="505" y="327" text-anchor="middle" style="font-size:12px">bounded steps &amp; time</text>
-            <text class="t-s" x="505" y="343" text-anchor="middle" style="font-size:11.5px">no raw logs, no keys</text>
+            <text class="t-s" x="505" y="327" text-anchor="middle" style="font-size:13.4px">bounded steps &amp; time</text>
+            <text class="t-s" x="505" y="343" text-anchor="middle" style="font-size:13px">no raw logs, no keys</text>
             <path class="flow" d="M594 320 H614" marker-end="url(#ps4-ink)"/>
 
             <rect class="b-code" x="618" y="266" width="174" height="108" rx="8"/>
-            <text class="t-b" x="705" y="290" text-anchor="middle" style="font-size:14px">Verifier</text>
-            <text class="t-m-g" x="705" y="309" text-anchor="middle" style="font-size:10.5px">PLAIN CODE · NO LLM</text>
-            <text class="t-s" x="705" y="327" text-anchor="middle" style="font-size:12px">independent re-check,</text>
-            <text class="t-s" x="705" y="343" text-anchor="middle" style="font-size:11.5px">policy &amp; retry counter</text>
+            <text class="t-b" x="705" y="290" text-anchor="middle" style="font-size:15.8px">Verifier</text>
+            <text class="t-m-g" x="705" y="309" text-anchor="middle" style="font-size:11.8px">PLAIN CODE · NO LLM</text>
+            <text class="t-s" x="705" y="327" text-anchor="middle" style="font-size:13.4px">independent re-check,</text>
+            <text class="t-s" x="705" y="343" text-anchor="middle" style="font-size:13px">policy &amp; retry counter</text>
 
             <path class="flow-g" d="M792 320 H822" marker-end="url(#ps4-good)"/>
-            <text class="t-m-g" x="807" y="311" text-anchor="middle" style="font-size:10px">PASS</text>
+            <text class="t-m-g" x="807" y="311" text-anchor="middle" style="font-size:11.2px">PASS</text>
 
             <rect class="b-code" x="826" y="266" width="162" height="108" rx="8"/>
-            <text class="t-b" x="907" y="290" text-anchor="middle" style="font-size:14px">Act gate</text>
-            <text class="t-m-g" x="907" y="309" text-anchor="middle" style="font-size:10.5px">AGENT 3 · PLAIN CODE</text>
-            <text class="t-s" x="907" y="327" text-anchor="middle" style="font-size:12px">fencing + narrow key</text>
-            <text class="t-s" x="907" y="343" text-anchor="middle" style="font-size:11.5px">idempotent write + ack</text>
+            <text class="t-b" x="907" y="290" text-anchor="middle" style="font-size:15.8px">Act gate</text>
+            <text class="t-m-g" x="907" y="309" text-anchor="middle" style="font-size:11.8px">AGENT 3 · PLAIN CODE</text>
+            <text class="t-s" x="907" y="327" text-anchor="middle" style="font-size:13.4px">fencing + narrow key</text>
+            <text class="t-s" x="907" y="343" text-anchor="middle" style="font-size:13px">idempotent write + ack</text>
             <path class="flow" d="M988 320 H1010" marker-end="url(#ps4-ink)"/>
           </g>
           <g class="stg-prev">
             <rect class="b-ext" x="1014" y="266" width="168" height="108" rx="8"/>
-            <text class="t-b" x="1098" y="294" text-anchor="middle" style="font-size:14px">Repo</text>
-            <text class="t-s" x="1098" y="316" text-anchor="middle" style="font-size:12px">pull request</text>
+            <text class="t-b" x="1098" y="294" text-anchor="middle" style="font-size:15.8px">Repo</text>
+            <text class="t-s" x="1098" y="316" text-anchor="middle" style="font-size:13.4px">pull request</text>
           </g>
           <g class="stg-prev">
             <path class="flow-d" d="M102 374 V430" marker-end="url(#ps4-mut)"/>
             <path class="flow-d" d="M860 374 V412 H102"/>
             <rect class="b-store" x="20" y="434" width="336" height="88" rx="7"/>
-            <text class="t-b" x="32" y="456" style="font-size:14px">Coordination store &amp; kill switch</text>
-            <text class="t-s" x="32" y="475" style="font-size:12px">Kill switch (operator) · storm count → pause</text>
-            <text class="t-s" x="32" y="492" style="font-size:12px">One row per case: state, lock, lease, fence</text>
-            <text class="t-s" x="32" y="509" style="font-size:12px">Duplicate or finished case → skip + ack</text>
+            <text class="t-b" x="32" y="456" style="font-size:15.8px">Coordination store &amp; kill switch</text>
+            <text class="t-s" x="32" y="475" style="font-size:13.4px">Kill switch (operator) · storm count → pause</text>
+            <text class="t-s" x="32" y="492" style="font-size:13.4px">One row per case: state, lock, lease, fence</text>
+            <text class="t-s" x="32" y="509" style="font-size:13.4px">Duplicate or finished case → skip + ack</text>
           </g>
           <g class="stg-new">
             <rect class="zone-ours" x="8" y="240" width="990" height="294" rx="10"/>
             <text class="zl" x="208" y="257">ONE WORKER SERVICE · DETERMINISTIC HARNESS AROUND THE MODELS</text>
           </g>
           <g class="stg-prev">
-            <text class="t-s" x="1180" y="186" text-anchor="end" style="font-size:12px">agent path: repair, minutes, asynchronous</text>
-            <text class="t-s" x="1180" y="204" text-anchor="end" style="font-size:12px">real load = volume × filter rate</text>
-            <text class="t-s" x="1180" y="222" text-anchor="end" style="font-size:12px">step and cost cap per case</text>
+            <text class="t-s" x="1180" y="186" text-anchor="end" style="font-size:13.4px">agent path: repair, minutes, asynchronous</text>
+            <text class="t-s" x="1180" y="204" text-anchor="end" style="font-size:13.4px">real load = volume × filter rate</text>
+            <text class="t-s" x="1180" y="222" text-anchor="end" style="font-size:13.4px">step and cost cap per case</text>
           </g>
         </svg>
-        <div class="fig-caption"><span>Figure 5 — Stage 4 of 6 (Q9): Black boxes split into Quarantined LLM, Privileged LLM, plain-code Verifier, and Act gate.</span>
+        <div class="fig-caption"><span>Figure 5 — Stage 4 · Opening the Black Boxes: Black boxes split into Quarantined LLM, Privileged LLM, plain-code Verifier, and Act gate.</span>
           <div class="legend-items"><span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good);border-width:2.2px;box-shadow:0 0 5px var(--good)"></i> <b>Bold glow = Added in this stage</b></span><span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good)"></i> Plain code</span><span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> LLM step</span><span><i class="swatch-dot" style="background:var(--amber-soft);border-color:var(--amber)"></i> Queue / store</span></div>
         </div>
       </div>
@@ -1460,8 +1496,8 @@
   <section class="sheet" id="stage-5">
     <div class="sheet-h">
       <div>
-        <span class="sec-badge">Stage 5 of 6 · Questions 10–11 · Typed Handoffs, Retries &amp; State</span>
-        <h2>Define Typed Handover Artifacts, Bounded Retries, and Memory Ownership</h2>
+        <span class="sec-badge">Inside the Worker &amp; Rollout</span>
+        <h2>Stage 5 · Handoffs and State</h2>
         <p>Pass small validated schemas between steps, cap retries, escalate cleanly, and keep long-term memory writes in code.</p>
       </div>
     </div>
@@ -1576,8 +1612,13 @@
           </table>
         </div>
       </div>
+      <div class="post-prose" style="margin-top:18px;">
+        <p>
+          <a href="#fig-s5"><em>Figure 6</em></a> wires those contracts and state rules onto the graph: each step emits a named schema (<code>→ FailureEvent</code>, <code>→ IncidentReport</code>, <code>→ ProposedPatch</code>, <code>→ Draft PR</code>) with shared chat history disabled, the Verifier gains its bounded <code>RETRY (&lt; N)</code> back-edge to Agent 2 and <code>ESCALATE to person</code> exit, and <strong>Session, blobs &amp; memory</strong> sit alongside the coordination database under code-owned write boundaries.
+        </p>
+      </div>
       <div class="diagram-frame" id="fig-s5">
-        <svg viewBox="0 0 1200 596" role="img" aria-label="Figure 6 — Stage 5 of 6 (Q10–Q11): Typed handoff artifacts, bounded retry (< N), human escalation, and session/memory stores.">
+        <svg viewBox="0 0 1200 596" role="img" aria-label="Figure 6 — Stage 5 · Handoffs and State: Typed handoff artifacts, bounded retry (< N), human escalation, and session/memory stores.">
           <defs>
             <marker id="ps5-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--ink)"/></marker>
             <marker id="ps5-mut" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--muted)"/></marker>
@@ -1587,40 +1628,40 @@
           </defs>
           <g class="stg-prev">
             <rect class="b-ext" x="20" y="66" width="170" height="92" rx="7"/>
-            <text class="t-b" x="32" y="90" style="font-size:14px">Triggers</text>
-            <text class="t-s" x="32" y="111" style="font-size:12.5px">events, alerts, users</text>
-            <text class="t-s" x="32" y="130" style="font-size:12px">pointer to raw data</text>
+            <text class="t-b" x="32" y="90" style="font-size:15.8px">Triggers</text>
+            <text class="t-s" x="32" y="111" style="font-size:14px">events, alerts, users</text>
+            <text class="t-s" x="32" y="130" style="font-size:13.4px">pointer to raw data</text>
             <rect class="b-ext" x="760" y="66" width="420" height="92" rx="7"/>
-            <text class="t-b" x="774" y="90" style="font-size:14px">Fast path · existing control · no model</text>
-            <text class="t-s" x="774" y="112" style="font-size:12.5px">rollback, block, drain, fall back</text>
-            <text class="t-s" x="774" y="134" style="font-size:12px">contains live impact in seconds, before agents run</text>
+            <text class="t-b" x="774" y="90" style="font-size:15.8px">Fast path · existing control · no model</text>
+            <text class="t-s" x="774" y="112" style="font-size:14px">rollback, block, drain, fall back</text>
+            <text class="t-s" x="774" y="134" style="font-size:13.4px">contains live impact in seconds, before agents run</text>
             <path class="flow-g" d="M105 66 V32 H970 V62" marker-end="url(#ps5-good)"/>
-            <text class="t-b t-c" x="540" y="24" style="font-size:13.5px">if something is on fire right now (seconds)</text>
+            <text class="t-b t-c" x="540" y="24" style="font-size:15.2px">if something is on fire right now (seconds)</text>
           </g>
           <g class="stg-prev">
             <rect class="b-code" x="236" y="66" width="184" height="92" rx="7"/>
-            <text class="t-b" x="248" y="90" style="font-size:14px">Ingress / Receiver</text>
-            <text class="t-s" x="248" y="110" style="font-size:12px">authenticate, filter,</text>
-            <text class="t-s" x="248" y="127" style="font-size:12px">fingerprint, reply 200</text>
-            <text class="t-s" x="248" y="144" style="font-size:11.5px">stateless receiver</text>
+            <text class="t-b" x="248" y="90" style="font-size:15.8px">Ingress / Receiver</text>
+            <text class="t-s" x="248" y="110" style="font-size:13.4px">authenticate, filter,</text>
+            <text class="t-s" x="248" y="127" style="font-size:13.4px">fingerprint, reply 200</text>
+            <text class="t-s" x="248" y="144" style="font-size:13px">stateless receiver</text>
             <rect class="b-store" x="466" y="66" width="174" height="92" rx="7"/>
-            <text class="t-b" x="478" y="90" style="font-size:14px">Queue</text>
-            <text class="t-s" x="478" y="110" style="font-size:12px">holds work until ack,</text>
-            <text class="t-s" x="478" y="127" style="font-size:12px">backoff + dead-letter</text>
-            <text class="t-s" x="478" y="144" style="font-size:11.5px">durable queue</text>
+            <text class="t-b" x="478" y="90" style="font-size:15.8px">Queue</text>
+            <text class="t-s" x="478" y="110" style="font-size:13.4px">holds work until ack,</text>
+            <text class="t-s" x="478" y="127" style="font-size:13.4px">backoff + dead-letter</text>
+            <text class="t-s" x="478" y="144" style="font-size:13px">durable queue</text>
             <path class="flow" d="M190 112 H232" marker-end="url(#ps5-ink)"/>
             <path class="flow" d="M420 112 H462" marker-end="url(#ps5-ink)"/>
             <path class="flow" d="M540 158 V210 H104 V262" marker-end="url(#ps5-ink)"/>
-            <text class="t-s t-c" x="322" y="201" style="font-size:12px">worker pulls one item</text>
+            <text class="t-s t-c" x="322" y="201" style="font-size:13.4px">worker pulls one item</text>
             <path class="flow-d" d="M907 266 V204 H596 V162" marker-end="url(#ps5-mut)"/>
-            <text class="t-s t-c" x="752" y="195" style="font-size:12px">ack at terminal exit</text>
+            <text class="t-s t-c" x="752" y="195" style="font-size:13.4px">ack at terminal exit</text>
           </g>
           <g class="stg-prev">
             <rect class="b-code" x="20" y="266" width="164" height="108" rx="8"/>
-            <text class="t-b" x="102" y="290" text-anchor="middle" style="font-size:14px">Dispatcher / Guard</text>
-            <text class="t-m-g" x="102" y="309" text-anchor="middle" style="font-size:10.5px">PLAIN CODE</text>
-            <text class="t-s" x="102" y="327" text-anchor="middle" style="font-size:12px">kill switch &amp; storm,</text>
-            <text class="t-s" x="102" y="343" text-anchor="middle" style="font-size:12px">claims 120s lease</text>
+            <text class="t-b" x="102" y="290" text-anchor="middle" style="font-size:15.8px">Dispatcher / Guard</text>
+            <text class="t-m-g" x="102" y="309" text-anchor="middle" style="font-size:11.8px">PLAIN CODE</text>
+            <text class="t-s" x="102" y="327" text-anchor="middle" style="font-size:13.4px">kill switch &amp; storm,</text>
+            <text class="t-s" x="102" y="343" text-anchor="middle" style="font-size:13.4px">claims 120s lease</text>
             <path class="flow" d="M184 320 H204" marker-end="url(#ps5-ink)"/>
           </g>
           <g class="stg-new">
@@ -1629,84 +1670,84 @@
           </g>
           <g class="stg-prev">
             <rect class="b-model" x="208" y="266" width="174" height="108" rx="8"/>
-            <text class="t-b" x="295" y="290" text-anchor="middle" style="font-size:14px">Quarantined LLM</text>
+            <text class="t-b" x="295" y="290" text-anchor="middle" style="font-size:15.8px">Quarantined LLM</text>
             <text class="t-m-v" x="295" y="309" text-anchor="middle">AGENT 1 · NO TOOLS</text>
-            <text class="t-s" x="295" y="327" text-anchor="middle" style="font-size:12px">1 call, fixed schema</text>
-            <text class="t-s" x="295" y="343" text-anchor="middle" style="font-size:11.5px">untrusted text stops</text>
+            <text class="t-s" x="295" y="327" text-anchor="middle" style="font-size:13.4px">1 call, fixed schema</text>
+            <text class="t-s" x="295" y="343" text-anchor="middle" style="font-size:13px">untrusted text stops</text>
             <path class="flow" d="M382 320 H412" marker-end="url(#ps5-ink)"/>
 
             <rect class="b-model" x="416" y="266" width="178" height="108" rx="8"/>
-            <text class="t-b" x="505" y="290" text-anchor="middle" style="font-size:14px">Privileged LLM</text>
+            <text class="t-b" x="505" y="290" text-anchor="middle" style="font-size:15.8px">Privileged LLM</text>
             <text class="t-m-v" x="505" y="309" text-anchor="middle">AGENT 2 · TOOL LOOP</text>
-            <text class="t-s" x="505" y="327" text-anchor="middle" style="font-size:12px">bounded steps &amp; time</text>
-            <text class="t-s" x="505" y="343" text-anchor="middle" style="font-size:11.5px">no raw logs, no keys</text>
+            <text class="t-s" x="505" y="327" text-anchor="middle" style="font-size:13.4px">bounded steps &amp; time</text>
+            <text class="t-s" x="505" y="343" text-anchor="middle" style="font-size:13px">no raw logs, no keys</text>
             <path class="flow" d="M594 320 H614" marker-end="url(#ps5-ink)"/>
 
             <rect class="b-code" x="618" y="266" width="174" height="108" rx="8"/>
-            <text class="t-b" x="705" y="290" text-anchor="middle" style="font-size:14px">Verifier</text>
-            <text class="t-m-g" x="705" y="309" text-anchor="middle" style="font-size:10.5px">PLAIN CODE · NO LLM</text>
-            <text class="t-s" x="705" y="327" text-anchor="middle" style="font-size:12px">independent re-check,</text>
-            <text class="t-s" x="705" y="343" text-anchor="middle" style="font-size:11.5px">policy &amp; retry counter</text>
+            <text class="t-b" x="705" y="290" text-anchor="middle" style="font-size:15.8px">Verifier</text>
+            <text class="t-m-g" x="705" y="309" text-anchor="middle" style="font-size:11.8px">PLAIN CODE · NO LLM</text>
+            <text class="t-s" x="705" y="327" text-anchor="middle" style="font-size:13.4px">independent re-check,</text>
+            <text class="t-s" x="705" y="343" text-anchor="middle" style="font-size:13px">policy &amp; retry counter</text>
 
             <path class="flow-g" d="M792 320 H822" marker-end="url(#ps5-good)"/>
-            <text class="t-m-g" x="807" y="311" text-anchor="middle" style="font-size:10px">PASS</text>
+            <text class="t-m-g" x="807" y="311" text-anchor="middle" style="font-size:11.2px">PASS</text>
 
             <rect class="b-code" x="826" y="266" width="162" height="108" rx="8"/>
-            <text class="t-b" x="907" y="290" text-anchor="middle" style="font-size:14px">Act gate</text>
-            <text class="t-m-g" x="907" y="309" text-anchor="middle" style="font-size:10.5px">AGENT 3 · PLAIN CODE</text>
-            <text class="t-s" x="907" y="327" text-anchor="middle" style="font-size:12px">fencing + narrow key</text>
-            <text class="t-s" x="907" y="343" text-anchor="middle" style="font-size:11.5px">idempotent write + ack</text>
+            <text class="t-b" x="907" y="290" text-anchor="middle" style="font-size:15.8px">Act gate</text>
+            <text class="t-m-g" x="907" y="309" text-anchor="middle" style="font-size:11.8px">AGENT 3 · PLAIN CODE</text>
+            <text class="t-s" x="907" y="327" text-anchor="middle" style="font-size:13.4px">fencing + narrow key</text>
+            <text class="t-s" x="907" y="343" text-anchor="middle" style="font-size:13px">idempotent write + ack</text>
             <path class="flow" d="M988 320 H1010" marker-end="url(#ps5-ink)"/>
           </g>
           <g class="stg-new">
 
             <text class="t-m-g" x="295" y="360" text-anchor="middle">→ IncidentReport</text>
             <text class="t-m-g" x="505" y="360" text-anchor="middle">→ ProposedPatch</text>
-            <text class="t-m-g" x="705" y="360" text-anchor="middle" style="font-size:10.5px">PASS · RETRY · ESCALATE</text>
+            <text class="t-m-g" x="705" y="360" text-anchor="middle" style="font-size:11.8px">PASS · RETRY · ESCALATE</text>
             <text class="t-m-g" x="907" y="360" text-anchor="middle">→ Draft PR</text>
           </g>
           <g class="stg-prev">
             <rect class="b-ext" x="1014" y="266" width="168" height="108" rx="8"/>
-            <text class="t-b" x="1098" y="294" text-anchor="middle" style="font-size:14px">Repo</text>
-            <text class="t-s" x="1098" y="316" text-anchor="middle" style="font-size:12px">pull request</text>
+            <text class="t-b" x="1098" y="294" text-anchor="middle" style="font-size:15.8px">Repo</text>
+            <text class="t-s" x="1098" y="316" text-anchor="middle" style="font-size:13.4px">pull request</text>
           </g>
           <g class="stg-prev">
             <path class="flow-d" d="M102 374 V482" marker-end="url(#ps5-mut)"/>
             <rect class="b-store" x="20" y="486" width="308" height="88" rx="7"/>
-            <text class="t-b" x="32" y="508" style="font-size:14px">Coordination store &amp; kill switch</text>
-            <text class="t-s" x="32" y="527" style="font-size:12px">Kill switch (operator) · storm count → pause</text>
-            <text class="t-s" x="32" y="544" style="font-size:12px">One row per case: state, lock, lease, fence</text>
-            <text class="t-s" x="32" y="561" style="font-size:12px">Duplicate or finished case → skip + ack</text>
+            <text class="t-b" x="32" y="508" style="font-size:15.8px">Coordination store &amp; kill switch</text>
+            <text class="t-s" x="32" y="527" style="font-size:13.4px">Kill switch (operator) · storm count → pause</text>
+            <text class="t-s" x="32" y="544" style="font-size:13.4px">One row per case: state, lock, lease, fence</text>
+            <text class="t-s" x="32" y="561" style="font-size:13.4px">Duplicate or finished case → skip + ack</text>
           </g>
           <g class="stg-new">
             <path d="M705 374 V432 H398 V342 H412" style="fill:none;stroke:var(--stop);stroke-width:1.9;stroke-dasharray:5 4" marker-end="url(#ps5-stop)"/>
             <text class="t-m-r" x="552" y="448" text-anchor="middle">RETRY (&lt; N) · truncated failure output</text>
             <path d="M776 374 V414 H1010" style="fill:none;stroke:var(--ink);stroke-width:1.7" marker-end="url(#ps5-ink)"/>
             <rect class="b-ext" x="1014" y="388" width="168" height="58" rx="8"/>
-            <text class="t-b" x="1098" y="411" text-anchor="middle" style="font-size:13px">ESCALATE to person</text>
-            <text class="t-s" x="1098" y="431" text-anchor="middle" style="font-size:11px">≥ N tries, policy, flaky</text>
+            <text class="t-b" x="1098" y="411" text-anchor="middle" style="font-size:14.6px">ESCALATE to person</text>
+            <text class="t-s" x="1098" y="431" text-anchor="middle" style="font-size:12.6px">≥ N tries, policy, flaky</text>
             <path class="flow-d" d="M356 374 V482" marker-end="url(#ps5-mut)"/>
             <rect class="b-store" x="342" y="486" width="324" height="88" rx="7"/>
-            <text class="t-b" x="354" y="508" style="font-size:14px">Session, blobs &amp; memory</text>
-            <text class="t-s" x="354" y="527" style="font-size:12px">Per-run workflow state &amp; blob pointers</text>
-            <text class="t-s" x="354" y="544" style="font-size:12px">Approved past cases (read-only in run)</text>
-            <text class="t-s" x="354" y="561" style="font-size:12px">Memory written by code after approval</text>
+            <text class="t-b" x="354" y="508" style="font-size:15.8px">Session, blobs &amp; memory</text>
+            <text class="t-s" x="354" y="527" style="font-size:13.4px">Per-run workflow state &amp; blob pointers</text>
+            <text class="t-s" x="354" y="544" style="font-size:13.4px">Approved past cases (read-only in run)</text>
+            <text class="t-s" x="354" y="561" style="font-size:13.4px">Memory written by code after approval</text>
           </g>
           <g class="stg-prev">
             <rect class="zone-ours" x="8" y="240" width="990" height="346" rx="10"/>
             <text class="zl" x="208" y="257">ONE WORKER SERVICE · DETERMINISTIC HARNESS AROUND THE MODELS</text>
           </g>
           <g class="stg-prev">
-            <text class="t-s" x="1180" y="186" text-anchor="end" style="font-size:12px">agent path: repair, minutes, asynchronous</text>
-            <text class="t-s" x="1180" y="204" text-anchor="end" style="font-size:12px">real load = volume × filter rate</text>
-            <text class="t-s" x="1180" y="222" text-anchor="end" style="font-size:12px">step and cost cap per case</text>
+            <text class="t-s" x="1180" y="186" text-anchor="end" style="font-size:13.4px">agent path: repair, minutes, asynchronous</text>
+            <text class="t-s" x="1180" y="204" text-anchor="end" style="font-size:13.4px">real load = volume × filter rate</text>
+            <text class="t-s" x="1180" y="222" text-anchor="end" style="font-size:13.4px">step and cost cap per case</text>
           </g>
           <g class="stg-new">
-            <text class="t-s" x="346" y="420" text-anchor="end" style="font-size:12px">no shared chat history</text>
-            <text class="t-s" x="346" y="438" text-anchor="end" style="font-size:12px">bounded reads by pointer</text>
+            <text class="t-s" x="346" y="420" text-anchor="end" style="font-size:13.4px">no shared chat history</text>
+            <text class="t-s" x="346" y="438" text-anchor="end" style="font-size:13.4px">bounded reads by pointer</text>
           </g>
         </svg>
-        <div class="fig-caption"><span>Figure 6 — Stage 5 of 6 (Q10–Q11): Typed handoff artifacts, bounded retry (< N), human escalation, and session/memory stores.</span>
+        <div class="fig-caption"><span>Figure 6 — Stage 5 · Handoffs and State: Typed handoff artifacts, bounded retry (< N), human escalation, and session/memory stores.</span>
           <div class="legend-items"><span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good);border-width:2.2px;box-shadow:0 0 5px var(--good)"></i> <b>Bold glow = Added in this stage</b></span><span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good)"></i> Plain code</span><span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> LLM step</span><span><i class="swatch-dot" style="background:var(--amber-soft);border-color:var(--amber)"></i> Queue / store</span></div>
         </div>
       </div>
@@ -1719,8 +1760,8 @@
   <section class="sheet" id="stage-6">
     <div class="sheet-h">
       <div>
-        <span class="sec-badge">Stage 6 of 6 · Questions 12–13 · Security Isolation, Rollout &amp; Completed Skeleton</span>
-        <h2>Isolate Code Execution, Gate Writes, and Measure Rollout</h2>
+        <span class="sec-badge">Inside the Worker &amp; Rollout</span>
+        <h2>Stage 6 · Isolation and Rollout</h2>
         <p>Put untrusted execution in credential-free sandboxes, keep a human on irreversible writes, and gate every change with offline and online evals.</p>
       </div>
     </div>
@@ -1728,7 +1769,7 @@
       <div class="beat">Where we are</div>
       <div class="post-prose">
         <p>
-          Running repository tests or model-written diffs inside the worker container would expose cloud identity and repository tokens to arbitrary code execution, and launching without replay metrics leaves engineers guessing whether the bot helps or creates noise. Adding isolated sandboxes (<code>Sandbox 1</code> and <code>Sandbox 2</code>), a human review loop, and the <strong>Audit and eval store</strong> in <a href="#fig-skeleton"><em>Figure 7</em></a> completes the reusable generic architecture.
+          Even with typed contracts and a plain-code verifier in <a href="#fig-s5"><em>Figure 6</em></a>, two production risks remain open. First, Agent 2's tools and the Verifier's test runner execute repository code and candidate diffs—running them inside the worker container would expose cloud workload credentials and GitHub write tokens to malicious test suites or prompt-injected patches. Second, switching an autonomous bot on without offline replay benchmarks and staged promotion leaves engineers blind to silent regressions until noisy pull requests erode trust. Questions 12 and 13 close execution isolation and launch governance.
         </p>
       </div>
       <div class="qb" id="q12" style="margin-top:20px;">
@@ -1779,8 +1820,13 @@
         </div>
       </div>
 
+      <div class="post-prose" style="margin-top:18px;">
+        <p>
+          <a href="#fig-skeleton"><em>Figure 7</em></a> completes the domain-neutral architecture: model calls and credentials remain on the worker while untrusted tool execution and clean-room verification dispatch downward into networkless, zero-credential <strong>Sandbox 1</strong> and <strong>Sandbox 2</strong>; the repository box becomes an explicit <strong>Human + record</strong> approval and telemetry gate; and every model turn, tool call, and verdict streams into the <strong>Audit and eval store</strong>.
+        </p>
+      </div>
       <div class="diagram-frame" id="fig-skeleton">
-        <svg viewBox="0 0 1200 608" role="img" aria-label="Figure 7 — Stage 6 of 6 (Q12–Q13): Isolated sandboxes, human gate, and audit/eval store complete the generic architecture.">
+        <svg viewBox="0 0 1200 608" role="img" aria-label="Figure 7 — Stage 6 · Isolation and Rollout: Isolated sandboxes, human gate, and audit/eval store complete the generic architecture.">
           <defs>
             <marker id="ps6-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--ink)"/></marker>
             <marker id="ps6-mut" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--muted)"/></marker>
@@ -1790,40 +1836,40 @@
           </defs>
           <g class="stg-prev">
             <rect class="b-ext" x="20" y="66" width="170" height="92" rx="7"/>
-            <text class="t-b" x="32" y="90" style="font-size:14px">Triggers</text>
-            <text class="t-s" x="32" y="111" style="font-size:12.5px">events, alerts, users</text>
-            <text class="t-s" x="32" y="130" style="font-size:12px">pointer to raw data</text>
+            <text class="t-b" x="32" y="90" style="font-size:15.8px">Triggers</text>
+            <text class="t-s" x="32" y="111" style="font-size:14px">events, alerts, users</text>
+            <text class="t-s" x="32" y="130" style="font-size:13.4px">pointer to raw data</text>
             <rect class="b-ext" x="760" y="66" width="420" height="92" rx="7"/>
-            <text class="t-b" x="774" y="90" style="font-size:14px">Fast path · existing control · no model</text>
-            <text class="t-s" x="774" y="112" style="font-size:12.5px">rollback, block, drain, fall back</text>
-            <text class="t-s" x="774" y="134" style="font-size:12px">contains live impact in seconds, before agents run</text>
+            <text class="t-b" x="774" y="90" style="font-size:15.8px">Fast path · existing control · no model</text>
+            <text class="t-s" x="774" y="112" style="font-size:14px">rollback, block, drain, fall back</text>
+            <text class="t-s" x="774" y="134" style="font-size:13.4px">contains live impact in seconds, before agents run</text>
             <path class="flow-g" d="M105 66 V32 H970 V62" marker-end="url(#ps6-good)"/>
-            <text class="t-b t-c" x="540" y="24" style="font-size:13.5px">if something is on fire right now (seconds)</text>
+            <text class="t-b t-c" x="540" y="24" style="font-size:15.2px">if something is on fire right now (seconds)</text>
           </g>
           <g class="stg-prev">
             <rect class="b-code" x="236" y="66" width="184" height="92" rx="7"/>
-            <text class="t-b" x="248" y="90" style="font-size:14px">Ingress / Receiver</text>
-            <text class="t-s" x="248" y="110" style="font-size:12px">authenticate, filter,</text>
-            <text class="t-s" x="248" y="127" style="font-size:12px">fingerprint, reply 200</text>
-            <text class="t-s" x="248" y="144" style="font-size:11.5px">stateless receiver</text>
+            <text class="t-b" x="248" y="90" style="font-size:15.8px">Ingress / Receiver</text>
+            <text class="t-s" x="248" y="110" style="font-size:13.4px">authenticate, filter,</text>
+            <text class="t-s" x="248" y="127" style="font-size:13.4px">fingerprint, reply 200</text>
+            <text class="t-s" x="248" y="144" style="font-size:13px">stateless receiver</text>
             <rect class="b-store" x="466" y="66" width="174" height="92" rx="7"/>
-            <text class="t-b" x="478" y="90" style="font-size:14px">Queue</text>
-            <text class="t-s" x="478" y="110" style="font-size:12px">holds work until ack,</text>
-            <text class="t-s" x="478" y="127" style="font-size:12px">backoff + dead-letter</text>
-            <text class="t-s" x="478" y="144" style="font-size:11.5px">durable queue</text>
+            <text class="t-b" x="478" y="90" style="font-size:15.8px">Queue</text>
+            <text class="t-s" x="478" y="110" style="font-size:13.4px">holds work until ack,</text>
+            <text class="t-s" x="478" y="127" style="font-size:13.4px">backoff + dead-letter</text>
+            <text class="t-s" x="478" y="144" style="font-size:13px">durable queue</text>
             <path class="flow" d="M190 112 H232" marker-end="url(#ps6-ink)"/>
             <path class="flow" d="M420 112 H462" marker-end="url(#ps6-ink)"/>
             <path class="flow" d="M540 158 V210 H104 V262" marker-end="url(#ps6-ink)"/>
-            <text class="t-s t-c" x="322" y="201" style="font-size:12px">worker pulls one item</text>
+            <text class="t-s t-c" x="322" y="201" style="font-size:13.4px">worker pulls one item</text>
             <path class="flow-d" d="M907 266 V204 H596 V162" marker-end="url(#ps6-mut)"/>
-            <text class="t-s t-c" x="752" y="195" style="font-size:12px">ack at terminal exit</text>
+            <text class="t-s t-c" x="752" y="195" style="font-size:13.4px">ack at terminal exit</text>
           </g>
           <g class="stg-prev">
             <rect class="b-code" x="20" y="266" width="164" height="108" rx="8"/>
-            <text class="t-b" x="102" y="290" text-anchor="middle" style="font-size:14px">Dispatcher / Guard</text>
-            <text class="t-m-g" x="102" y="309" text-anchor="middle" style="font-size:10.5px">PLAIN CODE</text>
-            <text class="t-s" x="102" y="327" text-anchor="middle" style="font-size:12px">kill switch &amp; storm,</text>
-            <text class="t-s" x="102" y="343" text-anchor="middle" style="font-size:12px">claims 120s lease</text>
+            <text class="t-b" x="102" y="290" text-anchor="middle" style="font-size:15.8px">Dispatcher / Guard</text>
+            <text class="t-m-g" x="102" y="309" text-anchor="middle" style="font-size:11.8px">PLAIN CODE</text>
+            <text class="t-s" x="102" y="327" text-anchor="middle" style="font-size:13.4px">kill switch &amp; storm,</text>
+            <text class="t-s" x="102" y="343" text-anchor="middle" style="font-size:13.4px">claims 120s lease</text>
             <path class="flow" d="M184 320 H204" marker-end="url(#ps6-ink)"/>
           </g>
           <g class="stg-prev">
@@ -1832,103 +1878,103 @@
           </g>
           <g class="stg-prev">
             <rect class="b-model" x="208" y="266" width="174" height="108" rx="8"/>
-            <text class="t-b" x="295" y="290" text-anchor="middle" style="font-size:14px">Quarantined LLM</text>
+            <text class="t-b" x="295" y="290" text-anchor="middle" style="font-size:15.8px">Quarantined LLM</text>
             <text class="t-m-v" x="295" y="309" text-anchor="middle">AGENT 1 · NO TOOLS</text>
-            <text class="t-s" x="295" y="327" text-anchor="middle" style="font-size:12px">1 call, fixed schema</text>
-            <text class="t-s" x="295" y="343" text-anchor="middle" style="font-size:11.5px">untrusted text stops</text>
+            <text class="t-s" x="295" y="327" text-anchor="middle" style="font-size:13.4px">1 call, fixed schema</text>
+            <text class="t-s" x="295" y="343" text-anchor="middle" style="font-size:13px">untrusted text stops</text>
             <path class="flow" d="M382 320 H412" marker-end="url(#ps6-ink)"/>
 
             <rect class="b-model" x="416" y="266" width="178" height="108" rx="8"/>
-            <text class="t-b" x="505" y="290" text-anchor="middle" style="font-size:14px">Privileged LLM</text>
+            <text class="t-b" x="505" y="290" text-anchor="middle" style="font-size:15.8px">Privileged LLM</text>
             <text class="t-m-v" x="505" y="309" text-anchor="middle">AGENT 2 · TOOL LOOP</text>
-            <text class="t-s" x="505" y="327" text-anchor="middle" style="font-size:12px">bounded steps &amp; time</text>
-            <text class="t-s" x="505" y="343" text-anchor="middle" style="font-size:11.5px">no raw logs, no keys</text>
+            <text class="t-s" x="505" y="327" text-anchor="middle" style="font-size:13.4px">bounded steps &amp; time</text>
+            <text class="t-s" x="505" y="343" text-anchor="middle" style="font-size:13px">no raw logs, no keys</text>
             <path class="flow" d="M594 320 H614" marker-end="url(#ps6-ink)"/>
 
             <rect class="b-code" x="618" y="266" width="174" height="108" rx="8"/>
-            <text class="t-b" x="705" y="290" text-anchor="middle" style="font-size:14px">Verifier</text>
-            <text class="t-m-g" x="705" y="309" text-anchor="middle" style="font-size:10.5px">PLAIN CODE · NO LLM</text>
-            <text class="t-s" x="705" y="327" text-anchor="middle" style="font-size:12px">independent re-check,</text>
-            <text class="t-s" x="705" y="343" text-anchor="middle" style="font-size:11.5px">policy &amp; retry counter</text>
+            <text class="t-b" x="705" y="290" text-anchor="middle" style="font-size:15.8px">Verifier</text>
+            <text class="t-m-g" x="705" y="309" text-anchor="middle" style="font-size:11.8px">PLAIN CODE · NO LLM</text>
+            <text class="t-s" x="705" y="327" text-anchor="middle" style="font-size:13.4px">independent re-check,</text>
+            <text class="t-s" x="705" y="343" text-anchor="middle" style="font-size:13px">policy &amp; retry counter</text>
 
             <path class="flow-g" d="M792 320 H822" marker-end="url(#ps6-good)"/>
-            <text class="t-m-g" x="807" y="311" text-anchor="middle" style="font-size:10px">PASS</text>
+            <text class="t-m-g" x="807" y="311" text-anchor="middle" style="font-size:11.2px">PASS</text>
 
             <rect class="b-code" x="826" y="266" width="162" height="108" rx="8"/>
-            <text class="t-b" x="907" y="290" text-anchor="middle" style="font-size:14px">Act gate</text>
-            <text class="t-m-g" x="907" y="309" text-anchor="middle" style="font-size:10.5px">AGENT 3 · PLAIN CODE</text>
-            <text class="t-s" x="907" y="327" text-anchor="middle" style="font-size:12px">fencing + narrow key</text>
-            <text class="t-s" x="907" y="343" text-anchor="middle" style="font-size:11.5px">idempotent write + ack</text>
+            <text class="t-b" x="907" y="290" text-anchor="middle" style="font-size:15.8px">Act gate</text>
+            <text class="t-m-g" x="907" y="309" text-anchor="middle" style="font-size:11.8px">AGENT 3 · PLAIN CODE</text>
+            <text class="t-s" x="907" y="327" text-anchor="middle" style="font-size:13.4px">fencing + narrow key</text>
+            <text class="t-s" x="907" y="343" text-anchor="middle" style="font-size:13px">idempotent write + ack</text>
             <path class="flow" d="M988 320 H1010" marker-end="url(#ps6-ink)"/>
           </g>
           <g class="stg-prev">
 
             <text class="t-m-g" x="295" y="360" text-anchor="middle">→ IncidentReport</text>
             <text class="t-m-g" x="505" y="360" text-anchor="middle">→ ProposedPatch</text>
-            <text class="t-m-g" x="705" y="360" text-anchor="middle" style="font-size:10.5px">PASS · RETRY · ESCALATE</text>
+            <text class="t-m-g" x="705" y="360" text-anchor="middle" style="font-size:11.8px">PASS · RETRY · ESCALATE</text>
             <text class="t-m-g" x="907" y="360" text-anchor="middle">→ Draft PR</text>
           </g>
           <g class="stg-new">
             <rect class="b-ext" x="1014" y="266" width="168" height="108" rx="8"/>
-            <text class="t-b" x="1098" y="290" text-anchor="middle" style="font-size:14px">Human + record</text>
-            <text class="t-s" x="1098" y="313" text-anchor="middle" style="font-size:12px">reviews draft PR,</text>
-            <text class="t-s" x="1098" y="331" text-anchor="middle" style="font-size:12px">live approval signal</text>
-            <text class="t-s" x="1098" y="349" text-anchor="middle" style="font-size:11.5px">governs rollout stage</text>
+            <text class="t-b" x="1098" y="290" text-anchor="middle" style="font-size:15.8px">Human + record</text>
+            <text class="t-s" x="1098" y="313" text-anchor="middle" style="font-size:13.4px">reviews draft PR,</text>
+            <text class="t-s" x="1098" y="331" text-anchor="middle" style="font-size:13.4px">live approval signal</text>
+            <text class="t-s" x="1098" y="349" text-anchor="middle" style="font-size:13px">governs rollout stage</text>
           </g>
           <g class="stg-prev">
             <path class="flow-d" d="M102 374 V494" marker-end="url(#ps6-mut)"/>
             <rect class="b-store" x="20" y="498" width="308" height="88" rx="7"/>
-            <text class="t-b" x="32" y="520" style="font-size:14px">Coordination store &amp; kill switch</text>
-            <text class="t-s" x="32" y="539" style="font-size:12px">Kill switch (operator) · storm count → pause</text>
-            <text class="t-s" x="32" y="556" style="font-size:12px">One row per case: state, lock, lease, fence</text>
-            <text class="t-s" x="32" y="573" style="font-size:12px">Duplicate or finished case → skip + ack</text>
+            <text class="t-b" x="32" y="520" style="font-size:15.8px">Coordination store &amp; kill switch</text>
+            <text class="t-s" x="32" y="539" style="font-size:13.4px">Kill switch (operator) · storm count → pause</text>
+            <text class="t-s" x="32" y="556" style="font-size:13.4px">One row per case: state, lock, lease, fence</text>
+            <text class="t-s" x="32" y="573" style="font-size:13.4px">Duplicate or finished case → skip + ack</text>
           </g>
           <g class="stg-prev">
             <path d="M693 452 V468 H398 V342 H412" style="fill:none;stroke:var(--stop);stroke-width:1.9;stroke-dasharray:5 4" marker-end="url(#ps6-stop)"/>
             <text class="t-m-r" x="545" y="484" text-anchor="middle">RETRY (&lt; N) · truncated failure output</text>
-            <path d="M778 374 V424 H1010" style="fill:none;stroke:var(--ink);stroke-width:1.7" marker-end="url(#ps6-ink)"/>
+            <path d="M788 374 V424 H1010" style="fill:none;stroke:var(--ink);stroke-width:1.7" marker-end="url(#ps6-ink)"/>
             <rect class="b-ext" x="1014" y="396" width="168" height="56" rx="8"/>
-            <text class="t-b" x="1098" y="418" text-anchor="middle" style="font-size:13px">ESCALATE to person</text>
-            <text class="t-s" x="1098" y="437" text-anchor="middle" style="font-size:11px">≥ N tries, policy, flaky</text>
+            <text class="t-b" x="1098" y="418" text-anchor="middle" style="font-size:14.6px">ESCALATE to person</text>
+            <text class="t-s" x="1098" y="437" text-anchor="middle" style="font-size:12.6px">≥ N tries, policy, flaky</text>
             <path class="flow-d" d="M356 374 V494" marker-end="url(#ps6-mut)"/>
             <rect class="b-store" x="342" y="498" width="316" height="88" rx="7"/>
-            <text class="t-b" x="354" y="520" style="font-size:14px">Session, blobs &amp; memory</text>
-            <text class="t-s" x="354" y="539" style="font-size:12px">Per-run workflow state &amp; blob pointers</text>
-            <text class="t-s" x="354" y="556" style="font-size:12px">Approved past cases (read-only in run)</text>
-            <text class="t-s" x="354" y="573" style="font-size:12px">Memory written by code after approval</text>
+            <text class="t-b" x="354" y="520" style="font-size:15.8px">Session, blobs &amp; memory</text>
+            <text class="t-s" x="354" y="539" style="font-size:13.4px">Per-run workflow state &amp; blob pointers</text>
+            <text class="t-s" x="354" y="556" style="font-size:13.4px">Approved past cases (read-only in run)</text>
+            <text class="t-s" x="354" y="573" style="font-size:13.4px">Memory written by code after approval</text>
           </g>
           <g class="stg-new">
             <line x1="505" y1="374" x2="505" y2="392" style="stroke:var(--cyan);stroke-width:1.7;stroke-dasharray:4 3" marker-end="url(#ps6-cyan)"/>
             <rect class="b-sbx" x="416" y="396" width="178" height="56" rx="7"/>
             <text class="t-m-c" x="505" y="416" text-anchor="middle">SANDBOX 1 · NO NET</text>
-            <text class="t-s" x="505" y="436" text-anchor="middle" style="font-size:11.5px;fill:var(--ink)">tools: 0 creds, isolated</text>
-            <line x1="693" y1="374" x2="693" y2="392" style="stroke:var(--cyan);stroke-width:1.7;stroke-dasharray:4 3" marker-end="url(#ps6-cyan)"/>
-            <rect class="b-sbx" x="618" y="396" width="150" height="56" rx="7"/>
-            <text class="t-m-c" x="693" y="416" text-anchor="middle">SANDBOX 2 · FRESH</text>
-            <text class="t-s" x="693" y="436" text-anchor="middle" style="font-size:11.5px;fill:var(--ink)">clean-room suite</text>
+            <text class="t-s" x="505" y="436" text-anchor="middle" style="font-size:13px;fill:var(--ink)">tools: 0 creds, isolated</text>
+            <line x1="700" y1="374" x2="700" y2="392" style="stroke:var(--cyan);stroke-width:1.7;stroke-dasharray:4 3" marker-end="url(#ps6-cyan)"/>
+            <rect class="b-sbx" x="618" y="396" width="164" height="56" rx="7"/>
+            <text class="t-m-c" x="700" y="416" text-anchor="middle">SANDBOX 2 · FRESH</text>
+            <text class="t-s" x="700" y="436" text-anchor="middle" style="font-size:13px;fill:var(--ink)">clean-room suite</text>
             <path class="flow-d" d="M907 374 V494" marker-end="url(#ps6-mut)"/>
             <path class="flow-d" d="M1098 452 V533 H990" marker-end="url(#ps6-mut)"/>
             <rect class="b-store" x="672" y="498" width="316" height="88" rx="7"/>
-            <text class="t-b" x="684" y="520" style="font-size:14px">Audit and eval store</text>
-            <text class="t-s" x="684" y="539" style="font-size:12px">One trace per case: calls, tools, routes</text>
-            <text class="t-s" x="684" y="556" style="font-size:12px">Feeds offline replay and online evals</text>
-            <text class="t-s" x="684" y="573" style="font-size:12px">Rollout: shadow → draft → ready, auto-demote</text>
+            <text class="t-b" x="684" y="520" style="font-size:15.8px">Audit and eval store</text>
+            <text class="t-s" x="684" y="539" style="font-size:13.4px">One trace per case: calls, tools, routes</text>
+            <text class="t-s" x="684" y="556" style="font-size:13.4px">Feeds offline replay and online evals</text>
+            <text class="t-s" x="684" y="573" style="font-size:13.4px">Rollout: shadow → draft → ready, auto-demote</text>
           </g>
           <g class="stg-prev">
             <rect class="zone-ours" x="8" y="240" width="990" height="358" rx="10"/>
             <text class="zl" x="208" y="257">ONE WORKER SERVICE · DETERMINISTIC HARNESS AROUND THE MODELS</text>
           </g>
           <g class="stg-prev">
-            <text class="t-s" x="1180" y="186" text-anchor="end" style="font-size:12px">agent path: repair, minutes, asynchronous</text>
-            <text class="t-s" x="1180" y="204" text-anchor="end" style="font-size:12px">real load = volume × filter rate</text>
-            <text class="t-s" x="1180" y="222" text-anchor="end" style="font-size:12px">step and cost cap per case</text>
+            <text class="t-s" x="1180" y="186" text-anchor="end" style="font-size:13.4px">agent path: repair, minutes, asynchronous</text>
+            <text class="t-s" x="1180" y="204" text-anchor="end" style="font-size:13.4px">real load = volume × filter rate</text>
+            <text class="t-s" x="1180" y="222" text-anchor="end" style="font-size:13.4px">step and cost cap per case</text>
           </g>
           <g class="stg-prev">
-            <text class="t-s" x="346" y="420" text-anchor="end" style="font-size:12px">no shared chat history</text>
-            <text class="t-s" x="346" y="438" text-anchor="end" style="font-size:12px">bounded reads by pointer</text>
+            <text class="t-s" x="346" y="420" text-anchor="end" style="font-size:13.4px">no shared chat history</text>
+            <text class="t-s" x="346" y="438" text-anchor="end" style="font-size:13.4px">bounded reads by pointer</text>
           </g>
         </svg>
-        <div class="fig-caption"><span>Figure 7 — Stage 6 of 6 (Q12–Q13): Isolated sandboxes, human gate, and audit/eval store complete the generic architecture.</span>
+        <div class="fig-caption"><span>Figure 7 — Stage 6 · Isolation and Rollout: Isolated sandboxes, human gate, and audit/eval store complete the generic architecture.</span>
           <div class="legend-items"><span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good);border-width:2.2px;box-shadow:0 0 5px var(--good)"></i> <b>Bold glow = Added in this stage</b></span><span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good)"></i> Plain code</span><span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> LLM step</span><span><i class="swatch-dot" style="background:var(--amber-soft);border-color:var(--amber)"></i> Queue / store</span><span><i class="swatch-dot" style="background:var(--panel-2);border-color:var(--cyan)"></i> Sandbox</span></div>
         </div>
       </div>
@@ -1976,7 +2022,7 @@
         </p>
       </div>
       <div class="diagram-frame" id="fig-gcp">
-        <svg viewBox="0 0 1200 590" role="img" aria-label="Figure 8: the completed generic architecture mapped 1-to-1 onto Google Cloud and Gemini Enterprise Agent Platform services.">
+        <svg viewBox="0 0 1200 638" role="img" aria-label="Figure 8: the completed generic architecture mapped 1-to-1 onto Google Cloud and Gemini Enterprise Agent Platform services.">
           <defs>
             <marker id="pgcp-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--ink)"/></marker>
             <marker id="pgcp-mut" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--muted)"/></marker>
@@ -1984,124 +2030,135 @@
             <marker id="pgcp-stop" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--stop)"/></marker>
             <marker id="pgcp-cyan" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--cyan)"/></marker>
           </defs>
+          <rect x="8" y="8" width="1184" height="622" rx="12" style="fill:none;stroke:#4285f4;stroke-width:1.8"/>
+          <g transform="translate(24, 15) scale(0.44)" aria-hidden="true">
+            <path d="M40.728 20.488l2.05.035 5.57-5.57.27-2.36C44.2 8.657 38.367 6.26 31.993 6.26c-11.54 0-21.28 7.852-24.163 18.488.608-.424 1.908-.106 1.908-.106l11.13-1.83s.572-.947.862-.9A13.88 13.88 0 0 1 32 17.375c3.3.007 6.34 1.173 8.728 3.102z" fill="#ea4335"/>
+            <path d="M56.17 24.77c-1.293-4.77-3.958-8.982-7.555-12.177l-7.887 7.887c3.16 2.55 5.187 6.452 5.187 10.82v1.392c3.837 0 6.954 3.124 6.954 6.954 0 3.837-3.124 6.954-6.954 6.954H32.007L30.615 48v8.346l1.392 1.385h13.908A18.11 18.11 0 0 0 64 39.647c-.007-6.155-3.1-11.6-7.83-14.876z" fill="#4285f4"/>
+            <path d="M18.085 57.74h13.9V46.6h-13.9a6.89 6.89 0 0 1-2.862-.622l-2.007.615-5.57 5.57-.488 1.88a18 18 0 0 0 10.926 3.689z" fill="#34a853"/>
+            <path d="M18.085 21.57A18.11 18.11 0 0 0 0 39.654c0 5.873 2.813 11.095 7.166 14.403l8.064-8.064a6.96 6.96 0 0 1-4.099-6.339c0-3.837 3.124-6.954 6.954-6.954 2.82 0 5.244 1.7 6.34 4.1l8.064-8.064c-3.307-4.353-8.53-7.166-14.403-7.166z" fill="#fbbc05"/>
+          </g>
+          <text class="t-b" x="60" y="36" style="font-size:16px">Google Cloud</text>
+          <text class="zl" x="176" y="36">· GEMINI ENTERPRISE AGENT PLATFORM</text>
+          <g transform="translate(0, 44)">
           <rect class="b-ext" x="20" y="66" width="170" height="92" rx="7"/>
-          <text class="t-b" x="32" y="90" style="font-size:14px">Event Sources</text>
-          <text class="t-s" x="32" y="110" style="font-size:12px">Cloud Build, GitHub,</text>
-          <text class="t-s" x="32" y="128" style="font-size:12px">Cloud Monitoring</text>
+          <text class="t-b" x="32" y="90" style="font-size:15.8px">Event Sources</text>
+          <text class="t-s" x="32" y="110" style="font-size:13.4px">Cloud Build, GitHub,</text>
+          <text class="t-s" x="32" y="128" style="font-size:13.4px">Cloud Monitoring</text>
 
           <rect class="b-code" x="236" y="66" width="184" height="92" rx="7"/>
-          <text class="t-b" x="248" y="90" style="font-size:14px">Cloud Run Receiver</text>
-          <text class="t-s" x="248" y="110" style="font-size:12px">HMAC / OIDC check,</text>
-          <text class="t-s" x="248" y="127" style="font-size:12px">fingerprint, 200 &lt;100ms</text>
-          <text class="t-s" x="248" y="144" style="font-size:11.5px">standalone service #1</text>
+          <text class="t-b" x="248" y="90" style="font-size:15.8px">Cloud Run Receiver</text>
+          <text class="t-s" x="248" y="110" style="font-size:13.4px">HMAC / OIDC check,</text>
+          <text class="t-s" x="248" y="127" style="font-size:13.4px">fingerprint, 200 &lt;100ms</text>
+          <text class="t-s" x="248" y="144" style="font-size:13px">standalone service #1</text>
 
           <rect class="b-store" x="466" y="66" width="174" height="92" rx="7"/>
-          <text class="t-b" x="478" y="90" style="font-size:14px">Cloud Pub/Sub</text>
-          <text class="t-s" x="478" y="110" style="font-size:12px">ack at completion,</text>
-          <text class="t-s" x="478" y="127" style="font-size:12px">backoff + DLQ topic</text>
-          <text class="t-s" x="478" y="144" style="font-size:11.5px">durable queue</text>
+          <text class="t-b" x="478" y="90" style="font-size:15.8px">Cloud Pub/Sub</text>
+          <text class="t-s" x="478" y="110" style="font-size:13.4px">ack at completion,</text>
+          <text class="t-s" x="478" y="127" style="font-size:13.4px">backoff + DLQ topic</text>
+          <text class="t-s" x="478" y="144" style="font-size:13px">durable queue</text>
 
           <rect class="b-ext" x="760" y="66" width="420" height="92" rx="7"/>
-          <text class="t-b" x="774" y="90" style="font-size:14px">Existing control · fast path · no model</text>
-          <text class="t-s" x="774" y="112" style="font-size:12.5px">Cloud Deploy rollback, Cloud Armor block, failover</text>
-          <text class="t-s" x="774" y="134" style="font-size:12px">acts in seconds, before any agent runs</text>
+          <text class="t-b" x="774" y="90" style="font-size:15.8px">Existing control · fast path · no model</text>
+          <text class="t-s" x="774" y="112" style="font-size:14px">Cloud Deploy rollback, Cloud Armor block, failover</text>
+          <text class="t-s" x="774" y="134" style="font-size:13.4px">acts in seconds, before any agent runs</text>
 
           <path class="flow" d="M190 112 H232" marker-end="url(#pgcp-ink)"/>
           <path class="flow" d="M420 112 H462" marker-end="url(#pgcp-ink)"/>
           <path class="flow-g" d="M105 66 V32 H970 V62" marker-end="url(#pgcp-good)"/>
-          <text class="t-b t-c" x="540" y="24" style="font-size:13.5px">containment in seconds</text>
+          <text class="t-b t-c" x="540" y="24" style="font-size:15.2px">containment in seconds</text>
           <path class="flow" d="M540 158 V210 H102 V262" marker-end="url(#pgcp-ink)"/>
-          <text class="t-s t-c" x="321" y="201" style="font-size:12px">Worker service pulls message</text>
+          <text class="t-s t-c" x="321" y="201" style="font-size:13.4px">Worker service pulls message</text>
           <path class="flow-d" d="M907 266 V204 H596 V162" marker-end="url(#pgcp-mut)"/>
-          <text class="t-s t-c" x="752" y="195" style="font-size:12px">Pub/Sub ack at terminal exit</text>
+          <text class="t-s t-c" x="752" y="195" style="font-size:13.4px">Pub/Sub ack at terminal exit</text>
 
           <rect class="b-code" x="20" y="266" width="164" height="108" rx="8"/>
-          <text class="t-b" x="102" y="290" text-anchor="middle" style="font-size:14px">Guard &amp; Lease</text>
-          <text class="t-m-g" x="102" y="309" text-anchor="middle" style="font-size:10.5px">SPANNER TXN</text>
-          <text class="t-s" x="102" y="327" text-anchor="middle" style="font-size:12px">kill switch &amp; 5-min storm,</text>
-          <text class="t-s" x="102" y="343" text-anchor="middle" style="font-size:12px">120s row lease</text>
+          <text class="t-b" x="102" y="290" text-anchor="middle" style="font-size:15.8px">Guard &amp; Lease</text>
+          <text class="t-m-g" x="102" y="309" text-anchor="middle" style="font-size:11.8px">SPANNER TXN</text>
+          <text class="t-s" x="102" y="327" text-anchor="middle" style="font-size:13.4px">kill switch &amp; 5-min storm,</text>
+          <text class="t-s" x="102" y="343" text-anchor="middle" style="font-size:13.4px">120s row lease</text>
           <text class="t-m-g" x="102" y="360" text-anchor="middle">→ FailureEvent</text>
           <path class="flow" d="M184 320 H204" marker-end="url(#pgcp-ink)"/>
 
           <rect class="b-model" x="208" y="266" width="174" height="108" rx="8"/>
-          <text class="t-b" x="295" y="290" text-anchor="middle" style="font-size:14px">Quarantined LLM</text>
+          <text class="t-b" x="295" y="290" text-anchor="middle" style="font-size:15.8px">Quarantined LLM</text>
           <text class="t-m-v" x="295" y="309" text-anchor="middle">MODEL ARMOR → LLM</text>
-          <text class="t-s" x="295" y="327" text-anchor="middle" style="font-size:12px">Cloud Logging / GCS,</text>
-          <text class="t-s" x="295" y="343" text-anchor="middle" style="font-size:11.5px">1 call, no tools</text>
+          <text class="t-s" x="295" y="327" text-anchor="middle" style="font-size:13.4px">Cloud Logging / GCS,</text>
+          <text class="t-s" x="295" y="343" text-anchor="middle" style="font-size:13px">1 call, no tools</text>
           <text class="t-m-g" x="295" y="360" text-anchor="middle">→ IncidentReport</text>
           <path class="flow" d="M382 320 H412" marker-end="url(#pgcp-ink)"/>
 
           <rect class="b-model" x="416" y="266" width="178" height="108" rx="8"/>
-          <text class="t-b" x="505" y="290" text-anchor="middle" style="font-size:14px">Privileged LLM</text>
+          <text class="t-b" x="505" y="290" text-anchor="middle" style="font-size:15.8px">Privileged LLM</text>
           <text class="t-m-v" x="505" y="309" text-anchor="middle">ADK AGENT LOOP</text>
-          <text class="t-s" x="505" y="327" text-anchor="middle" style="font-size:12px">model call on worker,</text>
-          <text class="t-s" x="505" y="343" text-anchor="middle" style="font-size:11.5px">tools in Code Exec</text>
+          <text class="t-s" x="505" y="327" text-anchor="middle" style="font-size:13.4px">model call on worker,</text>
+          <text class="t-s" x="505" y="343" text-anchor="middle" style="font-size:13px">tools in Code Exec</text>
           <text class="t-m-g" x="505" y="360" text-anchor="middle">→ ProposedPatch</text>
           <path class="flow" d="M594 320 H614" marker-end="url(#pgcp-ink)"/>
 
           <rect class="b-code" x="618" y="266" width="174" height="108" rx="8"/>
-          <text class="t-b" x="705" y="290" text-anchor="middle" style="font-size:14px">Verifier Node</text>
-          <text class="t-m-g" x="705" y="309" text-anchor="middle" style="font-size:10.5px">ADK FUNCTION NODE</text>
-          <text class="t-s" x="705" y="327" text-anchor="middle" style="font-size:12px">path &amp; diff policy,</text>
-          <text class="t-s" x="705" y="343" text-anchor="middle" style="font-size:11.5px">counts tries in Session</text>
-          <text class="t-m-g" x="705" y="360" text-anchor="middle" style="font-size:10.5px">PASS · RETRY · ESCALATE</text>
+          <text class="t-b" x="705" y="290" text-anchor="middle" style="font-size:15.8px">Verifier Node</text>
+          <text class="t-m-g" x="705" y="309" text-anchor="middle" style="font-size:11.8px">ADK FUNCTION NODE</text>
+          <text class="t-s" x="705" y="327" text-anchor="middle" style="font-size:13.4px">path &amp; diff policy,</text>
+          <text class="t-s" x="705" y="343" text-anchor="middle" style="font-size:13px">counts tries in Session</text>
+          <text class="t-m-g" x="705" y="360" text-anchor="middle" style="font-size:11.8px">PASS · RETRY · ESCALATE</text>
 
           <path class="flow-g" d="M792 320 H822" marker-end="url(#pgcp-good)"/>
-          <text class="t-m-g" x="807" y="311" text-anchor="middle" style="font-size:10px">PASS</text>
+          <text class="t-m-g" x="807" y="311" text-anchor="middle" style="font-size:11.2px">PASS</text>
 
           <rect class="b-code" x="826" y="266" width="162" height="108" rx="8"/>
-          <text class="t-b" x="907" y="290" text-anchor="middle" style="font-size:14px">Act gate</text>
-          <text class="t-m-g" x="907" y="309" text-anchor="middle" style="font-size:10.5px">ADK FUNCTION NODE</text>
-          <text class="t-s" x="907" y="327" text-anchor="middle" style="font-size:12px">Spanner fence, Secret</text>
-          <text class="t-s" x="907" y="343" text-anchor="middle" style="font-size:11.5px">Mgr token + ack</text>
+          <text class="t-b" x="907" y="290" text-anchor="middle" style="font-size:15.8px">Act gate</text>
+          <text class="t-m-g" x="907" y="309" text-anchor="middle" style="font-size:11.8px">ADK FUNCTION NODE</text>
+          <text class="t-s" x="907" y="327" text-anchor="middle" style="font-size:13.4px">Spanner fence, Secret</text>
+          <text class="t-s" x="907" y="343" text-anchor="middle" style="font-size:13px">Mgr token + ack</text>
           <text class="t-m-g" x="907" y="360" text-anchor="middle">→ Draft PR</text>
           <path class="flow" d="M988 320 H1010" marker-end="url(#pgcp-ink)"/>
 
           <rect class="b-ext" x="1014" y="266" width="168" height="108" rx="8"/>
-          <text class="t-b" x="1098" y="290" text-anchor="middle" style="font-size:14px">GitHub + Reviewer</text>
-          <text class="t-s" x="1098" y="313" text-anchor="middle" style="font-size:12px">autofix/* draft PR,</text>
-          <text class="t-s" x="1098" y="331" text-anchor="middle" style="font-size:12px">code owner merges</text>
-          <text class="t-s" x="1098" y="349" text-anchor="middle" style="font-size:11.5px">post-merge → Memory</text>
+          <text class="t-b" x="1098" y="290" text-anchor="middle" style="font-size:15.8px">GitHub + Reviewer</text>
+          <text class="t-s" x="1098" y="313" text-anchor="middle" style="font-size:13.4px">autofix/* draft PR,</text>
+          <text class="t-s" x="1098" y="331" text-anchor="middle" style="font-size:13.4px">code owner merges</text>
+          <text class="t-s" x="1098" y="349" text-anchor="middle" style="font-size:13px">post-merge → Memory</text>
 
           <line x1="505" y1="374" x2="505" y2="392" style="stroke:var(--cyan);stroke-width:1.7;stroke-dasharray:4 3" marker-end="url(#pgcp-cyan)"/>
           <rect class="b-sbx" x="416" y="396" width="178" height="56" rx="7"/>
           <text class="t-m-c" x="505" y="416" text-anchor="middle">CODE EXEC · SANDBOX 1</text>
-          <text class="t-s" x="505" y="436" text-anchor="middle" style="font-size:11.5px;fill:var(--ink)">gVisor: no net, no IAM</text>
+          <text class="t-s" x="505" y="436" text-anchor="middle" style="font-size:13px;fill:var(--ink)">gVisor: no net, no IAM</text>
 
-          <line x1="693" y1="374" x2="693" y2="392" style="stroke:var(--cyan);stroke-width:1.7;stroke-dasharray:4 3" marker-end="url(#pgcp-cyan)"/>
-          <rect class="b-sbx" x="618" y="396" width="150" height="56" rx="7"/>
-          <text class="t-m-c" x="693" y="416" text-anchor="middle">CODE EXEC · SANDBOX 2</text>
-          <text class="t-s" x="693" y="436" text-anchor="middle" style="font-size:11.5px;fill:var(--ink)">fresh pytest run</text>
+          <line x1="700" y1="374" x2="700" y2="392" style="stroke:var(--cyan);stroke-width:1.7;stroke-dasharray:4 3" marker-end="url(#pgcp-cyan)"/>
+          <rect class="b-sbx" x="618" y="396" width="164" height="56" rx="7"/>
+          <text class="t-m-c" x="700" y="416" text-anchor="middle">CODE EXEC · SANDBOX 2</text>
+          <text class="t-s" x="700" y="436" text-anchor="middle" style="font-size:13px;fill:var(--ink)">fresh pytest run</text>
 
           <path d="M693 452 V468 H398 V342 H412" style="fill:none;stroke:var(--stop);stroke-width:1.9;stroke-dasharray:5 4" marker-end="url(#pgcp-stop)"/>
           <text class="t-m-r" x="545" y="484" text-anchor="middle">RETRY (&lt; 3) · truncated stderr</text>
 
-          <path d="M778 374 V424 H1010" style="fill:none;stroke:var(--ink);stroke-width:1.7" marker-end="url(#pgcp-ink)"/>
+          <path d="M788 374 V424 H1010" style="fill:none;stroke:var(--ink);stroke-width:1.7" marker-end="url(#pgcp-ink)"/>
           <rect class="b-ext" x="1014" y="396" width="168" height="56" rx="8"/>
-          <text class="t-b" x="1098" y="418" text-anchor="middle" style="font-size:13px">GitHub Issue / Pager</text>
-          <text class="t-s" x="1098" y="437" text-anchor="middle" style="font-size:11px">ESCALATED + Pub/Sub ack</text>
+          <text class="t-b" x="1098" y="418" text-anchor="middle" style="font-size:14.6px">GitHub Issue / Pager</text>
+          <text class="t-s" x="1098" y="437" text-anchor="middle" style="font-size:12.6px">ESCALATED + Pub/Sub ack</text>
 
           <path class="flow-d" d="M102 374 V494" marker-end="url(#pgcp-mut)"/>
           <rect class="b-store" x="20" y="498" width="308" height="70" rx="7"/>
-          <text class="t-b" x="32" y="520" style="font-size:14px">Spanner (coordination)</text>
-          <text class="t-s" x="32" y="539" style="font-size:12px">Kill switch + 5-min storm query</text>
-          <text class="t-s" x="32" y="556" style="font-size:12px">Incident row: lock, lease &amp; fencing</text>
+          <text class="t-b" x="32" y="520" style="font-size:15.8px">Spanner (coordination)</text>
+          <text class="t-s" x="32" y="539" style="font-size:13.4px">Kill switch + 5-min storm query</text>
+          <text class="t-s" x="32" y="556" style="font-size:13.4px">Incident row: lock, lease &amp; fencing</text>
 
           <path class="flow-d" d="M356 374 V494" marker-end="url(#pgcp-mut)"/>
           <rect class="b-store" x="342" y="498" width="316" height="70" rx="7"/>
-          <text class="t-b" x="354" y="520" style="font-size:14px">Session, GCS &amp; Memory Bank</text>
-          <text class="t-s" x="354" y="539" style="font-size:12px">Agent Platform Session + GCS blobs</text>
-          <text class="t-s" x="354" y="556" style="font-size:12px">Memory Bank: past merged fixes only</text>
+          <text class="t-b" x="354" y="520" style="font-size:15.8px">Session, GCS &amp; Memory Bank</text>
+          <text class="t-s" x="354" y="539" style="font-size:13.4px">Agent Platform Session + GCS blobs</text>
+          <text class="t-s" x="354" y="556" style="font-size:13.4px">Memory Bank: past merged fixes only</text>
 
           <path class="flow-d" d="M907 374 V494" marker-end="url(#pgcp-mut)"/>
           <path class="flow-d" d="M1098 452 V533 H990" marker-end="url(#pgcp-mut)"/>
           <rect class="b-store" x="672" y="498" width="316" height="70" rx="7"/>
-          <text class="t-b" x="684" y="520" style="font-size:14px">Cloud Trace, BQ &amp; ADK Eval</text>
-          <text class="t-s" x="684" y="539" style="font-size:12px">One trace per run and tool call</text>
-          <text class="t-s" x="684" y="556" style="font-size:12px">BigQuery + ADK Eval replay &amp; metrics</text>
+          <text class="t-b" x="684" y="520" style="font-size:15.8px">Cloud Trace, BQ &amp; ADK Eval</text>
+          <text class="t-s" x="684" y="539" style="font-size:13.4px">One trace per run and tool call</text>
+          <text class="t-s" x="684" y="556" style="font-size:13.4px">BigQuery + ADK Eval replay &amp; metrics</text>
 
-          <rect class="zone-ours" x="8" y="240" width="990" height="340" rx="10"/>
-          <text class="zl" x="208" y="257">WORKER SERVICE #2 (CLOUD RUN OR AGENT RUNTIME) · AGENT IDENTITY · ADK WORKFLOW</text>
+          <rect class="zone-ours" x="14" y="240" width="984" height="338" rx="10"/>
+          <text class="zl" x="128" y="257">WORKER SERVICE #2 (CLOUD RUN OR AGENT RUNTIME) · AGENT IDENTITY · ADK WORKFLOW</text>
+          </g>
         </svg>
         <div class="fig-caption"><span>Figure 8 — The assembled architecture from <em>Figure 7</em> mapped 1-to-1 onto Google Cloud and Agent Platform.</span>
           <div class="legend-items"><span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good)"></i> Plain code</span><span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> LLM step</span><span><i class="swatch-dot" style="background:var(--amber-soft);border-color:var(--amber)"></i> Queue / store</span><span><i class="swatch-dot" style="background:var(--panel-2);border-color:var(--cyan)"></i> Sandbox</span></div>
@@ -2134,19 +2191,16 @@
       <div class="post-prose" style="margin-top:22px;">
         <h3>What Gets Deployed as Its Own Service</h3>
         <p>
-          Drawing several steps in a workflow graph often tempts teams to deploy every box—especially every agent—as a separate microservice over HTTP. Turning sequential steps of the same task into separate network services adds extra hops, serialization bugs, authentication policies, and partial-failure modes for zero gain. By default, workflow nodes—both <code>Agent</code> steps and plain functions—run <strong>in-process inside a single worker service</strong>, where one queue message drives one complete run of the graph.
-        </p>
-        <p>
-          Split a step out into its own standalone deployment or runtime boundary only when one of four conditions holds:
+          A box in the workflow graph represents an in-process step rather than a separate microservice. Start with a <strong>single worker service</strong> running all workflow nodes (both <code>Agent</code> steps and plain functions) in the same process, where one queue message drives one run of the graph, and split a step into its own deployment boundary only for one of four reasons:
         </p>
         <ul>
-          <li><strong>Different ingress or latency contract:</strong> a public endpoint that must answer callers in milliseconds cannot block on a multi-minute agent run.</li>
-          <li><strong>Security and isolation boundary:</strong> untrusted code or test suites must not execute inside the container that holds cloud identity or external write tokens.</li>
-          <li><strong>Independent scaling or hardware:</strong> one step needs GPUs, large memory, or scales at a completely different rate than the rest of the graph.</li>
-          <li><strong>Separate team ownership:</strong> a capability is owned and released independently by another team behind an explicit API or tool contract.</li>
+          <li><strong>Ingress latency:</strong> a public webhook endpoint answers callers in milliseconds while worker runs take minutes.</li>
+          <li><strong>Security isolation:</strong> untrusted code and test suites run in credential-free sandboxes separate from cloud identity and write tokens.</li>
+          <li><strong>Scaling or hardware:</strong> a step requires GPUs, large memory, or an independent scaling profile.</li>
+          <li><strong>Team ownership:</strong> another team owns and releases the capability behind a versioned API.</li>
         </ul>
         <p>
-          Applying those four criteria produces the exact two-service layout in <a href="#fig-gcp"><em>Figure 8</em></a>: a lightweight <strong>Cloud Run Receiver</strong> at the public webhook edge, and one <strong>Worker Service</strong> (on Cloud Run or Agent Runtime) running all workflow nodes in-process—dispatching only untrusted tool and test execution across an isolation boundary into ephemeral, credential-free <strong>Code Execution</strong> sandboxes while keeping model calls and the pull-request token on the worker.
+          Those rules produce the two-service layout in <a href="#fig-gcp"><em>Figure 8</em></a>: a standalone <strong>Cloud Run Receiver</strong> at the edge, and one <strong>Worker Service</strong> running the workflow in-process while dispatching untrusted tool and test execution to ephemeral <strong>Code Execution</strong> sandboxes.
         </p>
       </div>
     </div>
@@ -2170,7 +2224,7 @@
         <div class="nine-q-head">Table 7 · Master Cheat Sheet — All Thirteen Questions Mapped to Progressive Stages</div>
         <div class="tbl-wrap" style="margin:0;">
           <table>
-            <thead><tr><th style="width:6%">Q#</th><th style="width:22%">Design question</th><th style="width:22%">What breaks without it</th><th style="width:26%">Architectural rule / box added</th><th style="width:17%">Self-healing repo</th><th style="width:7%">Stage</th></tr></thead>
+            <thead><tr><th style="width:6%">Q#</th><th style="width:21%">Design question</th><th style="width:22%">What breaks without it</th><th style="width:25%">Architectural rule / box added</th><th style="width:17.5%">Self-healing repo</th><th style="width:8.5%">Stage</th></tr></thead>
             <tbody>
               <tr><td><b><a href="#q1">Q1</a></b></td><td>What wakes it up &amp; what is in the message?</td><td>Missed triggers or 50 MB log payloads on the bus.</td><td>Normalize every trigger into one small event carrying a data <strong>pointer</strong>.</td><td>CI, canary, alerts → <code>FailureEvent</code></td><td><a href="#stage-1">Stage 1</a></td></tr>
               <tr><td><b><a href="#q2">Q2</a></b></td><td>How big is it really?</td><td>Over-built infra for filtered noise, or runaway model bills.</td><td>Multiply volume × filter rate; enforce step and budget caps per case.</td><td><code>10,000 × 1% = 100</code>/day</td><td><a href="#stage-1">Stage 1</a></td></tr>
@@ -2188,11 +2242,6 @@
             </tbody>
           </table>
         </div>
-      </div>
-      <div class="post-prose">
-        <p>
-          <strong>Pacing a 30-minute design session:</strong> spend the first 4 minutes on Stage 1 (Q1–Q3: triggers, real scale, fast containment), 7 minutes sketching Stages 2–3 (Q4–Q8: intake queue, terminal <code>ack</code>, storm breaker, kill switch, lease + fencing), 12 minutes on Stages 4–5 (Q9–Q11: Dual-LLM split, plain-code Verifier and Act gate, typed handoffs, memory ownership), and the final 7 minutes on Stage 6 (Q12–Q13: sandboxes, narrow write scope, replay evals, and staged rollout).
-        </p>
       </div>
     </div>
   </section>
@@ -2229,18 +2278,18 @@
           <text class="t-zone" x="32" y="38">EPISODE 02 · OUTER SYSTEM &amp; WORKFLOW TOPOLOGY</text>
 
           <rect class="b-code" x="32" y="58" width="136" height="64" rx="7"/>
-          <text class="t-b" x="100" y="83" text-anchor="middle" style="font-size:13.5px">Receiver + Queue</text>
-          <text class="t-s" x="100" y="104" text-anchor="middle" style="font-size:11.5px">intake &amp; fast path</text>
+          <text class="t-b" x="100" y="83" text-anchor="middle" style="font-size:15.2px">Receiver + Queue</text>
+          <text class="t-s" x="100" y="104" text-anchor="middle" style="font-size:13px">intake &amp; fast path</text>
           <path class="flow" d="M168 90 H192" marker-end="url(#pbr-ink)"/>
 
           <rect class="b-code" x="196" y="58" width="136" height="64" rx="7"/>
-          <text class="t-b" x="264" y="83" text-anchor="middle" style="font-size:13.5px">Guard &amp; Lease</text>
-          <text class="t-s" x="264" y="104" text-anchor="middle" style="font-size:11.5px">storm + Spanner lock</text>
+          <text class="t-b" x="264" y="83" text-anchor="middle" style="font-size:15.2px">Guard &amp; Lease</text>
+          <text class="t-s" x="264" y="104" text-anchor="middle" style="font-size:13px">storm + Spanner lock</text>
           <path class="flow" d="M332 90 H356" marker-end="url(#pbr-ink)"/>
 
           <rect class="b-model" x="360" y="58" width="128" height="64" rx="7"/>
-          <text class="t-b" x="424" y="83" text-anchor="middle" style="font-size:13.5px">Quarantined</text>
-          <text class="t-s" x="424" y="104" text-anchor="middle" style="font-size:11.5px">1 call · no tools</text>
+          <text class="t-b" x="424" y="83" text-anchor="middle" style="font-size:15.2px">Quarantined</text>
+          <text class="t-s" x="424" y="104" text-anchor="middle" style="font-size:13px">1 call · no tools</text>
 
           <path class="flow" d="M424 122 V152 H112 V174" marker-end="url(#pbr-ink)"/>
 
@@ -2249,18 +2298,18 @@
           <text class="t-m-c" x="40" y="278">ZOOM SEAM: WHENEVER TOOLS OR GATES TOUCH ENTERPRISE DATA</text>
 
           <rect class="b-model" x="36" y="178" width="152" height="68" rx="7"/>
-          <text class="t-b" x="112" y="204" text-anchor="middle" style="font-size:13.5px">Privileged LLM</text>
-          <text class="t-s" x="112" y="225" text-anchor="middle" style="font-size:11.5px">calls read/query tools</text>
+          <text class="t-b" x="112" y="204" text-anchor="middle" style="font-size:15.2px">Privileged LLM</text>
+          <text class="t-s" x="112" y="225" text-anchor="middle" style="font-size:13px">calls read/query tools</text>
           <path class="flow" d="M188 212 H208" marker-end="url(#pbr-ink)"/>
 
           <rect class="b-code" x="212" y="178" width="116" height="68" rx="7"/>
-          <text class="t-b" x="270" y="204" text-anchor="middle" style="font-size:13.5px">Verifier</text>
-          <text class="t-s" x="270" y="225" text-anchor="middle" style="font-size:11.5px">code check</text>
+          <text class="t-b" x="270" y="204" text-anchor="middle" style="font-size:15.2px">Verifier</text>
+          <text class="t-s" x="270" y="225" text-anchor="middle" style="font-size:13px">code check</text>
           <path class="flow-g" d="M328 212 H348" marker-end="url(#pbr-good)"/>
 
           <rect class="b-code" x="352" y="178" width="130" height="68" rx="7"/>
-          <text class="t-b" x="417" y="204" text-anchor="middle" style="font-size:13.5px">Act gate</text>
-          <text class="t-s" x="417" y="225" text-anchor="middle" style="font-size:11.5px">commits write + ack</text>
+          <text class="t-b" x="417" y="204" text-anchor="middle" style="font-size:15.2px">Act gate</text>
+          <text class="t-s" x="417" y="225" text-anchor="middle" style="font-size:13px">commits write + ack</text>
 
           <!-- Zoom connector -->
           <path d="M492 213 H566" style="fill:none;stroke:var(--cyan);stroke-width:2.6;stroke-dasharray:6 4" marker-end="url(#pbr-cyan)"/>
@@ -2270,16 +2319,16 @@
           <rect x="572" y="14" width="594" height="312" rx="12" style="fill:var(--panel);stroke:var(--good);stroke-width:1.8"/>
           <text class="t-zone" x="592" y="38" style="fill:var(--good)">EPISODE 01 · INSIDE THE ENTERPRISE DATA &amp; TOOL WIRE (L1–L9)</text>
 
-          <rect class="b-code" x="592" y="58" width="268" height="74" rx="7"/>
-          <text class="t-b" x="606" y="82" style="font-size:13.5px">1 · Identity &amp; Gateways (L1, L2, L5)</text>
-          <text class="t-s" x="606" y="102" style="font-size:12px">Agent Identity (SPIFFE mTLS) + OBO token</text>
-          <text class="t-s" x="606" y="119" style="font-size:12px">Agent Gateway + Registry + Model Armor</text>
-          <path class="flow" d="M860 95 H884" marker-end="url(#pbr-ink)"/>
+          <rect class="b-code" x="588" y="58" width="280" height="74" rx="7"/>
+          <text class="t-b" x="598" y="82" style="font-size:15.2px">1 · Identity &amp; Gateways (L1, L2, L5)</text>
+          <text class="t-s" x="598" y="102" style="font-size:13.4px">Agent Identity (SPIFFE mTLS) + OBO token</text>
+          <text class="t-s" x="598" y="119" style="font-size:13.4px">Agent Gateway + Registry + Model Armor</text>
+          <path class="flow" d="M868 95 H890" marker-end="url(#pbr-ink)"/>
 
-          <rect class="b-code" x="888" y="58" width="258" height="74" rx="7"/>
-          <text class="t-b" x="902" y="82" style="font-size:13.5px">2 · Parameterized Tools (L3, L6)</text>
-          <text class="t-s" x="902" y="102" style="font-size:12px">MCP Toolbox: fixed SQL templates,</text>
-          <text class="t-s" x="902" y="119" style="font-size:12px">bound user claims + Cloud SDP mask</text>
+          <rect class="b-code" x="894" y="58" width="258" height="74" rx="7"/>
+          <text class="t-b" x="906" y="82" style="font-size:15.2px">2 · Parameterized Tools (L3, L6)</text>
+          <text class="t-s" x="906" y="102" style="font-size:13.4px">MCP Toolbox: fixed SQL templates,</text>
+          <text class="t-s" x="906" y="119" style="font-size:13.4px">bound user claims + Cloud SDP mask</text>
 
           <path class="flow" d="M1017 132 V166" marker-end="url(#pbr-ink)"/>
 
@@ -2287,14 +2336,14 @@
           <text class="t-zone" x="608" y="192" style="fill:var(--amber)">VPC SERVICE CONTROLS PERIMETER + PRIVATE SERVICE CONNECT (L7)</text>
 
           <rect class="b-store" x="608" y="206" width="256" height="82" rx="7"/>
-          <text class="t-b" x="622" y="230" style="font-size:13.5px">3 · Database Engine (L4)</text>
-          <text class="t-s" x="622" y="250" style="font-size:12px">FORCE RLS + column grants;</text>
-          <text class="t-s" x="622" y="268" style="font-size:12px">zero public IP, zero Cloud NAT</text>
+          <text class="t-b" x="622" y="230" style="font-size:15.2px">3 · Database Engine (L4)</text>
+          <text class="t-s" x="622" y="250" style="font-size:13.4px">FORCE RLS + column grants;</text>
+          <text class="t-s" x="622" y="268" style="font-size:13.4px">zero public IP, zero Cloud NAT</text>
 
           <rect class="b-code" x="880" y="206" width="250" height="82" rx="7"/>
-          <text class="t-b" x="894" y="230" style="font-size:13.5px">4 · Approval &amp; Audit (L8, L9)</text>
-          <text class="t-s" x="894" y="250" style="font-size:12px">HITL before mutations, end-to-end</text>
-          <text class="t-s" x="894" y="268" style="font-size:12px">user-to-SQL trace &amp; kill switch</text>
+          <text class="t-b" x="894" y="230" style="font-size:15.2px">4 · Approval &amp; Audit (L8, L9)</text>
+          <text class="t-s" x="894" y="250" style="font-size:13.4px">HITL before mutations, end-to-end</text>
+          <text class="t-s" x="894" y="268" style="font-size:13.4px">user-to-SQL trace &amp; kill switch</text>
         </svg>
         <div class="fig-caption"><span>Figure 9 — Episode 02 designs the outer workflow and autonomy boundaries; <a href="ep01_securing_agent_to_database.html">Episode 01</a> locks down the enterprise tool and database wire inside it.</span>
           <div class="legend-items"><span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good)"></i> Plain code</span><span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> LLM step</span><span><i class="swatch-dot" style="background:var(--amber-soft);border-color:var(--amber)"></i> Database / store</span></div>
@@ -2314,6 +2363,35 @@
             </tbody>
           </table>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== CONCLUSION ==================== -->
+  <section class="sheet" id="conclusion">
+    <div class="sheet-h">
+      <div>
+        <span class="sec-badge">Takeaways · Reusable Mental Model</span>
+        <h2>Conclusion</h2>
+        <p>Three durable engineering habits across changing frameworks, models, and domains.</p>
+      </div>
+    </div>
+    <div class="sheet-b">
+      <div class="post-prose">
+        <p>
+          Frameworks, model versions, and agent protocols will keep changing every few months, while the structural questions underneath an event-driven system remain stable. Whenever we start from a simple whiteboard sequence of agents, reliable design comes from building from the deterministic shell inward and giving every step only the autonomy its task requires.
+        </p>
+        <p>
+          Walking through the six stages turns that habit into repeatable muscle memory:
+        </p>
+        <ul>
+          <li><strong>Protect live operations and intake first (Stages 1–3):</strong> keep sub-second containment in existing deterministic automation, decouple callers behind a stateless receiver and a durable queue with terminal acknowledgement, and coordinate concurrent runs through one transactional store holding duplicate locks, a storm breaker, a manual kill switch, and expiring leases with pre-write fencing.</li>
+          <li><strong>Scope autonomy inside one harness (Stages 4–5):</strong> reserve language models for interpreting messy, untrusted text (a toolless Quarantined LLM) and exploring open-ended fixes (a bounded Privileged LLM), pass small code-validated contracts between steps with shared chat history disabled, verify every candidate independently in plain code, and restrict long-term memory writes to post-approval code.</li>
+          <li><strong>Isolate execution and prove quality (Stage 6):</strong> run untrusted tools and clean-room test suites inside networkless, credential-free sandboxes, keep external write tokens narrow on a plain-code gate, and promote changes through offline golden replays and live acceptance metrics.</li>
+        </ul>
+        <p>
+          Whether the trigger is a failing deployment, a disputed supplier invoice, a production alert, or an updated client filing, the domain nouns change while the architecture and its thirteen questions stay the same.
+        </p>
       </div>
     </div>
   </section>
@@ -2412,7 +2490,8 @@ self_healing_workflow = Workflow(
           <li>Anthropic, <a href="https://www.anthropic.com/research/multi-agent-research-system" target="_blank" rel="noopener">How We Built Our Multi-Agent Research System</a>, June 13, 2025. Effort scaling, context isolation across subagents, and production reliability lessons.</li>
           <li>Google Cloud, <a href="https://docs.cloud.google.com/architecture/choose-design-pattern-agentic-ai-system" target="_blank" rel="noopener">Choose a Design Pattern for Your Agentic AI System</a>, last reviewed November 13, 2026. Selecting single-agent, deterministic workflow, loop, or multi-agent patterns from task shape, latency, and budget.</li>
           <li>Cognition, <a href="https://cognition.com/blog/dont-build-multi-agents" target="_blank" rel="noopener">Don't Build Multi-Agents</a>, June 12, 2025. Why parallel writer swarms fail from fragmented context, and keeping writes single-threaded.</li>
-          <li>HumanLayer, <a href="https://github.com/humanlayer/12-factor-agents" target="_blank" rel="noopener">12-Factor Agents</a>, repository created March 30, 2025. Engineering principles for production agents: owning your context window, structured tool outputs, unified state, and explicit control flow.</li>
+          <li>Pete Hodgson, <a href="https://martinfowler.com/articles/feature-toggles.html" target="_blank" rel="noopener">Feature Toggles (aka Feature Flags)</a>, martinfowler.com, October 9, 2017. Operational toggles ("Kill Switches") as manually-managed circuit breakers evaluated dynamically at runtime.</li>
+          <li>HumanLayer, <a href="https://github.com/humanlayer/12-factor-agents" target="_blank" rel="noopener">12-Factor Agents</a> (including <a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-06-launch-pause-resume.md" target="_blank" rel="noopener">Factor 6: Launch/Pause/Resume with Simple APIs</a>), repository created March 30, 2025. Engineering principles for production agents: owning your context window, structured tool outputs, unified state, pause/resume between tool selection and execution, and explicit control flow.</li>
           <li>Simon Willison, <a href="https://simonwillison.net/2023/Apr/25/dual-llm-pattern/" target="_blank" rel="noopener">The Dual LLM Pattern for Building AI Assistants That Can Resist Prompt Injection</a>, April 25, 2023. Separating a toolless Quarantined LLM that reads untrusted input from a tool-equipped Privileged LLM mediated by a deterministic controller.</li>
           <li>Debenedetti et al., <a href="https://arxiv.org/abs/2503.18813" target="_blank" rel="noopener">Defeating Prompt Injections by Design (CaMeL)</a> (arXiv:2503.18813), March 24, 2025. Capability-tracked control and data flow between a Quarantined LLM and a Privileged LLM inside a deterministic interpreter.</li>
           <li><a href="ep01_securing_agent_to_database.html">Episode 01 — Securing the Agent-to-Database Connection</a> (including <a href="ep01_securing_agent_to_database.html#dual-llm-history-bleed">Dual-LLM shared-history isolation with <code>include_contents="none"</code></a>). The nine defense layers securing the enterprise tool and database wire inside this blueprint.</li>

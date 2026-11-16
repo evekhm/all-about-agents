@@ -1,0 +1,1517 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Full Architecture &amp; End-to-End Component Walkthrough — Designing Agentic Systems</title>
+<style>
+
+  :root,
+  html[data-theme="light"] {
+    --bg: #f6f8fb;
+    --bg-grid: rgba(15, 23, 42, 0.035);
+    --panel: #ffffff;
+    --panel-2: #f8fafc;
+    --panel-3: #f1f5f9;
+    --ink: #0f172a;
+    --muted: #475569;
+    --dim: #64748b;
+    --line: #cbd5e1;
+    --line-2: #e2e8f0;
+    --cyan: #0369a1;
+    --cyan-soft: rgba(3, 105, 161, 0.09);
+    --amber: #b45309;
+    --amber-soft: rgba(180, 83, 9, 0.10);
+    --good: #15803d;
+    --good-soft: rgba(21, 128, 61, 0.09);
+    --warn: #c2410c;
+    --warn-soft: rgba(194, 65, 12, 0.10);
+    --stop: #b91c1c;
+    --stop-soft: rgba(185, 28, 28, 0.08);
+    --violet: #6d28d9;
+    --violet-soft: rgba(109, 40, 217, 0.09);
+    --shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
+    --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --mono: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+  }
+
+  html[data-theme="dark"] {
+    --bg: #09131c;
+    --bg-grid: rgba(148, 198, 235, 0.055);
+    --panel: #0e1c2a;
+    --panel-2: #132536;
+    --panel-3: #0b1723;
+    --ink: #ecf3fb;
+    --muted: #b5c9de;
+    --dim: #7f9ab5;
+    --line: #21405c;
+    --line-2: #183149;
+    --cyan: #5fd4ff;
+    --cyan-soft: rgba(95, 212, 255, 0.13);
+    --amber: #ffbe55;
+    --amber-soft: rgba(255, 190, 85, 0.14);
+    --good: #52e29a;
+    --good-soft: rgba(82, 226, 154, 0.13);
+    --warn: #ff9a52;
+    --warn-soft: rgba(255, 154, 82, 0.14);
+    --stop: #ff6b7c;
+    --stop-soft: rgba(255, 107, 124, 0.14);
+    --violet: #b695ff;
+    --violet-soft: rgba(182, 149, 255, 0.14);
+    --shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+  }
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg);
+    background-image:
+      linear-gradient(to right, var(--bg-grid) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--bg-grid) 1px, transparent 1px);
+    background-size: 28px 28px;
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 10px 28px;
+    background: color-mix(in srgb, var(--panel) 92%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--cyan);
+  }
+  .brand-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--cyan);
+    box-shadow: 0 0 0 3px var(--cyan-soft);
+  }
+  .navlinks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+  .navlinks a, .theme-btn {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    padding: 5px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--line-2);
+    background: var(--panel-2);
+    color: var(--muted);
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .navlinks a:hover, .theme-btn:hover {
+    border-color: var(--cyan);
+    color: var(--cyan);
+  }
+
+  a.brand { text-decoration: none; } .brand-dot { flex-shrink: 0; }
+  a.brand:hover { text-decoration: underline; }
+  .navlinks a.home-link { border-color: var(--cyan); color: var(--cyan); font-weight: 700; }
+  .back-home { margin: 34px 0 10px; padding-top: 18px; border-top: 1px solid var(--line); font-family: var(--mono); font-size: 13px; }
+  .back-home a { color: var(--cyan); text-decoration: none; font-weight: 700; }
+  .back-home a:hover { text-decoration: underline; }
+
+  .app {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 28px 24px 72px;
+  }
+
+  .sheet {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    margin-bottom: 28px;
+    overflow: hidden;
+  }
+  .sheet-h {
+    padding: 20px 28px;
+    border-bottom: 1px solid var(--line-2);
+    background: var(--panel-2);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .sec-badge {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    color: var(--cyan);
+    background: var(--cyan-soft);
+    padding: 3px 9px;
+    border-radius: 5px;
+    border: 1px solid color-mix(in srgb, var(--cyan) 30%, transparent);
+    display: inline-block;
+    margin-bottom: 6px;
+  }
+  .sheet-h h1, .sheet-h h2 {
+    margin: 0;
+    font-size: 23px;
+    letter-spacing: -0.015em;
+  }
+  .sheet-h p {
+    margin: 4px 0 0;
+    color: var(--muted);
+    font-size: 14.5px;
+  }
+  .sheet-b {
+    padding: 28px;
+  }
+
+  .post-prose {
+    max-width: 100%;
+    font-size: 17px;
+    line-height: 1.78;
+    color: var(--ink);
+  }
+  .post-prose p {
+    margin: 0 0 18px;
+  }
+  .post-prose h3 {
+    margin: 26px 0 10px;
+    font-size: 20px;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .scenario-callout {
+    margin: 20px 0;
+    padding: 16px 20px;
+    border-left: 4px solid var(--cyan);
+    background: var(--cyan-soft);
+    border-radius: 0 10px 10px 0;
+    font-size: 16px;
+  }
+  .scenario-callout strong {
+    color: var(--cyan);
+  }
+
+  .diagram-frame {
+    background: var(--panel-2);
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    padding: 18px;
+    margin: 20px 0 4px;
+    overflow-x: auto;
+  }
+  .diagram-frame svg {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .fig-caption {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid var(--line-2);
+    font-family: var(--mono);
+    font-size: 13.5px;
+    color: var(--muted);
+  }
+  .legend-items {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .swatch-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+    border: 1.5px solid;
+    vertical-align: middle;
+    margin-right: 4px;
+  }
+
+  .zone-box { fill: var(--panel); stroke: var(--line); stroke-width: 1.5; stroke-dasharray: 6 4; }
+  .node-card { fill: var(--panel); stroke: var(--line); stroke-width: 1.75; }
+  .node-cyan { fill: var(--cyan-soft); stroke: var(--cyan); stroke-width: 1.8; }
+  .node-amber { fill: var(--amber-soft); stroke: var(--amber); stroke-width: 1.8; }
+  .node-good { fill: var(--good-soft); stroke: var(--good); stroke-width: 1.8; }
+  .node-warn { fill: var(--warn-soft); stroke: var(--warn); stroke-width: 1.6; }
+  .node-bad { fill: var(--stop-soft); stroke: var(--stop); stroke-width: 1.8; }
+  .node-violet { fill: var(--violet-soft); stroke: var(--violet); stroke-width: 1.8; }
+
+  .t-zone { font-family: var(--mono); font-size: 12.8px; font-weight: 700; fill: var(--muted); letter-spacing: 0.08em; }
+  .t-title { font-family: var(--sans); font-size: 16.2px; font-weight: 700; fill: var(--ink); }
+  .t-sub { font-family: var(--sans); font-size: 13.8px; fill: var(--muted); }
+  .t-mono { font-family: var(--mono); font-size: 11.5px; font-weight: 600; fill: var(--ink); }
+
+  .edge-line { stroke: var(--ink); stroke-width: 2; fill: none; }
+  .edge-cyan { stroke: var(--cyan); stroke-width: 2.2; fill: none; }
+  .edge-amber { stroke: var(--amber); stroke-width: 2.2; fill: none; }
+  .edge-good { stroke: var(--good); stroke-width: 2.2; fill: none; }
+  .edge-bad { stroke: var(--stop); stroke-width: 2.2; stroke-dasharray: 6 4; fill: none; }
+
+  .node-callout { fill: var(--panel); stroke: var(--stop); stroke-width: 1.4; stroke-dasharray: 5 3; }
+  .t-callout { font-family: var(--mono); font-size: 11px; fill: var(--ink); }
+  .t-callout-h { font-family: var(--mono); font-size: 11px; font-weight: 700; fill: var(--stop); letter-spacing: 0.04em; }
+  .t-badge { font-family: var(--mono); font-size: 10.5px; font-weight: 700; fill: #fff; text-anchor: middle; }
+  .badge-dot { fill: var(--stop); stroke: var(--panel); stroke-width: 1.5; }
+  .badge-dot.add { fill: var(--good); }
+  .tbl-wrap { overflow-x: auto; margin: 18px 0 8px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line-2); }
+  th { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); background: var(--panel-2); }
+  td code, .post-prose code { font-family: var(--mono); font-size: 0.9em; background: var(--panel-3); padding: 1px 5px; border-radius: 4px; }
+  .b-pill { display: inline-block; font-family: var(--mono); font-size: 10.5px; font-weight: 700; padding: 2px 7px; border-radius: 4px; margin: 1px 2px 1px 0; white-space: nowrap; border: 1px solid; text-decoration: none; }
+  a.b-pill:hover { text-decoration: none; filter: brightness(0.95); }
+  .b-pill.asi { color: var(--violet); background: var(--violet-soft); border-color: color-mix(in srgb, var(--violet) 35%, transparent); }
+  .b-pill.llm { color: var(--cyan); background: var(--cyan-soft); border-color: color-mix(in srgb, var(--cyan) 35%, transparent); }
+  .b-pill.api { color: var(--amber); background: var(--amber-soft); border-color: color-mix(in srgb, var(--amber) 35%, transparent); }
+  .b-pill.t { color: var(--stop); background: var(--stop-soft); border-color: color-mix(in srgb, var(--stop) 35%, transparent); }
+  .b-pill.g { color: var(--good); background: var(--good-soft); border-color: color-mix(in srgb, var(--good) 35%, transparent); }
+  .nine-q-wrap {
+    margin: 18px 0 8px;
+    padding: 16px 20px 18px;
+    background: var(--panel-2);
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+  }
+  .nine-q-head {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--cyan);
+    padding-bottom: 10px;
+    margin-bottom: 12px;
+    border-bottom: 1.5px solid var(--line);
+  }
+  .nine-q-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+  }
+  @media (max-width: 960px) { .nine-q-grid { grid-template-columns: 1fr; } }
+  .nine-q-card {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 14px 16px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-top: 3px solid var(--cyan);
+    border-radius: 8px;
+    font-size: 13.5px;
+    line-height: 1.5;
+  }
+  .nine-q-card .lq-id {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--muted);
+  }
+  .nine-q-card b {
+    font-size: 14.5px;
+    color: var(--ink);
+  }
+  .nine-q-card span:not(.lq-id) {
+    color: var(--muted);
+  }
+  .opt-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 18px 0; }
+  @media (max-width: 900px) { .opt-grid { grid-template-columns: 1fr; } }
+  .opt-card { border: 1px solid var(--line); border-radius: 10px; background: var(--panel-2); padding: 16px 18px; font-size: 14.5px; }
+  .opt-card h4 { margin: 0 0 6px; font-size: 16px; }
+  .opt-card .opt-tag { font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--cyan); }
+  .opt-card ul { margin: 8px 0 0 18px; padding: 0; }
+  .opt-card li { margin-bottom: 5px; }
+  .code-card { background: #0f172a; color: #f1f5f9; border-radius: 10px; padding: 14px 16px; margin: 12px 0 18px; overflow-x: auto; }
+  .code-card .code-title { font-family: var(--mono); font-size: 11px; color: #94a3b8; margin-bottom: 8px; letter-spacing: 0.06em; }
+  .code-card pre { margin: 0; font-family: var(--mono); font-size: 12.5px; line-height: 1.55; white-space: pre; }
+  /* Syntax Highlighting for Code & Payload Blocks */
+  .code-card pre .hl-c { color: #94a3b8; font-style: italic; }
+  .code-card pre .hl-k { color: #38bdf8; font-weight: 600; }
+  .code-card pre .hl-b { color: #c084fc; }
+  .code-card pre .hl-f { color: #fde047; font-weight: 600; }
+  .code-card pre .hl-s { color: #4ade80; }
+  .code-card pre .hl-n { color: #fb923c; }
+  .code-card pre .hl-v { color: #93c5fd; }
+  .code-card pre .hl-err { color: #fb7185; font-weight: 600; }
+
+  .t-card-full pre .hl-c { color: #64748b; font-style: italic; }
+  .t-card-full pre .hl-k { color: #0284c7; font-weight: 700; }
+  .t-card-full pre .hl-b { color: #7c3aed; font-weight: 600; }
+  .t-card-full pre .hl-f { color: #b45309; font-weight: 700; }
+  .t-card-full pre .hl-s { color: #15803d; }
+  .t-card-full pre .hl-n { color: #c2410c; font-weight: 600; }
+  .t-card-full pre .hl-v { color: #1d4ed8; }
+  .t-card-full pre .hl-err { color: #be123c; font-weight: 600; }
+
+  .beat { font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--cyan); margin: 22px 0 6px; }
+  .beat:first-child { margin-top: 0; }
+  .closes { display: flex; gap: 14px; flex-wrap: wrap; margin: 14px 0 6px; padding: 12px 16px; border-radius: 10px; background: var(--panel-2); border: 1px solid var(--line-2); font-family: var(--mono); font-size: 12.5px; }
+  .closes b { color: var(--good); }
+  .closes i { color: var(--stop); font-style: normal; }
+  .deeper { margin: 10px 0 0; font-size: 14.5px; }
+  .deeper a { color: var(--cyan); font-weight: 600; }
+  .node-dim { fill: var(--panel-3); stroke: var(--line); stroke-width: 1.2; }
+  .t-dim { font-family: var(--sans); font-size: 11px; fill: var(--dim); }
+  .node-new { fill: var(--good-soft); stroke: var(--good); stroke-width: 2.2; }
+  .node-done { fill: var(--panel); stroke: var(--good); stroke-width: 1.4; }
+
+
+  /* Progressive Hero Build Styles */
+  .prog-hero-frame svg text { font-family: var(--sans); font-size: 13.5px; fill: var(--ink); }
+  .prog-hero-frame .pt-b { font-weight: 600; font-size: 14px; }
+  .prog-hero-frame .pt-d { font-size: 17px; font-weight: 700; }
+  .prog-hero-frame .pt-s { font-size: 12px; fill: var(--muted); }
+  .prog-hero-frame .pt-m { font-family: var(--mono); font-size: 11.5px; }
+  .prog-hero-frame .pt-c { text-anchor: middle; }
+  .prog-hero-frame .p-zone { fill: var(--panel-3); stroke: var(--line-2); stroke-width: 1; }
+  .prog-hero-frame .p-zl { font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: .1em; fill: var(--muted); }
+  .prog-hero-frame .p-zl-v { font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: .1em; fill: var(--violet); }
+  .prog-hero-frame .p-edge { fill: none; stroke: var(--ink); stroke-width: 2; }
+  .prog-hero-frame .p-edge-id { fill: none; stroke: var(--good); stroke-width: 3; }
+
+  .prog-hero-frame .p-new rect.pb { fill: var(--good-soft); stroke: var(--good); stroke-width: 2.8; }
+  .prog-hero-frame .p-new text.pt-b, .prog-hero-frame .p-new text.pt-d { fill: var(--good); }
+  .prog-hero-frame .p-done rect.pb { fill: var(--panel); stroke: var(--good); stroke-width: 1.6; }
+  .prog-hero-frame .p-wait { opacity: 0.28; }
+  .prog-hero-frame .p-wait rect.pb { fill: var(--panel-3); stroke: var(--line); stroke-width: 1.2; stroke-dasharray: 4 3; }
+
+  .prog-hero-frame .p-vpc-rect { fill: var(--violet-soft); stroke: var(--violet); stroke-width: 1.5; }
+  .prog-hero-frame .p-prod-rect { fill: var(--panel); stroke: var(--violet); stroke-width: 1.2; stroke-dasharray: 4 3; }
+  .prog-hero-frame .p-new .p-vpc-rect, .prog-hero-frame .p-new .p-prod-rect { stroke: var(--good); stroke-width: 2.6; }
+
+  .prog-hero-frame .p-perim-rect { fill: none; stroke: var(--warn); stroke-width: 2; stroke-dasharray: 10 6; }
+  .prog-hero-frame .p-perim-txt { font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: .08em; fill: var(--warn); }
+  .prog-hero-frame .p-wait-perim { opacity: 0.22; }
+  .prog-hero-frame .p-new-perim .p-perim-rect { stroke: var(--good); stroke-width: 3.2; }
+  .prog-hero-frame .p-new-perim .p-perim-txt { fill: var(--good); }
+
+  /* Lethal Trifecta & Mode Cards & Spotlight Grids */
+  .tri-group-head {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--stop);
+    background: var(--stop-soft);
+    border: 1px solid color-mix(in srgb, var(--stop) 35%, transparent);
+    border-radius: 6px;
+    padding: 7px 12px;
+    margin: 16px 0 10px;
+  }
+  .trifecta-grid, .mode-3-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    margin: 10px 0 18px;
+  }
+  .trifecta-grid.two-col {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .tri-card, .mode-card {
+    border: 1.5px solid var(--line);
+    border-top: 4px solid var(--stop);
+    border-radius: 8px;
+    padding: 16px 18px;
+    background: var(--panel-2);
+  }
+  .mode-card { border-top-color: var(--cyan); }
+  .mode-card.m-teal { border-top-color: var(--good); }
+  .mode-card.m-violet { border-top-color: var(--violet); }
+  .tri-card .leg-tag, .mode-card .leg-tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--stop);
+    display: block;
+    margin-bottom: 6px;
+  }
+  .mode-card .leg-tag { color: var(--cyan); }
+  .mode-card.m-teal .leg-tag { color: var(--good); }
+  .mode-card.m-violet .leg-tag { color: var(--violet); }
+  .tri-card h4, .mode-card h4 { margin: 0 0 8px; font-size: 16.5px; }
+  .tri-card p, .mode-card p, .mode-card li { margin: 0; font-size: 14px; line-height: 1.55; }
+  .mode-card ol { margin: 6px 0 0; padding-left: 18px; display: grid; gap: 5px; }
+
+  .duo-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin: 18px 0;
+    align-items: start;
+  }
+  .info-card {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 18px 20px;
+    background: var(--panel-2);
+    font-size: 14.5px;
+  }
+  .info-card h3, .info-card h4 { margin: 0 0 10px; font-size: 17px; }
+  .info-card ul, .info-card ol { margin: 0; padding-left: 20px; display: grid; gap: 7px; }
+
+  .threat-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    margin: 20px 0;
+  }
+  .t-card-full {
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--stop);
+    border-radius: 8px;
+    padding: 14px 16px;
+    background: var(--panel-2);
+    font-size: 13.8px;
+  }
+  .t-card-full h4 { margin: 4px 0 6px; font-size: 15.5px; color: var(--ink); }
+  .t-card-full p { margin: 0 0 8px; color: var(--muted); }
+  .t-card-full pre {
+    margin: 0 0 8px;
+    padding: 8px 10px;
+    background: var(--panel);
+    border: 1px solid var(--line-2);
+    border-radius: 5px;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    white-space: pre-wrap;
+  }
+  .t-fix-row {
+    font-size: 12.8px;
+    padding: 6px 9px;
+    border-radius: 5px;
+    margin-top: 5px;
+    background: var(--panel);
+    border-left: 3px solid var(--good);
+  }
+  .t-fix-row.mit { border-left-color: var(--amber); }
+  .t-fix-row.gcp {
+    border-left-color: var(--cyan);
+    background: color-mix(in srgb, var(--cyan-soft) 55%, var(--panel));
+    font-size: 12.3px;
+  }
+  .t-fix-row.gcp b { color: var(--cyan); }
+
+  .t-card-full.l-card-full {
+    border-left: 4px solid var(--good);
+  }
+  .t-fix-row.threat-rem {
+    border-left-color: var(--stop);
+    background: color-mix(in srgb, var(--stop-soft) 45%, var(--panel));
+    font-size: 12.4px;
+  }
+  .t-fix-row.threat-rem b { color: var(--stop); }
+  .t-fix-row.oss {
+    border-left-color: var(--good);
+    background: color-mix(in srgb, var(--good-soft) 45%, var(--panel));
+    font-size: 12.3px;
+  }
+  .t-fix-row.oss b { color: var(--good); }
+
+  .p-stage {
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    padding: 16px 18px;
+    background: var(--panel-2);
+    margin-bottom: 14px;
+  }
+  .p-stage-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+    font-weight: 700;
+    font-size: 16px;
+  }
+  .p-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .p-col {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px 14px;
+    background: var(--panel);
+    font-size: 13.5px;
+  }
+  .p-col.flawed-col { border-left: 4px solid var(--stop); }
+  .p-col.guarded-col { border-left: 4px solid var(--good); }
+  .p-col-title { font-family: var(--mono); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; display: block; margin-bottom: 6px; }
+  .p-col.flawed-col .p-col-title { color: var(--stop); }
+  .p-col.guarded-col .p-col-title { color: var(--good); }
+  .p-code { font-family: var(--mono); font-size: 12px; background: var(--panel-2); padding: 8px 10px; border-radius: 5px; white-space: pre-wrap; margin-bottom: 8px; border: 1px solid var(--line-2); }
+
+  @media (max-width: 960px) {
+    .trifecta-grid, .mode-3-grid, .duo-grid, .threat-cards-grid, .p-cols { grid-template-columns: 1fr; }
+  }
+
+  @media print {
+    table { font-size: 10.5px; table-layout: auto; }
+    th, td { padding: 5px 6px; overflow-wrap: break-word; }
+    td code { white-space: normal; overflow-wrap: break-word; font-size: 9.5px; }
+    .b-pill { font-size: 9px; padding: 1px 4px; }
+    .tbl-wrap { break-inside: auto; overflow: visible; }
+    .topbar { display: none !important; }
+    .app { max-width: 100%; padding: 0; }
+    .sheet { break-inside: auto; box-shadow: none; margin-bottom: 14px; }
+    .diagram-frame, .opt-card, .code-card, .nine-q-card, .t-card-full, .chain, .link { break-inside: avoid; }
+    .code-card, .link pre { overflow: visible !important; }
+    .code-card pre { white-space: pre-wrap; word-break: break-word; font-size: 10.5px; line-height: 1.45; }
+    .link pre { white-space: pre-wrap; word-break: break-word; font-size: 9.2px; line-height: 1.45; padding: 10px 10px; }
+    .q-group-title, .post-prose h3, .sheet-h, .nine-q-head { break-inside: avoid; break-after: avoid; }
+    .nine-q-wrap > .tbl-wrap { display: contents; }
+    #cheatsheet { break-before: page; break-inside: avoid; margin-bottom: 12px; }
+    #references { break-before: page; break-inside: avoid; }
+    #cheatsheet .sheet-h { padding: 14px 22px; }
+    #cheatsheet .sheet-b { padding: 16px 22px; }
+    #cheatsheet .say { margin: 8px 0 12px; padding: 10px 14px; font-size: 14.5px; }
+    #cheatsheet .post-prose p { margin: 0 0 10px; font-size: 13.5px; line-height: 1.5; }
+    #cheatsheet .opt-grid { gap: 10px; margin: 10px 0; }
+    #cheatsheet .opt-card { padding: 10px 14px; font-size: 12.5px; }
+    #cheatsheet .opt-card li { margin-bottom: 3px; }
+    tr { break-inside: avoid; }
+  }
+
+
+
+
+  /* Ensure .t-badge inside any SVG always renders crisp white text */
+  .diagram-frame svg text.t-badge { fill: #ffffff !important; }
+
+  /* concept → implementation strip used in every section */
+  .concept-map { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 0; margin: 0 0 18px; border: 1.5px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--panel-2); }
+  .concept-map > div { padding: 10px 14px; border-right: 1px solid var(--line-2); font-size: 13.5px; }
+  .concept-map > div:last-child { border-right: 0; }
+  .concept-map .cm-k { display: block; font-family: var(--mono); font-size: 10.5px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; margin-bottom: 3px; }
+  .concept-map .cm-concept .cm-k { color: var(--ink); }
+  .concept-map .cm-oss .cm-k { color: var(--cyan); }
+  .concept-map .cm-gcp .cm-k { color: var(--good); }
+  .concept-map .cm-fig .cm-k { color: var(--violet); }
+  .concept-map a { color: inherit; }
+  @media (max-width: 960px) { .concept-map { grid-template-columns: 1fr 1fr; } }
+  .cm-pill { display:inline-block; font-family: var(--mono); font-size: 10.5px; font-weight: 700; padding: 1px 7px; border-radius: 4px; border: 1px solid; margin: 1px 4px 1px 0; }
+  .cm-pill.oss { color: var(--cyan); background: var(--cyan-soft); border-color: color-mix(in srgb, var(--cyan) 35%, transparent); }
+  .cm-pill.gcp { color: var(--good); background: var(--good-soft); border-color: color-mix(in srgb, var(--good) 35%, transparent); }
+  @media print { .concept-map { break-inside: avoid; } }
+
+  main a:not(.b-pill) { color: var(--cyan); }
+  @media screen and (max-width: 960px) {
+    .topbar { position: static; }
+    .diagram-frame svg { min-width: 860px; }
+  }
+    /* Page numbers in the PDF export */
+    @page {
+      margin: 10mm 10mm 14mm 10mm;
+      @bottom-center {
+        content: counter(page) " / " counter(pages);
+        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+        font-size: 9pt;
+        color: #64748b;
+      }
+    }
+
+  /* Playbook question cards & skeleton SVG styles */
+  .say {
+    border-left: 4px solid var(--cyan);
+    background: var(--cyan-soft);
+    padding: 14px 18px;
+    margin: 14px 0 20px;
+    border-radius: 0 8px 8px 0;
+    font-size: 16.5px;
+    font-weight: 600;
+  }
+  .say .eyebrow {
+    display: block;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--cyan);
+    margin-bottom: 4px;
+  }
+  .qb {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    margin: 14px 0 18px;
+    overflow: hidden;
+    background: var(--panel);
+    break-inside: avoid;
+  }
+  .qh {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    padding: 12px 18px;
+    background: var(--panel-2);
+    border-bottom: 1px solid var(--line-2);
+  }
+  .qh .n {
+    flex: none;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--panel);
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: 15px;
+    line-height: 34px;
+    text-align: center;
+  }
+  .qh h3 {
+    margin: 0;
+    font-size: 17.5px;
+    color: var(--ink);
+  }
+  .q3 {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .q3 > div {
+    padding: 14px 16px;
+    font-size: 14.5px;
+    line-height: 1.55;
+    border-right: 1px solid var(--line-2);
+    min-width: 0;
+  }
+  .q3 > div:last-child { border-right: 0; }
+  .q3 .lab {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 6px;
+  }
+  .q3 .a { background: var(--stop-soft); }
+  .q3 .a .lab { color: var(--stop); }
+  .q3 .b .lab { color: var(--good); }
+  .q3 .c { background: var(--cyan-soft); }
+  .q3 .c .lab { color: var(--cyan); }
+  .q3 ul { margin: 0; padding-left: 1.15em; }
+  .q3 li { margin-bottom: 4px; }
+  @media screen and (max-width: 820px) {
+    .q3 { grid-template-columns: 1fr; }
+    .q3 > div { border-right: 0; border-bottom: 1px solid var(--line-2); }
+    .q3 > div:last-child { border-bottom: 0; }
+  }
+  .q-group-title {
+    margin: 26px 0 8px;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--cyan);
+  }
+  .check {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+  }
+  .check li {
+    padding-left: 28px;
+    position: relative;
+    margin-bottom: 10px;
+  }
+  .check li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 5px;
+    width: 15px;
+    height: 15px;
+    border: 2px solid var(--cyan);
+    border-radius: 3px;
+  }
+  svg .t-b { font-family: var(--sans); font-size: 16px; font-weight: 700; fill: var(--ink); }
+  svg .t-s { font-family: var(--sans); font-size: 14px; fill: var(--muted); }
+  svg .t-c { text-anchor: middle; }
+  svg .t-e { text-anchor: end; }
+  svg .zone-ours { fill: none; stroke: var(--cyan); stroke-width: 1.5; stroke-dasharray: 8 5; }
+  svg .zl { font-family: var(--mono); font-size: 13.2px; letter-spacing: 0.09em; fill: var(--muted); font-weight: 700; }
+  svg .b-ext { fill: var(--panel); stroke: var(--muted); stroke-width: 1.4; stroke-dasharray: 5 4; }
+  svg .b-code { fill: var(--good-soft); stroke: var(--good); stroke-width: 1.8; }
+  svg .b-model { fill: var(--violet-soft); stroke: var(--violet); stroke-width: 1.8; }
+  svg .b-store { fill: var(--amber-soft); stroke: var(--amber); stroke-width: 1.6; }
+  svg .flow { stroke: var(--ink); stroke-width: 2.1; fill: none; }
+  svg .flow-d { stroke: var(--muted); stroke-width: 1.8; fill: none; stroke-dasharray: 6 4; }
+  svg .flow-g { stroke: var(--good); stroke-width: 2.4; fill: none; }
+
+  .chain {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin: 14px 0 22px;
+  }
+  .link {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--panel);
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    overflow: hidden;
+  }
+  .link header {
+    padding: 10px 14px;
+    background: var(--cyan-soft);
+    font-weight: 700;
+    font-size: 15.5px;
+    color: var(--ink);
+    border-bottom: 1px solid var(--line-2);
+  }
+  .link header span {
+    display: block;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--cyan);
+    margin-bottom: 2px;
+  }
+  .link pre {
+    margin: 0;
+    padding: 12px 14px;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.5;
+    background: #0f1b30;
+    color: #e6edf7;
+    overflow-x: auto;
+    flex: 1;
+  }
+  .link pre .hl-k { color: #8fc1ff; }
+  .link pre .hl-s { color: #a5e0b4; }
+  .link pre .hl-n { color: #f5c37a; }
+  .link footer {
+    padding: 10px 14px;
+    font-size: 13.5px;
+    line-height: 1.45;
+    color: var(--muted);
+    background: var(--panel-2);
+    border-top: 1px solid var(--line-2);
+  }
+  @media screen and (max-width: 820px) {
+    .chain { grid-template-columns: 1fr; }
+  }
+  .opt-grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  @media screen and (max-width: 900px) { .opt-grid.two { grid-template-columns: 1fr; } }
+  /* Progressive Stage Highlight Helpers (Ep02) */
+  svg g.stg-prev { opacity: 0.72; }
+  svg g.stg-new > rect { stroke-width: 3px !important; filter: drop-shadow(0 0 6px color-mix(in srgb, var(--good) 42%, transparent)); }
+  svg g.stg-new > path, svg g.stg-new > line { stroke-width: 2.6px !important; }
+  svg .t-m-g { font-family: var(--mono); font-size: 12.6px; font-weight: 700; fill: var(--good); }
+  svg .t-m-v { font-family: var(--mono); font-size: 12px; font-weight: 700; fill: var(--violet); }
+  svg .t-m-c { font-family: var(--mono); font-size: 12px; font-weight: 700; fill: var(--cyan); }
+  svg .t-m-r { font-family: var(--mono); font-size: 12.8px; font-weight: 700; fill: var(--stop); }
+  svg .b-sbx { fill: var(--panel-2); stroke: var(--cyan); stroke-width: 1.6; stroke-dasharray: 6 4; }
+  .fig-caption a { color: var(--cyan); }
+  @media print {
+    svg g.stg-new > rect { filter: none; stroke-width: 3px !important; }
+    #cheatsheet table { font-size: 9px; line-height: 1.3; }
+    #cheatsheet th, #cheatsheet td { padding: 2.8px 5px; }
+    #cheatsheet .nine-q-wrap { padding: 8px 12px 10px; margin: 6px 0 8px; }
+    #cheatsheet .nine-q-head { padding-bottom: 5px; margin-bottom: 5px; font-size: 10px; }
+    #references { break-before: auto !important; }
+  }
+  
+
+  .step-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+    margin: 16px 0 26px;
+  }
+  .step-card {
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--good);
+    border-radius: 10px;
+    padding: 15px 18px;
+    background: var(--panel-2);
+    break-inside: avoid;
+  }
+  .step-card.llm-step { border-left-color: var(--violet); }
+  .step-card.store-step { border-left-color: var(--amber); }
+  .step-card.sbx-step { border-left-color: var(--cyan); }
+  .step-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .step-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16.5px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 28px;
+    padding: 0 8px;
+    border-radius: 999px;
+    background: var(--ink);
+    color: var(--panel);
+    font-family: var(--mono);
+    font-size: 12.5px;
+    font-weight: 700;
+  }
+  .step-tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--panel);
+    color: var(--muted);
+  }
+  .step-card.llm-step .step-tag { color: var(--violet); border-color: color-mix(in srgb, var(--violet) 40%, transparent); background: var(--violet-soft); }
+  .step-card.store-step .step-tag { color: var(--amber); border-color: color-mix(in srgb, var(--amber) 40%, transparent); background: var(--amber-soft); }
+  .step-card.sbx-step .step-tag { color: var(--cyan); border-color: color-mix(in srgb, var(--cyan) 40%, transparent); background: var(--cyan-soft); }
+  .step-why {
+    font-size: 14.2px;
+    padding: 7px 11px;
+    border-radius: 6px;
+    background: var(--panel);
+    border: 1px solid var(--line-2);
+    margin-bottom: 9px;
+    color: var(--ink);
+  }
+  .step-why b { color: var(--stop); }
+  .step-how {
+    font-size: 14.8px;
+    line-height: 1.6;
+    color: var(--ink);
+    margin: 0;
+  }
+  .phase-banner {
+    margin: 26px 0 10px;
+    padding-bottom: 6px;
+    border-bottom: 1.5px solid var(--line);
+    font-family: var(--mono);
+    font-size: 12.5px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--cyan);
+  }
+
+</style>
+</head>
+<body>
+
+<nav class="topbar">
+  <a class="brand" id="brand-home-link" href="../index.html" title="All About Agents: all episodes">
+    <span class="brand-dot"></span>
+    <span>All About Agents · Full Architecture Reference</span>
+  </a>
+  <div class="navlinks">
+    <a class="home-link" href="../index.html">← Home</a>
+    <a href="../ep02_designing_agentic_systems.html">← Progressive Build (Episode 02)</a>
+    <a href="#platform-agnostic">1 · Platform-Agnostic</a>
+    <a href="#flow">2 · Step-by-Step Flow</a>
+    <a href="#gcp">3 · Google Cloud</a>
+    <a href="ep02-full-architecture.pdf">Download PDF</a>
+    <button class="theme-btn" id="theme-toggle" type="button">◑ Switch to Dark Mode</button>
+  </div>
+</nav>
+
+<main class="app">
+
+  <!-- ==================== SECTION 1: PLATFORM-AGNOSTIC ARCHITECTURE ==================== -->
+  <section class="sheet" id="platform-agnostic">
+    <div class="sheet-h">
+      <div>
+        <span class="sec-badge">Complete Reference · Zero Incremental Steps · Platform-Agnostic &amp; Google Cloud</span>
+        <h1>The Assembled Hybrid Agentic Architecture</h1>
+        <p>Both completed diagrams—platform-agnostic and mapped to Google Cloud—with a component-by-component walkthrough of how an event moves through the system from start to finish.</p>
+        <p style="font-family:var(--mono);font-size:12px;">By Eva Khmelinskaya · Companion reference to <a href="../ep02_designing_agentic_systems.html">A Mental Model for Designing Agentic Systems</a></p>
+      </div>
+    </div>
+    <div class="sheet-b">
+      <div class="post-prose">
+        <p>
+          This page presents the finished architecture directly as one assembled system, skipping the six incremental design stages of <a href="../ep02_designing_agentic_systems.html">Episode 02</a>. It governs asynchronous, event-driven workflows woken up by external signals that must interpret messy, potentially untrusted inputs, investigate context across external stores and tools, verify a proposed fix in a clean environment, and apply an external change safely under traffic bursts, duplicate deliveries, and worker crashes.
+        </p>
+        <div class="scenario-callout">
+          <strong>Reference Scenario:</strong> A self-healing code repository system handling <code>10,000</code> deployments a day across <code>20</code> to <code>30</code> repositories (<code>1%</code> failure rate = <code>100</code> failures/day). When a build, canary rollout, or error-rate alarm fires, the system contains live impact immediately, diagnoses the root cause, tests a candidate patch in an isolated sandbox, and opens a verified draft pull request for human review.
+        </div>
+        <p>
+          <a href="#fig-agnostic-full"><em>Figure 1</em></a> shows the complete platform-agnostic architecture. Language models sit only at the two purple nodes where unstructured interpretation (<strong>Quarantined LLM</strong>) and open-ended search (<strong>Privileged LLM</strong>) are needed; deterministic plain code owns fast containment, edge authentication, queueing, locks and leases, verification, external write credentials, and post-merge memory.
+        </p>
+      </div>
+
+      <div class="diagram-frame" id="fig-agnostic-full">
+<svg aria-label="Figure 1: Complete platform-agnostic hybrid agentic architecture" role="img" viewbox="0 0 1200 608">
+<defs>
+<marker id="ps6-ink" markerheight="6" markerwidth="6" orient="auto-start-reverse" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--ink)"></path></marker>
+<marker id="ps6-mut" markerheight="6" markerwidth="6" orient="auto-start-reverse" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--muted)"></path></marker>
+<marker id="ps6-good" markerheight="5.5" markerwidth="5.5" orient="auto-start-reverse" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--good)"></path></marker>
+<marker id="ps6-stop" markerheight="6" markerwidth="6" orient="auto-start-reverse" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--stop)"></path></marker>
+<marker id="ps6-cyan" markerheight="5.5" markerwidth="5.5" orient="auto-start-reverse" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--cyan)"></path></marker>
+</defs>
+<g>
+<rect class="b-ext" height="92" rx="7" width="170" x="20" y="66"></rect>
+<text class="t-b" style="font-size:15.8px" x="32" y="90">Triggers</text>
+<text class="t-s" style="font-size:14px" x="32" y="111">events, alerts, users</text>
+<text class="t-s" style="font-size:13.4px" x="32" y="130">pointer to raw data</text>
+<rect class="b-ext" height="92" rx="7" width="420" x="760" y="66"></rect>
+<text class="t-b" style="font-size:15.8px" x="774" y="90">Fast path · existing control · no model</text>
+<text class="t-s" style="font-size:14px" x="774" y="112">rollback, block, drain, fall back</text>
+<text class="t-s" style="font-size:13.4px" x="774" y="134">contains live impact in seconds, before agents run</text>
+<path class="flow-g" d="M105 66 V32 H970 V62" marker-end="url(#ps6-good)"></path>
+<text class="t-b t-c" style="font-size:15.2px" x="540" y="24">if something is on fire right now (seconds)</text>
+</g>
+<g>
+<rect class="b-code" height="92" rx="7" width="184" x="236" y="66"></rect>
+<text class="t-b" style="font-size:15.8px" x="248" y="90">Ingress / Receiver</text>
+<text class="t-s" style="font-size:13.4px" x="248" y="110">authenticate, filter,</text>
+<text class="t-s" style="font-size:13.4px" x="248" y="127">fingerprint, reply 200</text>
+<text class="t-s" style="font-size:13px" x="248" y="144">stateless receiver</text>
+<rect class="b-store" height="92" rx="7" width="174" x="466" y="66"></rect>
+<text class="t-b" style="font-size:15.8px" x="478" y="90">Queue</text>
+<text class="t-s" style="font-size:13.4px" x="478" y="110">holds work until ack,</text>
+<text class="t-s" style="font-size:13.4px" x="478" y="127">backoff + dead-letter</text>
+<text class="t-s" style="font-size:13px" x="478" y="144">durable queue</text>
+<path class="flow" d="M190 112 H232" marker-end="url(#ps6-ink)"></path>
+<path class="flow" d="M420 112 H462" marker-end="url(#ps6-ink)"></path>
+<path class="flow" d="M540 158 V210 H104 V262" marker-end="url(#ps6-ink)"></path>
+<text class="t-s t-c" style="font-size:13.4px" x="322" y="201">worker pulls one item</text>
+<path class="flow-d" d="M907 266 V204 H596 V162" marker-end="url(#ps6-mut)"></path>
+<text class="t-s t-c" style="font-size:13.4px" x="752" y="195">ack at terminal exit</text>
+</g>
+<g>
+<rect class="b-code" height="108" rx="8" width="164" x="20" y="266"></rect>
+<text class="t-b" style="font-size:15.8px" text-anchor="middle" x="102" y="290">Dispatcher / Guard</text>
+<text class="t-m-g" style="font-size:11.8px" text-anchor="middle" x="102" y="309">PLAIN CODE</text>
+<text class="t-s" style="font-size:13.4px" text-anchor="middle" x="102" y="327">kill switch &amp; storm,</text>
+<text class="t-s" style="font-size:13.4px" text-anchor="middle" x="102" y="343">claims 120s lease</text>
+<path class="flow" d="M184 320 H204" marker-end="url(#ps6-ink)"></path>
+</g>
+<g>
+<text class="t-m-g" text-anchor="middle" x="102" y="360">→ FailureEvent</text>
+</g>
+<g>
+<rect class="b-model" height="108" rx="8" width="174" x="208" y="266"></rect>
+<text class="t-b" style="font-size:15.8px" text-anchor="middle" x="295" y="290">Quarantined LLM</text>
+<text class="t-m-v" text-anchor="middle" x="295" y="309">AGENT 1 · NO TOOLS</text>
+<text class="t-s" style="font-size:13.4px" text-anchor="middle" x="295" y="327">1 call, fixed schema</text>
+<text class="t-s" style="font-size:13px" text-anchor="middle" x="295" y="343">untrusted text stops</text>
+<path class="flow" d="M382 320 H412" marker-end="url(#ps6-ink)"></path>
+<rect class="b-model" height="108" rx="8" width="178" x="416" y="266"></rect>
+<text class="t-b" style="font-size:15.8px" text-anchor="middle" x="505" y="290">Privileged LLM</text>
+<text class="t-m-v" text-anchor="middle" x="505" y="309">AGENT 2 · TOOL LOOP</text>
+<text class="t-s" style="font-size:13.4px" text-anchor="middle" x="505" y="327">bounded steps &amp; time</text>
+<text class="t-s" style="font-size:13px" text-anchor="middle" x="505" y="343">no raw logs, no keys</text>
+<path class="flow" d="M594 320 H614" marker-end="url(#ps6-ink)"></path>
+<rect class="b-code" height="108" rx="8" width="174" x="618" y="266"></rect>
+<text class="t-b" style="font-size:15.8px" text-anchor="middle" x="705" y="290">Verifier</text>
+<text class="t-m-g" style="font-size:11.8px" text-anchor="middle" x="705" y="309">PLAIN CODE · NO LLM</text>
+<text class="t-s" style="font-size:13.4px" text-anchor="middle" x="705" y="327">independent re-check,</text>
+<text class="t-s" style="font-size:13px" text-anchor="middle" x="705" y="343">policy &amp; retry counter</text>
+<path class="flow-g" d="M792 320 H822" marker-end="url(#ps6-good)"></path>
+<text class="t-m-g" style="font-size:11.2px" text-anchor="middle" x="807" y="311">PASS</text>
+<rect class="b-code" height="108" rx="8" width="162" x="826" y="266"></rect>
+<text class="t-b" style="font-size:15.8px" text-anchor="middle" x="907" y="290">Act gate</text>
+<text class="t-m-g" style="font-size:11.8px" text-anchor="middle" x="907" y="309">AGENT 3 · PLAIN CODE</text>
+<text class="t-s" style="font-size:13.4px" text-anchor="middle" x="907" y="327">fencing + narrow key</text>
+<text class="t-s" style="font-size:13px" text-anchor="middle" x="907" y="343">idempotent write + ack</text>
+<path class="flow" d="M988 320 H1010" marker-end="url(#ps6-ink)"></path>
+</g>
+<g>
+<text class="t-m-g" text-anchor="middle" x="295" y="360">→ IncidentReport</text>
+<text class="t-m-g" text-anchor="middle" x="505" y="360">→ ProposedPatch</text>
+<text class="t-m-g" style="font-size:11.8px" text-anchor="middle" x="705" y="360">PASS · RETRY · ESCALATE</text>
+<text class="t-m-g" text-anchor="middle" x="907" y="360">→ Draft PR</text>
+</g>
+<g>
+<rect class="b-ext" height="108" rx="8" width="168" x="1014" y="266"></rect>
+<text class="t-b" style="font-size:15.8px" text-anchor="middle" x="1098" y="290">Human + record</text>
+<text class="t-s" style="font-size:13.4px" text-anchor="middle" x="1098" y="313">reviews draft PR,</text>
+<text class="t-s" style="font-size:13.4px" text-anchor="middle" x="1098" y="331">live approval signal</text>
+<text class="t-s" style="font-size:13px" text-anchor="middle" x="1098" y="349">governs rollout stage</text>
+</g>
+<g>
+<path class="flow-d" d="M102 374 V494" marker-end="url(#ps6-mut)"></path>
+<rect class="b-store" height="88" rx="7" width="308" x="20" y="498"></rect>
+<text class="t-b" style="font-size:15.8px" x="32" y="520">Coordination store &amp; kill switch</text>
+<text class="t-s" style="font-size:13.4px" x="32" y="539">Kill switch (operator) · storm count → pause</text>
+<text class="t-s" style="font-size:13.4px" x="32" y="556">One row per case: state, lock, lease, fence</text>
+<text class="t-s" style="font-size:13.4px" x="32" y="573">Duplicate or finished case → skip + ack</text>
+</g>
+<g>
+<path d="M693 452 V468 H398 V342 H412" marker-end="url(#ps6-stop)" style="fill:none;stroke:var(--stop);stroke-width:1.9;stroke-dasharray:5 4"></path>
+<text class="t-m-r" text-anchor="middle" x="545" y="484">RETRY (&lt; N) · truncated failure output</text>
+<path d="M788 374 V424 H1010" marker-end="url(#ps6-ink)" style="fill:none;stroke:var(--ink);stroke-width:1.7"></path>
+<rect class="b-ext" height="56" rx="8" width="168" x="1014" y="396"></rect>
+<text class="t-b" style="font-size:14.6px" text-anchor="middle" x="1098" y="418">ESCALATE to person</text>
+<text class="t-s" style="font-size:12.6px" text-anchor="middle" x="1098" y="437">≥ N tries, policy, flaky</text>
+<path class="flow-d" d="M356 374 V494" marker-end="url(#ps6-mut)"></path>
+<rect class="b-store" height="88" rx="7" width="316" x="342" y="498"></rect>
+<text class="t-b" style="font-size:15.8px" x="354" y="520">Session, blobs &amp; memory</text>
+<text class="t-s" style="font-size:13.4px" x="354" y="539">Per-run workflow state &amp; blob pointers</text>
+<text class="t-s" style="font-size:13.4px" x="354" y="556">Approved past cases (read-only in run)</text>
+<text class="t-s" style="font-size:13.4px" x="354" y="573">Memory written by code after approval</text>
+</g>
+<g>
+<line marker-end="url(#ps6-cyan)" style="stroke:var(--cyan);stroke-width:1.7;stroke-dasharray:4 3" x1="505" x2="505" y1="374" y2="392"></line>
+<rect class="b-sbx" height="56" rx="7" width="178" x="416" y="396"></rect>
+<text class="t-m-c" text-anchor="middle" x="505" y="416">SANDBOX 1 · NO NET</text>
+<text class="t-s" style="font-size:13px;fill:var(--ink)" text-anchor="middle" x="505" y="436">tools: 0 creds, isolated</text>
+<line marker-end="url(#ps6-cyan)" style="stroke:var(--cyan);stroke-width:1.7;stroke-dasharray:4 3" x1="700" x2="700" y1="374" y2="392"></line>
+<rect class="b-sbx" height="56" rx="7" width="164" x="618" y="396"></rect>
+<text class="t-m-c" text-anchor="middle" x="700" y="416">SANDBOX 2 · FRESH</text>
+<text class="t-s" style="font-size:13px;fill:var(--ink)" text-anchor="middle" x="700" y="436">clean-room suite</text>
+<path class="flow-d" d="M907 374 V494" marker-end="url(#ps6-mut)"></path>
+<path class="flow-d" d="M1098 452 V533 H990" marker-end="url(#ps6-mut)"></path>
+<rect class="b-store" height="88" rx="7" width="316" x="672" y="498"></rect>
+<text class="t-b" style="font-size:15.8px" x="684" y="520">Audit and eval store</text>
+<text class="t-s" style="font-size:13.4px" x="684" y="539">One trace per case: calls, tools, routes</text>
+<text class="t-s" style="font-size:13.4px" x="684" y="556">Feeds offline replay and online evals</text>
+<text class="t-s" style="font-size:13.4px" x="684" y="573">Rollout: shadow → draft → ready, auto-demote</text>
+</g>
+<g>
+<rect class="zone-ours" height="358" rx="10" width="990" x="8" y="240"></rect>
+<text class="zl" x="208" y="257">ONE WORKER SERVICE · DETERMINISTIC HARNESS AROUND THE MODELS</text>
+</g>
+<g>
+<text class="t-s" style="font-size:13.4px" text-anchor="end" x="1180" y="186">agent path: repair, minutes, asynchronous</text>
+<text class="t-s" style="font-size:13.4px" text-anchor="end" x="1180" y="204">real load = volume × filter rate</text>
+<text class="t-s" style="font-size:13.4px" text-anchor="end" x="1180" y="222">step and cost cap per case</text>
+</g>
+<g>
+<text class="t-s" style="font-size:13.4px" text-anchor="end" x="346" y="420">no shared chat history</text>
+<text class="t-s" style="font-size:13.4px" text-anchor="end" x="346" y="438">bounded reads by pointer</text>
+</g>
+</svg>
+<div class="fig-caption"><span>Figure 1 — Complete platform-agnostic architecture: urgent fast path, stateless intake, coordination store, Dual-LLM harness, isolated sandboxes, human gate, and audit/eval store.</span><div class="legend-items"><span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good)"></i> Plain code</span><span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> LLM step</span><span><i class="swatch-dot" style="background:var(--amber-soft);border-color:var(--amber)"></i> Queue / store</span><span><i class="swatch-dot" style="background:var(--panel-2);border-color:var(--cyan)"></i> Isolated sandbox</span></div></div>
+</div>
+    </div>
+  </section>
+
+  <!-- ==================== SECTION 2: END-TO-END FLOW PER COMPONENT ==================== -->
+  <section class="sheet" id="flow">
+    <div class="sheet-h">
+      <div>
+        <span class="sec-badge">Execution Walkthrough · Component by Component</span>
+        <h2>How an Event Flows Through Every Component</h2>
+        <p>Tracing a single failure on commit <code>a3f91c2</code> from initial signal to verified draft pull request, human review, and audit.</p>
+      </div>
+    </div>
+    <div class="sheet-b">
+
+      <div class="phase-banner">Phase 1 · Upstream Signal &amp; Sub-Second Containment (Before Any Worker Runs)</div>
+      <div class="step-grid">
+        <div class="step-card">
+          <div class="step-head">
+            <div class="step-title"><span class="step-num">01</span><span>Triggers (Normalized Pointer Event)</span></div>
+            <span class="step-tag">External Event Source</span>
+          </div>
+          <div class="step-why"><b>Problem solved:</b> Failure signals arrive from separate systems in incompatible schemas, often attached to tens of megabytes of build or runtime logs that choke event buses and model context windows.</div>
+          <p class="step-how">
+            CI runners, canary controllers, and monitoring alarms keep raw logs in object or log storage and emit only a small normalized pointer payload carrying the repository name, exact <code>commit_sha</code>, error metadata, and <code>log_pointer</code>.
+          </p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-head">
+            <div class="step-title"><span class="step-num">02</span><span>Fast Path · Existing Control (Zero Model Calls)</span></div>
+            <span class="step-tag">Plain Deterministic Automation</span>
+          </div>
+          <div class="step-why"><b>Problem solved:</b> Live users hit by a bad canary rollout require relief in seconds, whereas reading source files, synthesizing a patch, and running test suites takes minutes.</div>
+          <p class="step-how">
+            Whenever an alert indicates live production impact, existing deployment automation acts immediately along the top green path in <a href="#fig-agnostic-full"><em>Figure 1</em></a>—rolling back the canary, draining traffic, or blocking bad requests in seconds—while the repair workflow runs asynchronously in the background on a code branch.
+          </p>
+        </div>
+      </div>
+
+      <div class="phase-banner">Phase 2 · Stateless Edge Intake, Durable Queueing &amp; Coordination Guard</div>
+      <div class="step-grid">
+        <div class="step-card">
+          <div class="step-head">
+            <div class="step-title"><span class="step-num">03</span><span>Ingress / Receiver</span></div>
+            <span class="step-tag">Plain Code · Standalone Service #1</span>
+          </div>
+          <div class="step-why"><b>Problem solved:</b> Webhook senders time out after a few seconds, public HTTP endpoints attract spoofed requests, and 99% of deployment events represent healthy builds.</div>
+          <p class="step-how">
+            A lightweight stateless HTTP service verifies the caller's HMAC or OIDC signature, filters incoming webhooks down to real failures, computes a deterministic <code>failure_fingerprint</code> hash from error type, location, and cleaned message, publishes a typed <code>FailureEvent</code> to the queue, and replies <code>200 OK</code> in under 100 milliseconds.
+          </p>
+        </div>
+
+        <div class="step-card store-step">
+          <div class="step-head">
+            <div class="step-title"><span class="step-num">04</span><span>Durable Queue &amp; Dead-Letter Path</span></div>
+            <span class="step-tag">Durable Message Broker</span>
+          </div>
+          <div class="step-why"><b>Problem solved:</b> Outage bursts overwhelm synchronous workers, and a worker crashing mid-run loses any event acknowledged on receipt.</div>
+          <p class="step-how">
+            Buffers <code>FailureEvent</code> messages durably and delivers one item at a time to available workers. A message remains unacknowledged while the run executes and is deleted only when the worker records a terminal state (<code>DONE</code>, <code>PARKED</code>, <code>SKIP</code>, or <code>ESCALATED</code>) and sends <code>ack</code>. Repeated crashes back off exponentially and route to a dead-letter queue after 5 failed deliveries.
+          </p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-head">
+            <div class="step-title"><span class="step-num">05</span><span>Dispatcher / Guard + Coordination Store &amp; Kill Switch</span></div>
+            <span class="step-tag">Plain Code + Transactional DB</span>
+          </div>
+          <div class="step-why"><b>Problem solved:</b> At-least-once queues redeliver duplicates, shared infrastructure outages break twenty healthy repos at once, bad prompt/model releases need an instant manual stop, and crashed workers leave stale locks behind.</div>
+          <p class="step-how">
+            As the entry node of the single worker process, the Guard executes three transactional checks against the <strong>Coordination store</strong> before any model runs:
+            (1) reads the operator <strong>kill switch</strong> flag—if tripped for that repo or globally, marks the case <code>PARKED</code> and sends <code>ack</code> so work pauses cleanly and resumes when cleared;
+            (2) counts distinct repositories failing over a <strong>5-minute sliding window</strong>—if 5 or more fail together, trips the <strong>storm breaker</strong>, pauses automated PRs for 15 minutes, and pages on-call once;
+            (3) atomically claims the <code>(repo, failure_fingerprint)</code> row as <code>IN_PROGRESS</code> with a <strong>120-second expiring lease</strong> (renewed every 30 seconds by worker heartbeats) and increments a monotonic <strong>fencing generation (<code>epoch</code>)</strong>. Duplicate or already-finished rows skip immediately and send <code>ack</code>.
+          </p>
+        </div>
+      </div>
+
+      <div class="phase-banner">Phase 3 · Inside the Single-Worker Harness: Dual-LLM Split, Sandboxes &amp; Verifier</div>
+      <div class="post-prose">
+        <p>
+          Once the Guard claims a lease, the deterministic worker harness drives every internal step in-process, passing small code-validated artifacts with shared chat history disabled (<code>include_contents="none"</code>):
+        </p>
+      </div>
+
+      <div class="chain">
+<div class="link">
+<header><span>RECEIVER → WORKER</span>FailureEvent</header>
+<pre>{
+  <span class="hl-k">"repo"</span>: <span class="hl-s">"acme/payments"</span>,
+  <span class="hl-k">"commit_sha"</span>: <span class="hl-s">"a3f91c2"</span>,
+  <span class="hl-k">"failure_fingerprint"</span>: <span class="hl-s">"fp_8d4e"</span>,
+  <span class="hl-k">"log_pointer"</span>: <span class="hl-s">"dep_4471"</span>
+}</pre>
+<footer>A pointer to the logs. The 50 MB payload stays in the logging system.</footer>
+</div>
+<div class="link">
+<header><span>AGENT 1 → AGENT 2</span>IncidentReport</header>
+<pre>{
+  <span class="hl-k">"category"</span>: <span class="hl-s">"test_regression"</span>,
+  <span class="hl-k">"suspected_files"</span>: [<span class="hl-s">"payments/tax.py"</span>],
+  <span class="hl-k">"failing_test"</span>: <span class="hl-s">"tests/test_tax.py"</span>,
+  <span class="hl-k">"confidence"</span>: <span class="hl-n">0.86</span>
+}</pre>
+<footer><strong>Raw logs stop here.</strong> Agent 2 never sees log text or Agent 1's prompt.</footer>
+</div>
+<div class="link">
+<header><span>AGENT 2 → VERIFIER → AGENT 3</span>ProposedPatch</header>
+<pre>{
+  <span class="hl-k">"target_files"</span>: [<span class="hl-s">"payments/tax.py"</span>],
+  <span class="hl-k">"unified_diff"</span>: <span class="hl-s">"--- a/… +++ b/…"</span>,
+  <span class="hl-k">"explanation"</span>: <span class="hl-s">"Default missing vat_rate"</span>
+}</pre>
+<footer>Agent 3 receives it only after the verifier's own test run passes.</footer>
+</div>
+</div>
+
+      <div class="step-grid">
+        <div class="step-card llm-step">
+          <div class="step-head">
+            <div class="step-title"><span class="step-num">06</span><span>Quarantined LLM (Agent 1 · Detect — 1 Call, Zero Tools)</span></div>
+            <span class="step-tag">LLM Step · Quarantined</span>
+          </div>
+          <div class="step-why"><b>Problem solved:</b> Build and runtime logs mix unstructured stack traces with untrusted strings (commit messages, test inputs, dependency output) capable of hijacking a tool-calling agent via indirect prompt injection.</div>
+          <p class="step-how">
+            Deterministic code fetches at most 100 screened failure lines from <code>log_pointer</code> and invokes the <strong>Quarantined LLM</strong> in a single turn with zero tools, <code>include_contents="none"</code>, and a closed output schema (<code>IncidentReport</code>). Plain code verifies that <code>category</code> belongs to the allowed enum (<code>CODE_BUG</code>, <code>INFRA</code>, <code>FLAKY</code>, <code>UNKNOWN</code>) and that <code>suspect_files</code> and <code>target_test</code> exist at <code>commit_sha</code>. Raw untrusted log text stops permanently at this boundary; <code>INFRA</code> and <code>FLAKY</code> cases route straight to escalation or skip.
+          </p>
+        </div>
+
+        <div class="step-card llm-step">
+          <div class="step-head">
+            <div class="step-title"><span class="step-num">07</span><span>Privileged LLM (Agent 2 · Suggest Fix) + Sandbox 1 + Read-Only Memory</span></div>
+            <span class="step-tag">LLM Tool Loop + Isolated Sandbox</span>
+          </div>
+          <div class="step-why"><b>Problem solved:</b> Synthesizing a code fix requires iterative search and test runs where each lookup depends on the previous result, yet running repository code inside the worker container would expose cloud identity and write tokens.</div>
+          <p class="step-how">
+            The harness passes only the validated <code>IncidentReport</code>, read-only matches of past human-merged fixes from <strong>Long-term memory</strong>, and (on retries) tail-sliced test failure output into the <strong>Privileged LLM</strong> under hard step, time, and token caps. Model API calls happen from the worker, while every file search, edit, and test command executes across an isolation boundary inside <strong>Sandbox 1</strong>—an ephemeral container checked out at <code>commit_sha</code> with zero network egress and zero credentials—emitting a structured <code>ProposedPatch</code> before <code>Sandbox 1</code> is destroyed.
+          </p>
+        </div>
+
+        <div class="step-card sbx-step">
+          <div class="step-head">
+            <div class="step-title"><span class="step-num">08</span><span>Plain-Code Verifier + Sandbox 2 (Clean-Room Suite, Bounded Retry &amp; Escalate)</span></div>
+            <span class="step-tag">Plain Code + Fresh Sandbox</span>
+          </div>
+          <div class="step-why"><b>Problem solved:</b> Models grading their own diffs overlook broken edge cases or weakened assertions, and <code>Sandbox 1</code> may carry leftover state from exploratory edits.</div>
+          <p class="step-how">
+            Plain code first enforces path and diff policies on <code>ProposedPatch</code> (blocking edits to CI workflows, secrets, auth rules, or oversized diffs). Next, it boots a brand-new, networkless <strong>Sandbox 2</strong> at <code>commit_sha</code>, confirms that <code>target_test</code> fails <em>before</em> the patch (proving the bug was reproduced), applies <code>git_diff</code>, and runs the full test suite and linter.
+            If verification passes (<code>PASS</code>), control advances to the Act gate.
+            If verification fails and <code>fix_attempts &lt; 3</code> in <strong>Session state</strong> (<code>RETRY</code>), the harness increments <code>fix_attempts</code>, attaches <code>stderr[-2000:]</code>, and loops back to the Privileged LLM.
+            Once <code>fix_attempts</code> reaches <code>3</code> (<code>ESCALATE</code>), the harness marks the case <code>ESCALATED</code>, pages/opens a diagnostic ticket for a human engineer, and sends terminal <code>ack</code>.
+          </p>
+        </div>
+      </div>
+
+      <div class="phase-banner">Phase 4 · Gated External Write, Human Review, Memory &amp; Evaluation</div>
+      <div class="step-grid">
+        <div class="step-card">
+          <div class="step-head">
+            <div class="step-title"><span class="step-num">09</span><span>Act Gate (Agent 3 · Open Draft PR)</span></div>
+            <span class="step-tag">Plain Code · Narrow Write Scope</span>
+          </div>
+          <div class="step-why"><b>Problem solved:</b> Opening a pull request follows a fixed API contract that needs zero model reasoning, and a worker stalled past its 120-second lease could wake up late and double-write after another worker took over.</div>
+          <p class="step-how">
+            Implemented strictly as plain deterministic code holding a repository credential restricted to <code>autofix/*</code> branches. Right before calling the repository API, it performs a second transactional check on the <strong>Coordination store</strong>—verifying that the manual <strong>kill switch</strong> remains clear and that its <strong>fencing generation (<code>epoch</code>)</strong> still owns the row—then pushes the branch idempotently, opens a <strong>draft pull request</strong>, marks the row <code>DONE</code>, and sends terminal <code>ack</code> to the queue.
+          </p>
+        </div>
+
+        <div class="step-card store-step">
+          <div class="step-head">
+            <div class="step-title"><span class="step-num">10</span><span>Human + System of Record &amp; Post-Merge Memory Write</span></div>
+            <span class="step-tag">Human Gate + Curated Memory</span>
+          </div>
+          <div class="step-why"><b>Problem solved:</b> Production merges require human accountability, and allowing agents to write directly to long-term memory during a run lets unverified or prompt-injected notes poison future runs.</div>
+          <p class="step-how">
+            A human code owner reviews the draft pull request alongside its reproduction and test summary. Only after a human merges the pull request does deterministic post-merge automation write the verified incident-to-patch pair into <strong>Long-term memory</strong>, keeping memory read-only during active runs.
+          </p>
+        </div>
+
+        <div class="step-card store-step">
+          <div class="step-head">
+            <div class="step-title"><span class="step-num">11</span><span>Audit &amp; Eval Store (Golden Replay &amp; Staged Rollout)</span></div>
+            <span class="step-tag">Telemetry + Offline/Live Evals</span>
+          </div>
+          <div class="step-why"><b>Problem solved:</b> Prompt, model, or tool updates silently degrade fix quality unless every trajectory is recorded and gated against real historical incidents and human acceptance rates.</div>
+          <p class="step-how">
+            Every model input/output, tool invocation, token cost, verifier exit code, and downstream PR outcome (<em>merged without edits</em>, <em>merged with edits</em>, or <em>closed</em>) lands in the <strong>Audit and eval store</strong>. Prompt or model changes replay offline against a golden set of historical failures before promotion, and live rollout advances from shadow mode to draft PRs with automatic demotion if reviewer rejection spikes.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==================== SECTION 3: GOOGLE CLOUD MAPPING ==================== -->
+  <section class="sheet" id="gcp">
+    <div class="sheet-h">
+      <div>
+        <span class="sec-badge">Cloud Reference · Google Cloud &amp; Gemini Enterprise Agent Platform</span>
+        <h2>The Full Architecture Mapped to Google Cloud</h2>
+        <p>Every box and wire from <em>Figure 1</em> mapped 1-to-1 onto managed Google Cloud services—deployed as two services plus ephemeral gVisor sandboxes.</p>
+      </div>
+    </div>
+    <div class="sheet-b">
+      <div class="post-prose">
+        <p>
+          <a href="#fig-gcp-full"><em>Figure 2</em></a> maps the platform-agnostic architecture directly onto Google Cloud and the <strong>Gemini Enterprise Agent Platform</strong> (shortened to <strong>Agent Platform</strong>; model calls stay family-neutral). At ~100 failures a day, one <strong>Spanner</strong> database handles the operator kill switch, the 5-minute distinct-repo storm query, and the per-incident lock, 120-second lease, and fencing generation check.
+        </p>
+      </div>
+
+      <div class="diagram-frame" id="fig-gcp-full">
+<svg aria-label="Figure 2: Complete architecture mapped 1-to-1 onto Google Cloud and Gemini Enterprise Agent Platform" role="img" viewbox="0 0 1200 638">
+<defs>
+<marker id="pgcp-ink" markerheight="6" markerwidth="6" orient="auto-start-reverse" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--ink)"></path></marker>
+<marker id="pgcp-mut" markerheight="6" markerwidth="6" orient="auto-start-reverse" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--muted)"></path></marker>
+<marker id="pgcp-good" markerheight="5.5" markerwidth="5.5" orient="auto-start-reverse" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--good)"></path></marker>
+<marker id="pgcp-stop" markerheight="6" markerwidth="6" orient="auto-start-reverse" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--stop)"></path></marker>
+<marker id="pgcp-cyan" markerheight="5.5" markerwidth="5.5" orient="auto-start-reverse" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--cyan)"></path></marker>
+</defs>
+<rect height="622" rx="12" style="fill:none;stroke:#4285f4;stroke-width:1.8" width="1184" x="8" y="8"></rect>
+<g aria-hidden="true" transform="translate(24, 15) scale(0.44)">
+<path d="M40.728 20.488l2.05.035 5.57-5.57.27-2.36C44.2 8.657 38.367 6.26 31.993 6.26c-11.54 0-21.28 7.852-24.163 18.488.608-.424 1.908-.106 1.908-.106l11.13-1.83s.572-.947.862-.9A13.88 13.88 0 0 1 32 17.375c3.3.007 6.34 1.173 8.728 3.102z" fill="#ea4335"></path>
+<path d="M56.17 24.77c-1.293-4.77-3.958-8.982-7.555-12.177l-7.887 7.887c3.16 2.55 5.187 6.452 5.187 10.82v1.392c3.837 0 6.954 3.124 6.954 6.954 0 3.837-3.124 6.954-6.954 6.954H32.007L30.615 48v8.346l1.392 1.385h13.908A18.11 18.11 0 0 0 64 39.647c-.007-6.155-3.1-11.6-7.83-14.876z" fill="#4285f4"></path>
+<path d="M18.085 57.74h13.9V46.6h-13.9a6.89 6.89 0 0 1-2.862-.622l-2.007.615-5.57 5.57-.488 1.88a18 18 0 0 0 10.926 3.689z" fill="#34a853"></path>
+<path d="M18.085 21.57A18.11 18.11 0 0 0 0 39.654c0 5.873 2.813 11.095 7.166 14.403l8.064-8.064a6.96 6.96 0 0 1-4.099-6.339c0-3.837 3.124-6.954 6.954-6.954 2.82 0 5.244 1.7 6.34 4.1l8.064-8.064c-3.307-4.353-8.53-7.166-14.403-7.166z" fill="#fbbc05"></path>
+</g>
+<text class="t-b" style="font-size:16px" x="60" y="36">Google Cloud</text>
+<text class="zl" x="176" y="36">· GEMINI ENTERPRISE AGENT PLATFORM</text>
+<g transform="translate(0, 44)">
+<rect class="b-ext" height="92" rx="7" width="170" x="20" y="66"></rect>
+<text class="t-b" style="font-size:15.8px" x="32" y="90">Event Sources</text>
+<text class="t-s" style="font-size:13.4px" x="32" y="110">Cloud Build, GitHub,</text>
+<text class="t-s" style="font-size:13.4px" x="32" y="128">Cloud Monitoring</text>
+<rect class="b-code" height="92" rx="7" width="184" x="236" y="66"></rect>
+<text class="t-b" style="font-size:15.8px" x="248" y="90">Cloud Run Receiver</text>
+<text class="t-s" style="font-size:13.4px" x="248" y="110">HMAC / OIDC check,</text>
+<text class="t-s" style="font-size:13.4px" x="248" y="127">fingerprint, 200 &lt;100ms</text>
+<text class="t-s" style="font-size:13px" x="248" y="144">standalone service #1</text>
+<rect class="b-store" height="92" rx="7" width="174" x="466" y="66"></rect>
+<text class="t-b" style="font-size:15.8px" x="478" y="90">Cloud Pub/Sub</text>
+<text class="t-s" style="font-size:13.4px" x="478" y="110">ack at completion,</text>
+<text class="t-s" style="font-size:13.4px" x="478" y="127">backoff + DLQ topic</text>
+<text class="t-s" style="font-size:13px" x="478" y="144">durable queue</text>
+<rect class="b-ext" height="92" rx="7" width="420" x="760" y="66"></rect>
+<text class="t-b" style="font-size:15.8px" x="774" y="90">Existing control · fast path · no model</text>
+<text class="t-s" style="font-size:14px" x="774" y="112">Cloud Deploy rollback, Cloud Armor block, failover</text>
+<text class="t-s" style="font-size:13.4px" x="774" y="134">acts in seconds, before any agent runs</text>
+<path class="flow" d="M190 112 H232" marker-end="url(#pgcp-ink)"></path>
+<path class="flow" d="M420 112 H462" marker-end="url(#pgcp-ink)"></path>
+<path class="flow-g" d="M105 66 V32 H970 V62" marker-end="url(#pgcp-good)"></path>
+<text class="t-b t-c" style="font-size:15.2px" x="540" y="24">containment in seconds</text>
+<path class="flow" d="M540 158 V210 H102 V262" marker-end="url(#pgcp-ink)"></path>
+<text class="t-s t-c" style="font-size:13.4px" x="321" y="201">Worker service pulls message</text>
+<path class="flow-d" d="M907 266 V204 H596 V162" marker-end="url(#pgcp-mut)"></path>
+<text class="t-s t-c" style="font-size:13.4px" x="752" y="195">Pub/Sub ack at terminal exit</text>
+<rect class="b-code" height="108" rx="8" width="164" x="20" y="266"></rect>
+<text class="t-b" style="font-size:15.8px" text-anchor="middle" x="102" y="290">Guard &amp; Lease</text>
+<text class="t-m-g" style="font-size:11.8px" text-anchor="middle" x="102" y="309">SPANNER TXN</text>
+<text class="t-s" style="font-size:13.4px" text-anchor="middle" x="102" y="327">kill switch &amp; 5-min storm,</text>
+<text class="t-s" style="font-size:13.4px" text-anchor="middle" x="102" y="343">120s row lease</text>
+<text class="t-m-g" text-anchor="middle" x="102" y="360">→ FailureEvent</text>
+<path class="flow" d="M184 320 H204" marker-end="url(#pgcp-ink)"></path>
+<rect class="b-model" height="108" rx="8" width="174" x="208" y="266"></rect>
+<text class="t-b" style="font-size:15.8px" text-anchor="middle" x="295" y="290">Quarantined LLM</text>
+<text class="t-m-v" text-anchor="middle" x="295" y="309">MODEL ARMOR → LLM</text>
+<text class="t-s" style="font-size:13.4px" text-anchor="middle" x="295" y="327">Cloud Logging / GCS,</text>
+<text class="t-s" style="font-size:13px" text-anchor="middle" x="295" y="343">1 call, no tools</text>
+<text class="t-m-g" text-anchor="middle" x="295" y="360">→ IncidentReport</text>
+<path class="flow" d="M382 320 H412" marker-end="url(#pgcp-ink)"></path>
+<rect class="b-model" height="108" rx="8" width="178" x="416" y="266"></rect>
+<text class="t-b" style="font-size:15.8px" text-anchor="middle" x="505" y="290">Privileged LLM</text>
+<text class="t-m-v" text-anchor="middle" x="505" y="309">ADK AGENT LOOP</text>
+<text class="t-s" style="font-size:13.4px" text-anchor="middle" x="505" y="327">model call on worker,</text>
+<text class="t-s" style="font-size:13px" text-anchor="middle" x="505" y="343">tools in Code Exec</text>
+<text class="t-m-g" text-anchor="middle" x="505" y="360">→ ProposedPatch</text>
+<path class="flow" d="M594 320 H614" marker-end="url(#pgcp-ink)"></path>
+<rect class="b-code" height="108" rx="8" width="174" x="618" y="266"></rect>
+<text class="t-b" style="font-size:15.8px" text-anchor="middle" x="705" y="290">Verifier Node</text>
+<text class="t-m-g" style="font-size:11.8px" text-anchor="middle" x="705" y="309">ADK FUNCTION NODE</text>
+<text class="t-s" style="font-size:13.4px" text-anchor="middle" x="705" y="327">path &amp; diff policy,</text>
+<text class="t-s" style="font-size:13px" text-anchor="middle" x="705" y="343">counts tries in Session</text>
+<text class="t-m-g" style="font-size:11.8px" text-anchor="middle" x="705" y="360">PASS · RETRY · ESCALATE</text>
+<path class="flow-g" d="M792 320 H822" marker-end="url(#pgcp-good)"></path>
+<text class="t-m-g" style="font-size:11.2px" text-anchor="middle" x="807" y="311">PASS</text>
+<rect class="b-code" height="108" rx="8" width="162" x="826" y="266"></rect>
+<text class="t-b" style="font-size:15.8px" text-anchor="middle" x="907" y="290">Act gate</text>
+<text class="t-m-g" style="font-size:11.8px" text-anchor="middle" x="907" y="309">ADK FUNCTION NODE</text>
+<text class="t-s" style="font-size:13.4px" text-anchor="middle" x="907" y="327">Spanner fence, Secret</text>
+<text class="t-s" style="font-size:13px" text-anchor="middle" x="907" y="343">Mgr token + ack</text>
+<text class="t-m-g" text-anchor="middle" x="907" y="360">→ Draft PR</text>
+<path class="flow" d="M988 320 H1010" marker-end="url(#pgcp-ink)"></path>
+<rect class="b-ext" height="108" rx="8" width="168" x="1014" y="266"></rect>
+<text class="t-b" style="font-size:15.8px" text-anchor="middle" x="1098" y="290">GitHub + Reviewer</text>
+<text class="t-s" style="font-size:13.4px" text-anchor="middle" x="1098" y="313">autofix/* draft PR,</text>
+<text class="t-s" style="font-size:13.4px" text-anchor="middle" x="1098" y="331">code owner merges</text>
+<text class="t-s" style="font-size:13px" text-anchor="middle" x="1098" y="349">post-merge → Memory</text>
+<line marker-end="url(#pgcp-cyan)" style="stroke:var(--cyan);stroke-width:1.7;stroke-dasharray:4 3" x1="505" x2="505" y1="374" y2="392"></line>
+<rect class="b-sbx" height="56" rx="7" width="178" x="416" y="396"></rect>
+<text class="t-m-c" text-anchor="middle" x="505" y="416">CODE EXEC · SANDBOX 1</text>
+<text class="t-s" style="font-size:13px;fill:var(--ink)" text-anchor="middle" x="505" y="436">gVisor: no net, no IAM</text>
+<line marker-end="url(#pgcp-cyan)" style="stroke:var(--cyan);stroke-width:1.7;stroke-dasharray:4 3" x1="700" x2="700" y1="374" y2="392"></line>
+<rect class="b-sbx" height="56" rx="7" width="164" x="618" y="396"></rect>
+<text class="t-m-c" text-anchor="middle" x="700" y="416">CODE EXEC · SANDBOX 2</text>
+<text class="t-s" style="font-size:13px;fill:var(--ink)" text-anchor="middle" x="700" y="436">fresh pytest run</text>
+<path d="M693 452 V468 H398 V342 H412" marker-end="url(#pgcp-stop)" style="fill:none;stroke:var(--stop);stroke-width:1.9;stroke-dasharray:5 4"></path>
+<text class="t-m-r" text-anchor="middle" x="545" y="484">RETRY (&lt; 3) · truncated stderr</text>
+<path d="M788 374 V424 H1010" marker-end="url(#pgcp-ink)" style="fill:none;stroke:var(--ink);stroke-width:1.7"></path>
+<rect class="b-ext" height="56" rx="8" width="168" x="1014" y="396"></rect>
+<text class="t-b" style="font-size:14.6px" text-anchor="middle" x="1098" y="418">GitHub Issue / Pager</text>
+<text class="t-s" style="font-size:12.6px" text-anchor="middle" x="1098" y="437">ESCALATED + Pub/Sub ack</text>
+<path class="flow-d" d="M102 374 V494" marker-end="url(#pgcp-mut)"></path>
+<rect class="b-store" height="70" rx="7" width="308" x="20" y="498"></rect>
+<text class="t-b" style="font-size:15.8px" x="32" y="520">Spanner (coordination)</text>
+<text class="t-s" style="font-size:13.4px" x="32" y="539">Kill switch + 5-min storm query</text>
+<text class="t-s" style="font-size:13.4px" x="32" y="556">Incident row: lock, lease &amp; fencing</text>
+<path class="flow-d" d="M356 374 V494" marker-end="url(#pgcp-mut)"></path>
+<rect class="b-store" height="70" rx="7" width="316" x="342" y="498"></rect>
+<text class="t-b" style="font-size:15.8px" x="354" y="520">Session, GCS &amp; Memory Bank</text>
+<text class="t-s" style="font-size:13.4px" x="354" y="539">Agent Platform Session + GCS blobs</text>
+<text class="t-s" style="font-size:13.4px" x="354" y="556">Memory Bank: past merged fixes only</text>
+<path class="flow-d" d="M907 374 V494" marker-end="url(#pgcp-mut)"></path>
+<path class="flow-d" d="M1098 452 V533 H990" marker-end="url(#pgcp-mut)"></path>
+<rect class="b-store" height="70" rx="7" width="316" x="672" y="498"></rect>
+<text class="t-b" style="font-size:15.8px" x="684" y="520">Cloud Trace, BQ &amp; ADK Eval</text>
+<text class="t-s" style="font-size:13.4px" x="684" y="539">One trace per run and tool call</text>
+<text class="t-s" style="font-size:13.4px" x="684" y="556">BigQuery + ADK Eval replay &amp; metrics</text>
+<rect class="zone-ours" height="338" rx="10" width="984" x="14" y="240"></rect>
+<text class="zl" x="128" y="257">WORKER SERVICE #2 (CLOUD RUN OR AGENT RUNTIME) · AGENT IDENTITY · ADK WORKFLOW</text>
+</g>
+</svg>
+<div class="fig-caption"><span>Figure 2 — Complete architecture mapped 1-to-1 onto Google Cloud and Gemini Enterprise Agent Platform.</span>
+<div class="legend-items"><span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good)"></i> Plain code</span><span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> LLM step</span><span><i class="swatch-dot" style="background:var(--amber-soft);border-color:var(--amber)"></i> Queue / store</span><span><i class="swatch-dot" style="background:var(--panel-2);border-color:var(--cyan)"></i> Sandbox</span></div>
+</div>
+</div>
+
+      <div class="post-prose" style="margin-top:22px;">
+        <h3>How the Flow Runs on Google Cloud</h3>
+        <ul>
+          <li><strong>Edge &amp; Fast Containment (Steps 01–04):</strong> Failure alerts from Cloud Build, GitHub, or Cloud Monitoring trigger immediate <strong>Cloud Deploy</strong> canary rollback when live users are affected, while posting webhooks to the standalone <strong>Cloud Run Receiver</strong> (Service #1). The Receiver verifies HMAC/OIDC signatures, computes <code>failure_fingerprint</code>, enqueues <code>FailureEvent</code> into <strong>Cloud Pub/Sub</strong> (configured with exponential backoff and a dead-letter topic), and returns <code>200</code> in under 100 ms.</li>
+          <li><strong>Single Worker Service &amp; Spanner Guard (Step 05):</strong> <strong>Worker Service #2</strong> (deployed on <strong>Cloud Run</strong> or <strong>Agent Runtime</strong> with keyless <strong>Agent Identity</strong>) runs the entire <strong>ADK 2.x <code>Workflow</code></strong> graph in-process so sequential steps avoid network hops. Its entry <code>Guard &amp; Lease</code> function node runs a <strong>Spanner</strong> transaction checking the kill switch, running the 5-minute storm query, and claiming a 120-second row lease with a fencing epoch.</li>
+          <li><strong>Quarantined &amp; Privileged LLM Nodes + gVisor Sandboxes (Steps 06–08):</strong> The <code>Quarantined LLM</code> node reads ≤100 log lines from <strong>Cloud Logging / Cloud Storage</strong> through <strong>Model Armor</strong> inline prompt-injection screening with zero tools to produce <code>IncidentReport</code>. The <code>Privileged LLM</code> ADK agent loop reads past merged fixes from <strong>Memory Bank</strong> and dispatches repo search/edit/test tools into <strong>Agent Platform Code Execution Sandbox 1</strong> (ephemeral gVisor sandbox with no network and no IAM credentials). The plain-code <code>Verifier Node</code> tracks <code>fix_attempts</code> in <strong>Agent Platform Session</strong> and runs the clean-room test suite in a fresh <strong>Code Execution Sandbox 2</strong>.</li>
+          <li><strong>Act Gate, Post-Merge Memory &amp; ADK Eval (Steps 09–11):</strong> On <code>PASS</code>, the plain-code <code>Act gate</code> function node re-verifies the Spanner kill switch and fencing epoch, fetches the narrow <code>autofix/*</code> GitHub token from <strong>Secret Manager</strong>, opens the draft PR, and sends the terminal <strong>Pub/Sub <code>ack</code></strong>. Post-merge automation writes human-approved fixes into <strong>Memory Bank</strong>, while <strong>Cloud Trace</strong>, <strong>BigQuery</strong>, and <strong>ADK Eval</strong> capture every trajectory and run offline golden replays.</li>
+        </ul>
+      </div>
+
+      <div class="nine-q-wrap" id="tbl-gcp-map" style="margin:14px 0 12px;">
+<div class="nine-q-head">Component-to-Google Cloud Service Mapping</div>
+<div class="tbl-wrap" style="margin:0;">
+<table>
+<thead><tr><th style="width:24%">Generic component</th><th style="width:30%">Google Cloud service</th><th>In the self-healing repo</th></tr></thead>
+<tbody>
+<tr><td><b>Ingress / Receiver</b></td><td>Cloud Run service</td><td>Verifies HMAC/OIDC, hashes the fingerprint, publishes <code>FailureEvent</code>.</td></tr>
+<tr><td><b>Queue</b></td><td>Pub/Sub with a dead-letter topic</td><td>Holds the event until the terminal <code>ack</code>; dead-letters after 5 failed deliveries.</td></tr>
+<tr><td><b>Fast path</b></td><td>Cloud Deploy rollback, as the existing control</td><td>Rolls back the failing canary in seconds.</td></tr>
+<tr><td><b>Worker and harness</b></td><td>Cloud Run or Agent Runtime, running an ADK 2.x <code>Workflow</code></td><td>All workflow nodes run in-process; one message drives one run.</td></tr>
+<tr><td><b>Coordination store and kill switch</b></td><td>One Spanner database</td><td>A control row for the kill switch, the 5-minute storm query, and an <code>incidents</code> table with lock, 120s lease and fencing. An in-memory cache such as Memorystore becomes useful at thousands of events per second.</td></tr>
+<tr><td><b>Quarantined LLM input</b></td><td>Cloud Logging and Model Armor</td><td>At most 100 log lines, screened before the single model call.</td></tr>
+<tr><td><b>Session and blobs</b></td><td>Agent Platform Session and Cloud Storage</td><td><code>fix_attempts</code> and typed outputs in the session; logs and diffs by pointer.</td></tr>
+<tr><td><b>Long-term memory</b></td><td>Memory Bank</td><td>Human-merged fixes, written after the merge and read-only during a run.</td></tr>
+<tr><td><b>Sandboxes 1 and 2</b></td><td>Agent Platform Code Execution</td><td>Tool calls and the verifier's test run, with no network and no credentials.</td></tr>
+<tr><td><b>Act gate credential</b></td><td>Secret Manager</td><td>The repository token, limited to <code>autofix/*</code> branches.</td></tr>
+<tr><td><b>Audit and eval store</b></td><td>Cloud Trace, BigQuery and ADK Eval</td><td>One trace per case and the golden replay set.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+    </div>
+  </section>
+
+  <div class="back-home"><a href="../ep02_designing_agentic_systems.html">← Back to Episode 02 (Progressive 6-Stage Build &amp; 13 Questions)</a> · <a href="../index.html">All About Agents Home</a></div>
+</main>
+
+<script>
+document.getElementById("theme-toggle").addEventListener("click", function() {
+  const root = document.documentElement;
+  const current = root.getAttribute("data-theme") || "light";
+  const next = current === "light" ? "dark" : "light";
+  root.setAttribute("data-theme", next);
+  this.textContent = next === "light" ? "◑ Switch to Dark Mode" : "◐ Switch to Light Mode";
+});
+</script>
+</body>
+</html>
