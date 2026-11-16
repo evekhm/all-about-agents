@@ -130,6 +130,13 @@
     color: var(--cyan);
   }
 
+  a.brand { text-decoration: none; } .brand-dot { flex-shrink: 0; }
+  a.brand:hover { text-decoration: underline; }
+  .navlinks a.home-link { border-color: var(--cyan); color: var(--cyan); font-weight: 700; }
+  .back-home { margin: 34px 0 10px; padding-top: 18px; border-top: 1px solid var(--line); font-family: var(--mono); font-size: 13px; }
+  .back-home a { color: var(--cyan); text-decoration: none; font-weight: 700; }
+  .back-home a:hover { text-decoration: underline; }
+
   .app {
     max-width: 1180px;
     margin: 0 auto;
@@ -625,11 +632,12 @@
 <body>
 
 <nav class="topbar">
-  <div class="brand">
+  <a class="brand" id="brand-home-link" href="index.html" title="All About Agents: all episodes">
     <span class="brand-dot"></span>
     <span>Agentic Governance Series · Episode 1</span>
-  </div>
+  </a>
   <div class="navlinks">
+    <a id="home-link" class="home-link" href="index.html">← Home</a>
     <a href="#part-01">Prototype</a>
     <a href="#part-02">Threats &amp; Layers</a>
     <a href="#part-02b">Reference Architecture</a>
@@ -6249,6 +6257,7 @@ Authorization: Bearer &lt;Token_obo_or_KMS_Context_JWT&gt;
       </div>
     </div>
   </section>
+  <div class="back-home"><a id="back-home-link" href="https://evekhm.github.io/all-about-agents/">← All About Agents · all episodes</a></div>
 </main>
 
 <script>
