@@ -1,0 +1,2622 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="author" content="Eva Khmelinskaya">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Foundations for five essential AI system-design interview questions: earning enterprise trust around language models, choosing across the open and proprietary model spectrum, retail demand forecasting with realistic LLM boundaries, modern hybrid RAG combinations, and building a lean domain-specific agent equipped with specialized capabilities and domain language.">
+<meta property="og:title" content="Five Foundational Questions in AI System Design">
+<meta property="og:description" content="Five core AI system-design interview questions: opening black-box language models, navigating the full model spectrum, retail demand forecasting, modern RAG combinations, and building a lean domain-specific agent with specialized capabilities and domain language.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://evekhm.github.io/all-about-agents/ep03_ai_architecture_field_questions.html">
+<title>All About Agents — Five Foundational Questions in AI System Design</title>
+<style>
+  :root,
+  html[data-theme="light"] {
+    --bg: #f6f8fb;
+    --bg-grid: rgba(15, 23, 42, 0.035);
+    --panel: #ffffff;
+    --panel-2: #f8fafc;
+    --panel-3: #f1f5f9;
+    --ink: #0f172a;
+    --muted: #475569;
+    --dim: #64748b;
+    --line: #cbd5e1;
+    --line-2: #e2e8f0;
+    --cyan: #0369a1;
+    --cyan-soft: rgba(3, 105, 161, 0.09);
+    --amber: #b45309;
+    --amber-soft: rgba(180, 83, 9, 0.10);
+    --good: #15803d;
+    --good-soft: rgba(21, 128, 61, 0.09);
+    --warn: #c2410c;
+    --warn-soft: rgba(194, 65, 12, 0.10);
+    --stop: #b91c1c;
+    --stop-soft: rgba(185, 28, 28, 0.08);
+    --violet: #6d28d9;
+    --violet-soft: rgba(109, 40, 217, 0.09);
+    --shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
+    --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --mono: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+  }
+
+  html[data-theme="dark"] {
+    --bg: #09131c;
+    --bg-grid: rgba(148, 198, 235, 0.055);
+    --panel: #0e1c2a;
+    --panel-2: #132536;
+    --panel-3: #0b1723;
+    --ink: #ecf3fb;
+    --muted: #b5c9de;
+    --dim: #7f9ab5;
+    --line: #21405c;
+    --line-2: #183149;
+    --cyan: #5fd4ff;
+    --cyan-soft: rgba(95, 212, 255, 0.13);
+    --amber: #ffbe55;
+    --amber-soft: rgba(255, 190, 85, 0.14);
+    --good: #52e29a;
+    --good-soft: rgba(82, 226, 154, 0.13);
+    --warn: #ff9a52;
+    --warn-soft: rgba(255, 154, 82, 0.14);
+    --stop: #ff6b7c;
+    --stop-soft: rgba(255, 107, 124, 0.14);
+    --violet: #b695ff;
+    --violet-soft: rgba(182, 149, 255, 0.14);
+    --shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+  }
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg);
+    background-image:
+      linear-gradient(to right, var(--bg-grid) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--bg-grid) 1px, transparent 1px);
+    background-size: 28px 28px;
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 10px 28px;
+    background: color-mix(in srgb, var(--panel) 92%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--cyan);
+  }
+  .brand-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--cyan);
+    box-shadow: 0 0 0 3px var(--cyan-soft);
+  }
+  .navlinks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+  .navlinks a, .theme-btn {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    padding: 5px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--line-2);
+    background: var(--panel-2);
+    color: var(--muted);
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .navlinks a:hover, .theme-btn:hover {
+    border-color: var(--cyan);
+    color: var(--cyan);
+  }
+
+  a.brand { text-decoration: none; } .brand-dot { flex-shrink: 0; }
+  a.brand:hover { text-decoration: underline; }
+  .navlinks a.home-link { border-color: var(--cyan); color: var(--cyan); font-weight: 700; }
+  .back-home { margin: 34px 0 10px; padding-top: 18px; border-top: 1px solid var(--line); font-family: var(--mono); font-size: 13px; }
+  .back-home a { color: var(--cyan); text-decoration: none; font-weight: 700; }
+  .back-home a:hover { text-decoration: underline; }
+
+  .app {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 28px 24px 72px;
+  }
+
+  .sheet {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    margin-bottom: 28px;
+    overflow: hidden;
+  }
+  .sheet-h {
+    padding: 20px 28px;
+    border-bottom: 1px solid var(--line-2);
+    background: var(--panel-2);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .sec-badge {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    color: var(--cyan);
+    background: var(--cyan-soft);
+    padding: 3px 9px;
+    border-radius: 5px;
+    border: 1px solid color-mix(in srgb, var(--cyan) 30%, transparent);
+    display: inline-block;
+    margin-bottom: 6px;
+  }
+  .sheet-h h1, .sheet-h h2 {
+    margin: 0;
+    font-size: 23px;
+    letter-spacing: -0.015em;
+  }
+  .sheet-h p {
+    margin: 4px 0 0;
+    color: var(--muted);
+    font-size: 14.5px;
+  }
+  .sheet-b {
+    padding: 28px;
+  }
+
+  .post-prose {
+    max-width: 100%;
+    font-size: 17px;
+    line-height: 1.78;
+    color: var(--ink);
+  }
+  .post-prose p {
+    margin: 0 0 18px;
+  }
+  .post-prose h3 {
+    margin: 26px 0 10px;
+    font-size: 20px;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .scenario-callout {
+    margin: 20px 0;
+    padding: 16px 20px;
+    border-left: 4px solid var(--cyan);
+    background: var(--cyan-soft);
+    border-radius: 0 10px 10px 0;
+    font-size: 16px;
+  }
+  .scenario-callout strong {
+    color: var(--cyan);
+  }
+
+  .diagram-frame {
+    background: var(--panel-2);
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    padding: 18px;
+    margin: 20px 0 4px;
+    overflow-x: auto;
+  }
+  .diagram-frame svg {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .fig-caption {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid var(--line-2);
+    font-family: var(--mono);
+    font-size: 13.5px;
+    color: var(--muted);
+  }
+  .legend-items {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .swatch-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+    border: 1.5px solid;
+    vertical-align: middle;
+    margin-right: 4px;
+  }
+
+  .zone-box { fill: var(--panel); stroke: var(--line); stroke-width: 1.5; stroke-dasharray: 6 4; }
+  .node-card { fill: var(--panel); stroke: var(--line); stroke-width: 1.75; }
+  .node-cyan { fill: var(--cyan-soft); stroke: var(--cyan); stroke-width: 1.8; }
+  .node-amber { fill: var(--amber-soft); stroke: var(--amber); stroke-width: 1.8; }
+  .node-good { fill: var(--good-soft); stroke: var(--good); stroke-width: 1.8; }
+  .node-warn { fill: var(--warn-soft); stroke: var(--warn); stroke-width: 1.6; }
+  .node-bad { fill: var(--stop-soft); stroke: var(--stop); stroke-width: 1.8; }
+  .node-violet { fill: var(--violet-soft); stroke: var(--violet); stroke-width: 1.8; }
+
+  .t-zone { font-family: var(--mono); font-size: 12.8px; font-weight: 700; fill: var(--muted); letter-spacing: 0.08em; }
+  .t-title { font-family: var(--sans); font-size: 16.2px; font-weight: 700; fill: var(--ink); }
+  .t-sub { font-family: var(--sans); font-size: 13.8px; fill: var(--muted); }
+  .t-mono { font-family: var(--mono); font-size: 11.5px; font-weight: 600; fill: var(--ink); }
+
+  .edge-line { stroke: var(--ink); stroke-width: 2; fill: none; }
+  .edge-cyan { stroke: var(--cyan); stroke-width: 2.2; fill: none; }
+  .edge-amber { stroke: var(--amber); stroke-width: 2.2; fill: none; }
+  .edge-good { stroke: var(--good); stroke-width: 2.2; fill: none; }
+  .edge-bad { stroke: var(--stop); stroke-width: 2.2; stroke-dasharray: 6 4; fill: none; }
+
+  .node-callout { fill: var(--panel); stroke: var(--stop); stroke-width: 1.4; stroke-dasharray: 5 3; }
+  .t-callout { font-family: var(--mono); font-size: 11px; fill: var(--ink); }
+  .t-callout-h { font-family: var(--mono); font-size: 11px; font-weight: 700; fill: var(--stop); letter-spacing: 0.04em; }
+  .t-badge { font-family: var(--mono); font-size: 10.5px; font-weight: 700; fill: #fff; text-anchor: middle; }
+  .badge-dot { fill: var(--stop); stroke: var(--panel); stroke-width: 1.5; }
+  .badge-dot.add { fill: var(--good); }
+  .tbl-wrap { overflow-x: auto; margin: 18px 0 8px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line-2); }
+  th { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); background: var(--panel-2); }
+  td code, .post-prose code { font-family: var(--mono); font-size: 0.9em; background: var(--panel-3); padding: 1px 5px; border-radius: 4px; }
+  .b-pill { display: inline-block; font-family: var(--mono); font-size: 10.5px; font-weight: 700; padding: 2px 7px; border-radius: 4px; margin: 1px 2px 1px 0; white-space: nowrap; border: 1px solid; text-decoration: none; }
+  a.b-pill:hover { text-decoration: none; filter: brightness(0.95); }
+  .b-pill.asi { color: var(--violet); background: var(--violet-soft); border-color: color-mix(in srgb, var(--violet) 35%, transparent); }
+  .b-pill.llm { color: var(--cyan); background: var(--cyan-soft); border-color: color-mix(in srgb, var(--cyan) 35%, transparent); }
+  .b-pill.api { color: var(--amber); background: var(--amber-soft); border-color: color-mix(in srgb, var(--amber) 35%, transparent); }
+  .b-pill.t { color: var(--stop); background: var(--stop-soft); border-color: color-mix(in srgb, var(--stop) 35%, transparent); }
+  .b-pill.g { color: var(--good); background: var(--good-soft); border-color: color-mix(in srgb, var(--good) 35%, transparent); }
+  .nine-q-wrap {
+    margin: 18px 0 8px;
+    padding: 16px 20px 18px;
+    background: var(--panel-2);
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+  }
+  .nine-q-head {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--cyan);
+    padding-bottom: 10px;
+    margin-bottom: 12px;
+    border-bottom: 1.5px solid var(--line);
+  }
+  .nine-q-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+  }
+  @media (max-width: 960px) { .nine-q-grid { grid-template-columns: 1fr; } }
+  .nine-q-card {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 14px 16px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-top: 3px solid var(--cyan);
+    border-radius: 8px;
+    font-size: 13.5px;
+    line-height: 1.5;
+  }
+  .nine-q-card .lq-id {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--muted);
+  }
+  .nine-q-card b {
+    font-size: 14.5px;
+    color: var(--ink);
+  }
+  .nine-q-card span:not(.lq-id) {
+    color: var(--muted);
+  }
+  .opt-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 18px 0; }
+  @media (max-width: 900px) { .opt-grid { grid-template-columns: 1fr; } }
+  .opt-card { border: 1px solid var(--line); border-radius: 10px; background: var(--panel-2); padding: 16px 18px; font-size: 14.5px; }
+  .opt-card h4 { margin: 0 0 6px; font-size: 16px; }
+  .opt-card .opt-tag { font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--cyan); }
+  .opt-card ul { margin: 8px 0 0 18px; padding: 0; }
+  .opt-card li { margin-bottom: 5px; }
+  .code-card { background: #0f172a; color: #f1f5f9; border-radius: 10px; padding: 14px 16px; margin: 12px 0 18px; overflow-x: auto; }
+  .code-card .code-title { font-family: var(--mono); font-size: 11px; color: #94a3b8; margin-bottom: 8px; letter-spacing: 0.06em; }
+  .code-card pre { margin: 0; font-family: var(--mono); font-size: 12.5px; line-height: 1.55; white-space: pre; }
+  /* Syntax Highlighting for Code & Payload Blocks */
+  .code-card pre .hl-c { color: #94a3b8; font-style: italic; }
+  .code-card pre .hl-k { color: #38bdf8; font-weight: 600; }
+  .code-card pre .hl-b { color: #c084fc; }
+  .code-card pre .hl-f { color: #fde047; font-weight: 600; }
+  .code-card pre .hl-s { color: #4ade80; }
+  .code-card pre .hl-n { color: #fb923c; }
+  .code-card pre .hl-v { color: #93c5fd; }
+  .code-card pre .hl-err { color: #fb7185; font-weight: 600; }
+
+  .t-card-full pre .hl-c { color: #64748b; font-style: italic; }
+  .t-card-full pre .hl-k { color: #0284c7; font-weight: 700; }
+  .t-card-full pre .hl-b { color: #7c3aed; font-weight: 600; }
+  .t-card-full pre .hl-f { color: #b45309; font-weight: 700; }
+  .t-card-full pre .hl-s { color: #15803d; }
+  .t-card-full pre .hl-n { color: #c2410c; font-weight: 600; }
+  .t-card-full pre .hl-v { color: #1d4ed8; }
+  .t-card-full pre .hl-err { color: #be123c; font-weight: 600; }
+
+  .beat { font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--cyan); margin: 22px 0 6px; }
+  .beat:first-child { margin-top: 0; }
+  .closes { display: flex; gap: 14px; flex-wrap: wrap; margin: 14px 0 6px; padding: 12px 16px; border-radius: 10px; background: var(--panel-2); border: 1px solid var(--line-2); font-family: var(--mono); font-size: 12.5px; }
+  .closes b { color: var(--good); }
+  .closes i { color: var(--stop); font-style: normal; }
+  .deeper { margin: 10px 0 0; font-size: 14.5px; }
+  .deeper a { color: var(--cyan); font-weight: 600; }
+  .node-dim { fill: var(--panel-3); stroke: var(--line); stroke-width: 1.2; }
+  .t-dim { font-family: var(--sans); font-size: 11px; fill: var(--dim); }
+  .node-new { fill: var(--good-soft); stroke: var(--good); stroke-width: 2.2; }
+  .node-done { fill: var(--panel); stroke: var(--good); stroke-width: 1.4; }
+
+
+  /* Progressive Hero Build Styles */
+  .prog-hero-frame svg text { font-family: var(--sans); font-size: 13.5px; fill: var(--ink); }
+  .prog-hero-frame .pt-b { font-weight: 600; font-size: 14px; }
+  .prog-hero-frame .pt-d { font-size: 17px; font-weight: 700; }
+  .prog-hero-frame .pt-s { font-size: 12px; fill: var(--muted); }
+  .prog-hero-frame .pt-m { font-family: var(--mono); font-size: 11.5px; }
+  .prog-hero-frame .pt-c { text-anchor: middle; }
+  .prog-hero-frame .p-zone { fill: var(--panel-3); stroke: var(--line-2); stroke-width: 1; }
+  .prog-hero-frame .p-zl { font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: .1em; fill: var(--muted); }
+  .prog-hero-frame .p-zl-v { font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: .1em; fill: var(--violet); }
+  .prog-hero-frame .p-edge { fill: none; stroke: var(--ink); stroke-width: 2; }
+  .prog-hero-frame .p-edge-id { fill: none; stroke: var(--good); stroke-width: 3; }
+
+  .prog-hero-frame .p-new rect.pb { fill: var(--good-soft); stroke: var(--good); stroke-width: 2.8; }
+  .prog-hero-frame .p-new text.pt-b, .prog-hero-frame .p-new text.pt-d { fill: var(--good); }
+  .prog-hero-frame .p-done rect.pb { fill: var(--panel); stroke: var(--good); stroke-width: 1.6; }
+  .prog-hero-frame .p-wait { opacity: 0.28; }
+  .prog-hero-frame .p-wait rect.pb { fill: var(--panel-3); stroke: var(--line); stroke-width: 1.2; stroke-dasharray: 4 3; }
+
+  .prog-hero-frame .p-vpc-rect { fill: var(--violet-soft); stroke: var(--violet); stroke-width: 1.5; }
+  .prog-hero-frame .p-prod-rect { fill: var(--panel); stroke: var(--violet); stroke-width: 1.2; stroke-dasharray: 4 3; }
+  .prog-hero-frame .p-new .p-vpc-rect, .prog-hero-frame .p-new .p-prod-rect { stroke: var(--good); stroke-width: 2.6; }
+
+  .prog-hero-frame .p-perim-rect { fill: none; stroke: var(--warn); stroke-width: 2; stroke-dasharray: 10 6; }
+  .prog-hero-frame .p-perim-txt { font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: .08em; fill: var(--warn); }
+  .prog-hero-frame .p-wait-perim { opacity: 0.22; }
+  .prog-hero-frame .p-new-perim .p-perim-rect { stroke: var(--good); stroke-width: 3.2; }
+  .prog-hero-frame .p-new-perim .p-perim-txt { fill: var(--good); }
+
+  /* Lethal Trifecta & Mode Cards & Spotlight Grids */
+  .tri-group-head {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--stop);
+    background: var(--stop-soft);
+    border: 1px solid color-mix(in srgb, var(--stop) 35%, transparent);
+    border-radius: 6px;
+    padding: 7px 12px;
+    margin: 16px 0 10px;
+  }
+  .trifecta-grid, .mode-3-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    margin: 10px 0 18px;
+  }
+  .trifecta-grid.two-col {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .tri-card, .mode-card {
+    border: 1.5px solid var(--line);
+    border-top: 4px solid var(--stop);
+    border-radius: 8px;
+    padding: 16px 18px;
+    background: var(--panel-2);
+  }
+  .mode-card { border-top-color: var(--cyan); }
+  .mode-card.m-teal { border-top-color: var(--good); }
+  .mode-card.m-violet { border-top-color: var(--violet); }
+  .tri-card .leg-tag, .mode-card .leg-tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--stop);
+    display: block;
+    margin-bottom: 6px;
+  }
+  .mode-card .leg-tag { color: var(--cyan); }
+  .mode-card.m-teal .leg-tag { color: var(--good); }
+  .mode-card.m-violet .leg-tag { color: var(--violet); }
+  .tri-card h4, .mode-card h4 { margin: 0 0 8px; font-size: 16.5px; }
+  .tri-card p, .mode-card p, .mode-card li { margin: 0; font-size: 14px; line-height: 1.55; }
+  .mode-card ol { margin: 6px 0 0; padding-left: 18px; display: grid; gap: 5px; }
+
+  .duo-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin: 18px 0;
+    align-items: start;
+  }
+  .info-card {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 18px 20px;
+    background: var(--panel-2);
+    font-size: 14.5px;
+  }
+  .info-card h3, .info-card h4 { margin: 0 0 10px; font-size: 17px; }
+  .info-card ul, .info-card ol { margin: 0; padding-left: 20px; display: grid; gap: 7px; }
+
+  .threat-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    margin: 20px 0;
+  }
+  .t-card-full {
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--stop);
+    border-radius: 8px;
+    padding: 14px 16px;
+    background: var(--panel-2);
+    font-size: 13.8px;
+  }
+  .t-card-full h4 { margin: 4px 0 6px; font-size: 15.5px; color: var(--ink); }
+  .t-card-full p { margin: 0 0 8px; color: var(--muted); }
+  .t-card-full pre {
+    margin: 0 0 8px;
+    padding: 8px 10px;
+    background: var(--panel);
+    border: 1px solid var(--line-2);
+    border-radius: 5px;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    white-space: pre-wrap;
+  }
+  .t-fix-row {
+    font-size: 12.8px;
+    padding: 6px 9px;
+    border-radius: 5px;
+    margin-top: 5px;
+    background: var(--panel);
+    border-left: 3px solid var(--good);
+  }
+  .t-fix-row.mit { border-left-color: var(--amber); }
+  .t-fix-row.gcp {
+    border-left-color: var(--cyan);
+    background: color-mix(in srgb, var(--cyan-soft) 55%, var(--panel));
+    font-size: 12.3px;
+  }
+  .t-fix-row.gcp b { color: var(--cyan); }
+
+  .t-card-full.l-card-full {
+    border-left: 4px solid var(--good);
+  }
+  .t-fix-row.threat-rem {
+    border-left-color: var(--stop);
+    background: color-mix(in srgb, var(--stop-soft) 45%, var(--panel));
+    font-size: 12.4px;
+  }
+  .t-fix-row.threat-rem b { color: var(--stop); }
+  .t-fix-row.oss {
+    border-left-color: var(--good);
+    background: color-mix(in srgb, var(--good-soft) 45%, var(--panel));
+    font-size: 12.3px;
+  }
+  .t-fix-row.oss b { color: var(--good); }
+
+  .p-stage {
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    padding: 16px 18px;
+    background: var(--panel-2);
+    margin-bottom: 14px;
+  }
+  .p-stage-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+    font-weight: 700;
+    font-size: 16px;
+  }
+  .p-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .p-col {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px 14px;
+    background: var(--panel);
+    font-size: 13.5px;
+  }
+  .p-col.flawed-col { border-left: 4px solid var(--stop); }
+  .p-col.guarded-col { border-left: 4px solid var(--good); }
+  .p-col-title { font-family: var(--mono); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; display: block; margin-bottom: 6px; }
+  .p-col.flawed-col .p-col-title { color: var(--stop); }
+  .p-col.guarded-col .p-col-title { color: var(--good); }
+  .p-code { font-family: var(--mono); font-size: 12px; background: var(--panel-2); padding: 8px 10px; border-radius: 5px; white-space: pre-wrap; margin-bottom: 8px; border: 1px solid var(--line-2); }
+
+  @media (max-width: 960px) {
+    .trifecta-grid, .mode-3-grid, .duo-grid, .threat-cards-grid, .p-cols { grid-template-columns: 1fr; }
+  }
+
+  @media print {
+    table { font-size: 10.5px; table-layout: auto; }
+    th, td { padding: 5px 6px; overflow-wrap: break-word; }
+    td code { white-space: normal; overflow-wrap: break-word; font-size: 9.5px; }
+    .b-pill { font-size: 9px; padding: 1px 4px; }
+    .tbl-wrap { break-inside: auto; overflow: visible; }
+    .topbar { display: none !important; }
+    .app { max-width: 100%; padding: 0; }
+    .sheet { break-inside: auto; box-shadow: none; margin-bottom: 14px; }
+    .diagram-frame, .opt-card, .code-card, .nine-q-card, .t-card-full, .chain, .link { break-inside: avoid; }
+    .code-card, .link pre { overflow: visible !important; }
+    .code-card pre { white-space: pre-wrap; word-break: break-word; font-size: 10.5px; line-height: 1.45; }
+    .link pre { white-space: pre-wrap; word-break: break-word; font-size: 9.2px; line-height: 1.45; padding: 10px 10px; }
+    .q-group-title, .post-prose h3, .sheet-h, .nine-q-head { break-inside: avoid; break-after: avoid; }
+    .nine-q-wrap > .tbl-wrap { display: contents; }
+    #cheatsheet { break-before: page; break-inside: avoid; margin-bottom: 12px; }
+    #references { break-before: page; break-inside: avoid; }
+    #cheatsheet .sheet-h { padding: 14px 22px; }
+    #cheatsheet .sheet-b { padding: 16px 22px; }
+    #cheatsheet .say { margin: 8px 0 12px; padding: 10px 14px; font-size: 14.5px; }
+    #cheatsheet .post-prose p { margin: 0 0 10px; font-size: 13.5px; line-height: 1.5; }
+    #cheatsheet .opt-grid { gap: 10px; margin: 10px 0; }
+    #cheatsheet .opt-card { padding: 10px 14px; font-size: 12.5px; }
+    #cheatsheet .opt-card li { margin-bottom: 3px; }
+    tr { break-inside: avoid; }
+  }
+
+
+
+
+  /* Ensure .t-badge inside any SVG always renders crisp white text */
+  .diagram-frame svg text.t-badge { fill: #ffffff !important; }
+
+  /* concept → implementation strip used in every section */
+  .concept-map { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 0; margin: 0 0 18px; border: 1.5px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--panel-2); }
+  .concept-map > div { padding: 10px 14px; border-right: 1px solid var(--line-2); font-size: 13.5px; }
+  .concept-map > div:last-child { border-right: 0; }
+  .concept-map .cm-k { display: block; font-family: var(--mono); font-size: 10.5px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; margin-bottom: 3px; }
+  .concept-map .cm-concept .cm-k { color: var(--ink); }
+  .concept-map .cm-oss .cm-k { color: var(--cyan); }
+  .concept-map .cm-gcp .cm-k { color: var(--good); }
+  .concept-map .cm-fig .cm-k { color: var(--violet); }
+  .concept-map a { color: inherit; }
+  @media (max-width: 960px) { .concept-map { grid-template-columns: 1fr 1fr; } }
+  .cm-pill { display:inline-block; font-family: var(--mono); font-size: 10.5px; font-weight: 700; padding: 1px 7px; border-radius: 4px; border: 1px solid; margin: 1px 4px 1px 0; }
+  .cm-pill.oss { color: var(--cyan); background: var(--cyan-soft); border-color: color-mix(in srgb, var(--cyan) 35%, transparent); }
+  .cm-pill.gcp { color: var(--good); background: var(--good-soft); border-color: color-mix(in srgb, var(--good) 35%, transparent); }
+  @media print { .concept-map { break-inside: avoid; } }
+
+  main a:not(.b-pill) { color: var(--cyan); }
+  @media screen and (max-width: 960px) {
+    .topbar { position: static; }
+    .diagram-frame svg { min-width: 860px; }
+  }
+    /* Page numbers in the PDF export */
+    @page {
+      margin: 10mm 10mm 14mm 10mm;
+      @bottom-center {
+        content: counter(page) " / " counter(pages);
+        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+        font-size: 9pt;
+        color: #64748b;
+      }
+    }
+
+  /* Playbook question cards & skeleton SVG styles */
+  .say {
+    border-left: 4px solid var(--cyan);
+    background: var(--cyan-soft);
+    padding: 14px 18px;
+    margin: 14px 0 20px;
+    border-radius: 0 8px 8px 0;
+    font-size: 16.5px;
+    font-weight: 600;
+  }
+  .say .eyebrow {
+    display: block;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--cyan);
+    margin-bottom: 4px;
+  }
+  .qb {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    margin: 14px 0 18px;
+    overflow: hidden;
+    background: var(--panel);
+    break-inside: avoid;
+  }
+  .qh {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    padding: 12px 18px;
+    background: var(--panel-2);
+    border-bottom: 1px solid var(--line-2);
+  }
+  .qh .n {
+    flex: none;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--panel);
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: 15px;
+    line-height: 34px;
+    text-align: center;
+  }
+  .qh h3 {
+    margin: 0;
+    font-size: 17.5px;
+    color: var(--ink);
+  }
+  .q3 {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .q3 > div {
+    padding: 14px 16px;
+    font-size: 14.5px;
+    line-height: 1.55;
+    border-right: 1px solid var(--line-2);
+    min-width: 0;
+  }
+  .q3 > div:last-child { border-right: 0; }
+  .q3 .lab {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 6px;
+  }
+  .q3 .a { background: var(--stop-soft); }
+  .q3 .a .lab { color: var(--stop); }
+  .q3 .b .lab { color: var(--good); }
+  .q3 .c { background: var(--cyan-soft); }
+  .q3 .c .lab { color: var(--cyan); }
+  .q3 ul { margin: 0; padding-left: 1.15em; }
+  .q3 li { margin-bottom: 4px; }
+  @media screen and (max-width: 820px) {
+    .q3 { grid-template-columns: 1fr; }
+    .q3 > div { border-right: 0; border-bottom: 1px solid var(--line-2); }
+    .q3 > div:last-child { border-bottom: 0; }
+  }
+  .q-group-title {
+    margin: 26px 0 8px;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--cyan);
+  }
+  .check {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+  }
+  .check li {
+    padding-left: 28px;
+    position: relative;
+    margin-bottom: 10px;
+  }
+  .check li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 5px;
+    width: 15px;
+    height: 15px;
+    border: 2px solid var(--cyan);
+    border-radius: 3px;
+  }
+  svg .t-b { font-family: var(--sans); font-size: 16px; font-weight: 700; fill: var(--ink); }
+  svg .t-s { font-family: var(--sans); font-size: 14px; fill: var(--muted); }
+  svg .t-c { text-anchor: middle; }
+  svg .t-e { text-anchor: end; }
+  svg .zone-ours { fill: none; stroke: var(--cyan); stroke-width: 1.5; stroke-dasharray: 8 5; }
+  svg .zl { font-family: var(--mono); font-size: 13.2px; letter-spacing: 0.09em; fill: var(--muted); font-weight: 700; }
+  svg .b-ext { fill: var(--panel); stroke: var(--muted); stroke-width: 1.4; stroke-dasharray: 5 4; }
+  svg .b-code { fill: var(--good-soft); stroke: var(--good); stroke-width: 1.8; }
+  svg .b-model { fill: var(--violet-soft); stroke: var(--violet); stroke-width: 1.8; }
+  svg .b-store { fill: var(--amber-soft); stroke: var(--amber); stroke-width: 1.6; }
+  svg .flow { stroke: var(--ink); stroke-width: 2.1; fill: none; }
+  svg .flow-d { stroke: var(--muted); stroke-width: 1.8; fill: none; stroke-dasharray: 6 4; }
+  svg .flow-g { stroke: var(--good); stroke-width: 2.4; fill: none; }
+
+  .chain {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin: 14px 0 22px;
+  }
+  .link {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--panel);
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    overflow: hidden;
+  }
+  .link header {
+    padding: 10px 14px;
+    background: var(--cyan-soft);
+    font-weight: 700;
+    font-size: 15.5px;
+    color: var(--ink);
+    border-bottom: 1px solid var(--line-2);
+  }
+  .link header span {
+    display: block;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--cyan);
+    margin-bottom: 2px;
+  }
+  .link pre {
+    margin: 0;
+    padding: 12px 14px;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.5;
+    background: #0f1b30;
+    color: #e6edf7;
+    overflow-x: auto;
+    flex: 1;
+  }
+  .link pre .hl-k { color: #8fc1ff; }
+  .link pre .hl-s { color: #a5e0b4; }
+  .link pre .hl-n { color: #f5c37a; }
+  .link footer {
+    padding: 10px 14px;
+    font-size: 13.5px;
+    line-height: 1.45;
+    color: var(--muted);
+    background: var(--panel-2);
+    border-top: 1px solid var(--line-2);
+  }
+  @media screen and (max-width: 820px) {
+    .chain { grid-template-columns: 1fr; }
+  }
+  .opt-grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  @media screen and (max-width: 900px) { .opt-grid.two { grid-template-columns: 1fr; } }
+  /* Progressive Stage Highlight Helpers (Ep02) */
+  svg g.stg-prev { opacity: 0.72; }
+  svg g.stg-new > rect { stroke-width: 3px !important; filter: drop-shadow(0 0 6px color-mix(in srgb, var(--good) 42%, transparent)); }
+  svg g.stg-new > path, svg g.stg-new > line { stroke-width: 2.6px !important; }
+  svg .t-m-g { font-family: var(--mono); font-size: 12.6px; font-weight: 700; fill: var(--good); }
+  svg .t-m-v { font-family: var(--mono); font-size: 12px; font-weight: 700; fill: var(--violet); }
+  svg .t-m-c { font-family: var(--mono); font-size: 12px; font-weight: 700; fill: var(--cyan); }
+  svg .t-m-r { font-family: var(--mono); font-size: 12.8px; font-weight: 700; fill: var(--stop); }
+  svg .b-sbx { fill: var(--panel-2); stroke: var(--cyan); stroke-width: 1.6; stroke-dasharray: 6 4; }
+  .fig-caption a { color: var(--cyan); }
+  @media print {
+    svg g.stg-new > rect { filter: none; stroke-width: 3px !important; }
+    #cheatsheet table { font-size: 9px; line-height: 1.3; }
+    #cheatsheet th, #cheatsheet td { padding: 2.8px 5px; }
+    #cheatsheet .nine-q-wrap { padding: 8px 12px 10px; margin: 6px 0 8px; }
+    #cheatsheet .nine-q-head { padding-bottom: 5px; margin-bottom: 5px; font-size: 10px; }
+    #references { break-before: auto !important; }
+  }
+  </style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="brand" id="brand-home-link" href="index.html"><span class="brand-dot"></span> All About Agents · Episode 03</a>
+  <nav class="navlinks" aria-label="Section navigation">
+    <a class="home-link" id="home-link" href="index.html">← Home</a>
+    <a href="#intro">Overview</a>
+    <a href="#q1">Q1 · Trust</a>
+    <a href="#q2">Q2 · Model Spectrum</a>
+    <a href="#q3">Q3 · Forecasting</a>
+    <a href="#q4">Q4 · Modern RAG</a>
+    <a href="#q5">Q5 · Policy Engine</a>
+    <a href="#cheatsheet">Cheat Sheet</a>
+    <a href="#references">References</a>
+    <button class="theme-btn" id="theme-toggle" type="button">◑ Switch to Dark Mode</button>
+  </nav>
+</header>
+
+<main class="app">
+
+  <!-- ==================== HERO / OVERVIEW ==================== -->
+  <section class="sheet" id="intro">
+    <div class="sheet-h">
+      <div>
+        <span class="sec-badge">Episode 03 · System Design Interview Foundations</span>
+        <h1>Five Foundational Questions in AI System Design</h1>
+        <p>Core questions companies test in AI system-design interviews: opening the language-model black box, choosing across the full model spectrum, scoping numerical forecasting, combining modern RAG with structured stores, and building a lean domain-specific agent with specialized capabilities and domain language.</p>
+      </div>
+    </div>
+    <div class="sheet-b">
+      <div class="post-prose">
+        <p>
+          My goal with this episode is to build a solid, ground-up foundation across five recurring questions that companies ask in AI system-design interviews. These are the core questions you need to have internalized deeply enough to explain and defend clearly on the spot, even if someone wakes you up in the middle of the night (as my university professor used to tell us when explaining core theorems on the board). In <a href="ep02_designing_agentic_systems.html">Episode 02</a>, we walked through a single asynchronous workflow end to end and separated deterministic control flow from bounded model steps. Interviewers also probe five standalone topics directly: how to make a language model trustworthy to a skeptical enterprise customer, when to choose open-weight models versus proprietary APIs or classical machine learning, how retail demand forecasting works and where language models fit around it, how Retrieval-Augmented Generation (RAG) has evolved and what it pairs with today, and how to build a lean, domain-specific agent equipped with specialized capabilities and domain language.
+        </p>
+
+        <div class="nine-q-wrap">
+          <div class="nine-q-head">Roadmap · Five Architectural Questions Covered in This Episode</div>
+          <div class="nine-q-grid">
+            <div class="nine-q-card">
+              <span class="lq-id">Question 01 · Trust &amp; Transparency</span>
+              <b>Making an LLM Trustworthy</b>
+              <span>Examining the eight angles behind "black box," staying candid about weight opacity, and wrapping the model in seven transparent system layers.</span>
+            </div>
+            <div class="nine-q-card">
+              <span class="lq-id">Question 02 · Model Spectrum</span>
+              <b>Open-Weight, Closed &amp; Classical Tiers</b>
+              <span>Filtering choices through residency/ZDR reality, GPU VRAM and utilization math, prefix-cache physics, and a five-tier hybrid router.</span>
+            </div>
+            <div class="nine-q-card">
+              <span class="lq-id">Question 03 · Retail Forecasting</span>
+              <b>Numerical Core vs. Scoped LLM Sidecars</b>
+              <span>Stockout uncensoring, quantile safety stock, LightGBM + TimesFM + count ensembles, and honest executive framing that avoids overselling LLMs.</span>
+            </div>
+            <div class="nine-q-card">
+              <span class="lq-id">Question 04 · Retrieval in 2026</span>
+              <b>Modern RAG &amp; Multi-Store Combinations</b>
+              <span>Contextual retrieval, hybrid BM25 + dense RRF + cross-encoder reranking, and pairing RAG with SQL, graphs, prefix-cached long context, and memory.</span>
+            </div>
+            <div class="nine-q-card">
+              <span class="lq-id">Question 05 · Domain-Specific Agent</span>
+              <b>Specialized Capabilities &amp; Domain Language</b>
+              <span>Equipping one lean agent to understand domain terminology, follow cross-references, and handle conflicting rules using minimal components.</span>
+            </div>
+            <div class="nine-q-card">
+              <span class="lq-id">Synthesis · Reference Appendix</span>
+              <b>ADK 2.x Graph &amp; Master Cheat Sheet</b>
+              <span>Runnable single-workflow policy graph sketch, printable five-question comparison matrix, and primary literature with publication dates.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== QUESTION 1: TRUST & BLACK BOX ==================== -->
+  <section class="sheet" id="q1">
+    <div class="sheet-h">
+      <div>
+        <span class="sec-badge">Question 01 · Enterprise Trust &amp; Transparency</span>
+        <h2>How Do We Make a Language Model Trustworthy for a Customer?</h2>
+        <p>Where we are: an enterprise stakeholder hesitates to adopt an LLM because they cannot yet predict how it behaves, check its work, control its boundaries, or defend its decisions to leadership, auditors, and regulators.</p>
+      </div>
+    </div>
+    <div class="sheet-b">
+      <div class="post-prose">
+        <p>
+          When a customer calls an AI platform or solution "a black box," they mean something practical: <em>"I cannot predict how this system behaves, check its outputs, control its limits, or defend its decisions to my boss, my auditor, or my regulator."</em> We separate the opacity inside the model's weights from the transparency we build in the system around the model, examine each angle from which the platform is seen as a black box, and address each one directly.
+        </p>
+
+        <h3>1. Angles From Which the Solution Looks Like a Black Box</h3>
+        <p>
+          "Black box" covers eight different concerns depending on who is in the room: an end user wants sources behind an answer, an engineering team wants predictable outputs and version stability, security wants data boundaries, and compliance wants an audit trail (<em>Table 1A</em>). Clarifying which of these angles applies tells us which control matters first.
+        </p>
+
+        <div class="nine-q-wrap">
+          <div class="nine-q-head">Table 1A · What "Black Box" Can Mean</div>
+          <div class="tbl-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>What the Customer Says</th>
+                  <th>Underlying Angle</th>
+                  <th>What Addresses It</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><b>"We don't know why it gave that answer."</b></td>
+                  <td><b>Explainability</b></td>
+                  <td>Traceable source passages and structured criteria behind every claim</td>
+                </tr>
+                <tr>
+                  <td><b>"It answers differently every time."</b></td>
+                  <td><b>Predictability</b></td>
+                  <td>Low-variance decoding, fixed schemas, and measured <code>pass^k</code> consistency</td>
+                </tr>
+                <tr>
+                  <td><b>"We don't know what it was trained on."</b></td>
+                  <td><b>Provenance</b></td>
+                  <td>Model cards, bias disclosures, and IP / copyright indemnification clarity</td>
+                </tr>
+                <tr>
+                  <td><b>"We don't know where our data goes."</b></td>
+                  <td><b>Data Governance</b></td>
+                  <td>Contractual zero-training, regional residency, encryption, and retention bounds</td>
+                </tr>
+                <tr>
+                  <td><b>"We can't tell when it is wrong."</b></td>
+                  <td><b>Reliability</b></td>
+                  <td>Groundedness checks, calibrated abstention, and known failure rates</td>
+                </tr>
+                <tr>
+                  <td><b>"We can't audit a past decision."</b></td>
+                  <td><b>Accountability</b></td>
+                  <td>Immutable logs and step traces capable of reconstructing any historical run</td>
+                </tr>
+                <tr>
+                  <td><b>"You will update the model under us."</b></td>
+                  <td><b>Version Stability</b></td>
+                  <td>Strict model version pinning and regression-gated customer cutovers</td>
+                </tr>
+                <tr>
+                  <td><b>"We have no way to measure it."</b></td>
+                  <td><b>Quality</b></td>
+                  <td>Agreed numerical metrics over a golden dataset built with their experts</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <p>
+          Underneath those eight technical angles sit six concrete business and personal risks that decide whether a project moves forward:
+        </p>
+        <ul>
+          <li><strong>Legal and Financial Liability:</strong> A wrong answer reaches an external customer, a patient record, or a financial ledger, and the enterprise owns the consequences.</li>
+          <li><strong>Regulatory Scrutiny:</strong> Frameworks such as the EU AI Act, GDPR automated-decision rules, banking model risk management (<code>SR 11-7</code>), HIPAA, and FDA guidance require defensible explanations when an examiner asks how a decision was reached.</li>
+          <li><strong>Confidential Data Exposure:</strong> Proprietary records leaking into vendor training runs or surfacing across users via prompt injection.</li>
+          <li><strong>Reputational Harm:</strong> A public screenshot of an assistant stating something fabricated or off-policy.</li>
+          <li><strong>Loss of Control and Lock-In:</strong> Unplanned vendor shifts in model behavior, terms, or unit pricing.</li>
+          <li><strong>Personal Career Risk for the Internal Champion:</strong> The sponsor backing the project carries personal accountability if an opaque failure embarrasses their team.</li>
+        </ul>
+
+        <h3>2. Why the Model Core Remains Opaque</h3>
+        <p>
+          Inside the model itself, there is real opacity that should be stated plainly up front:
+        </p>
+        <ul>
+          <li><strong>Distributed Weights and Probabilistic Sampling:</strong> Knowledge and pattern matching sit spread across billions of continuous parameters with zero human-readable <code>if-then</code> rules inside the weights, while next-token probability sampling introduces surface phrasing variation.</li>
+          <li><strong>Limits of Interpretability and Chain-of-Thought:</strong> Mechanistic interpretability is an active research area, yet it cannot explain individual production business decisions today. Similarly, generated Chain-of-Thought text helps task accuracy while remaining an unverified proxy for the internal factors driving an output (<a href="https://arxiv.org/abs/2305.04388" target="_blank" rel="noopener">Turpin et al., NeurIPS 2023</a>).</li>
+          <li><strong>The New-Employee Analogy:</strong> Hiring a capable human analyst carries the same internal opacity: nobody inspects an employee's neurons. Organizations build trust through background checks, clear instructions, reference materials, checking their work on high-risk decisions, performance evaluations, and an audit trail.</li>
+        </ul>
+        <p>
+          That gives us the governing boundary: <strong>the model's weights remain opaque, while the surrounding system makes inputs, sources, limits, evaluations, and history transparent</strong> (<em>Figure 1</em>).
+        </p>
+
+        
+<div class="diagram-frame" id="fig-q1">
+  <svg viewBox="0 0 920 638" role="img" aria-label="Separating irreducible opacity inside model weights from seven transparent system layers around the model, preceded by stakeholder diagnosis and backed by the transparency-versus-flexibility spectrum">
+    
+  <defs>
+    <marker id="arr-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:var(--ink)"/>
+    </marker>
+    <marker id="arr-good" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:var(--good)"/>
+    </marker>
+    <marker id="arr-cyan" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:var(--cyan)"/>
+    </marker>
+    <marker id="arr-stop" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:var(--stop)"/>
+    </marker>
+    <marker id="arr-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:var(--amber)"/>
+    </marker>
+  </defs>
+
+    <rect x="14" y="14" width="892" height="610" rx="14" style="fill:var(--panel-2);stroke:var(--good);stroke-width:2"/>
+    <text class="zl" x="34" y="42" style="fill:var(--good)">OPENING THE BLACK BOX · OPAQUE WEIGHTS INSIDE, TRANSPARENT ENGINEERED SYSTEM AROUND IT</text>
+
+    <!-- Step 1 Top Bar: Diagnose Stakeholder Meaning & Underlying Fear -->
+    <rect class="b-store" x="32" y="56" width="856" height="78" rx="9"/>
+    <text class="t-m-c" x="50" y="78" style="fill:var(--amber)">1 · DIAGNOSE FIRST: CLARIFY WHICH "BLACK BOX" CONCERN &amp; BUSINESS FEAR APPLIES</text>
+    <text class="t-b" x="50" y="101">Technical: Explainability · Predictability · Provenance · Data Privacy · Reliability · Auditability · Drift · Metrics</text>
+    <text class="t-s" x="50" y="122">Underlying Fears: Liability · Regulators (EU AI Act / SR 11-7 / HIPAA) · Data Leak · Reputation · Lock-In · Champion Risk</text>
+
+    <line x1="460" y1="134" x2="460" y2="154" class="flow-g" marker-end="url(#arr-good)"/>
+
+    <!-- Outer Transparent System Shell -->
+    <rect x="32" y="158" width="856" height="364" rx="12" style="fill:var(--panel);stroke:var(--good);stroke-width:2.2"/>
+    <text class="t-m-g" x="50" y="182">2 · TRANSPARENT SYSTEM SHELL · SEVEN AUDITED LAYERS AROUND AN HONESTLY OPAQUE CORE</text>
+
+    <!-- Row 1 around Core: A, B, F -->
+    <rect class="b-code" x="48" y="196" width="256" height="92" rx="8"/>
+    <text class="t-m-g" x="64" y="218">A · EVIDENCE GROUNDING</text>
+    <text class="t-b" x="64" y="240">RAG + Verified Citations</text>
+    <text class="t-s" x="64" y="261">Clickable spans, structured JSON</text>
+    <text class="t-s" x="64" y="279">&amp; explicit "not found" abstention</text>
+
+    <rect class="b-code" x="320" y="196" width="280" height="92" rx="8"/>
+    <text class="t-m-g" x="336" y="218">B · CO-OWNED EVALUATION</text>
+    <text class="t-b" x="336" y="240">SME Golden Set &amp; Candor</text>
+    <text class="t-s" x="336" y="261">Regression CI on every change;</text>
+    <text class="t-s" x="336" y="279">share exact failure slices openly</text>
+
+    <rect class="node-cyan" x="616" y="196" width="256" height="92" rx="8"/>
+    <text class="t-m-c" x="632" y="218">F · DATA &amp; MODEL PROVENANCE</text>
+    <text class="t-b" x="632" y="240">Zero-Training &amp; Perimeter</text>
+    <text class="t-s" x="632" y="261">Model cards, VPC-SC, CMEK,</text>
+    <text class="t-s" x="632" y="279">residency, ZDR &amp; SOC 2 / HIPAA</text>
+
+    <!-- Middle Row: D (Left) -> Opaque Core (Center) -> E (Right) -->
+    <rect class="b-code" x="48" y="302" width="256" height="100" rx="8"/>
+    <text class="t-m-g" x="64" y="324">D · GUARDRAILS &amp; PINNING</text>
+    <text class="t-b" x="64" y="346">Code Rules &amp; Version Lock</text>
+    <text class="t-s" x="64" y="367">Model Armor PII/injection filters,</text>
+    <text class="t-s" x="64" y="386">code policy gates &amp; pinned versions</text>
+
+    <line x1="304" y1="352" x2="322" y2="352" class="flow" marker-end="url(#arr-ink)"/>
+
+    <!-- Candid Opaque Core -->
+    <rect class="b-model" x="326" y="302" width="268" height="100" rx="9" style="stroke-dasharray:6 4"/>
+    <text class="t-m-v" x="460" y="325" text-anchor="middle">CANDID OPAQUE MODEL CORE</text>
+    <text class="t-b" x="460" y="348" text-anchor="middle">Billions of Continuous Weights</text>
+    <text class="t-s" x="460" y="369" text-anchor="middle">Distributed representations;</text>
+    <text class="t-s" x="460" y="388" text-anchor="middle">CoT is helpful text, unverified cause</text>
+
+    <line x1="594" y1="352" x2="612" y2="352" class="flow-g" marker-end="url(#arr-good)"/>
+
+    <rect class="node-bad" x="616" y="302" width="256" height="100" rx="8"/>
+    <text class="t-m-r" x="632" y="324">E · ACCOUNTABLE HITL</text>
+    <text class="t-b" x="632" y="346">Risk-Matched Sign-Off</text>
+    <text class="t-s" x="632" y="367">Confidence routing, dry-run</text>
+    <text class="t-s" x="632" y="386">approval &amp; single RACI owner</text>
+
+    <!-- Bottom Row inside Shell: C (Audit) & G (Graduated Rollout) -->
+    <rect class="b-store" x="48" y="416" width="404" height="90" rx="8"/>
+    <text class="t-m-c" x="64" y="438" style="fill:var(--amber)">C · FULL AUDITABILITY &amp; RECONSTRUCTION</text>
+    <text class="t-b" x="64" y="460">Logs, Traces &amp; Drift Dashboards</text>
+    <text class="t-s" x="64" y="481">Every prompt, chunk, tool call, model version &amp; edit</text>
+
+    <rect class="b-code" x="468" y="416" width="404" height="90" rx="8"/>
+    <text class="t-m-g" x="484" y="438">G · GRADUATED ROLLOUT &amp; KILL SWITCH</text>
+    <text class="t-b" x="484" y="460">Pilot → Shadow → Assist → Scoped Auto</text>
+    <text class="t-s" x="484" y="481">Low-risk wedge first + instant downgrade toggle</text>
+
+    <!-- Bottom Spectrum Bar -->
+    <rect class="node-card" x="32" y="536" width="856" height="72" rx="9"/>
+    <text class="t-m-c" x="50" y="558">3 · SPECTRUM OF ALTERNATIVES (HIGHER STRUCTURAL TRANSPARENCY ↔ HIGHER LANGUAGE FLEXIBILITY)</text>
+    <text class="t-b" x="50" y="582">Deterministic Rules  →  Tabular ML + SHAP  →  Hybrid (LLM Extracts, Code Decides)  →  Constrained Labels / Search</text>
+  </svg>
+  <div class="fig-caption">
+    <span>Figure 1 — Addressing the "black box" objection: diagnose which of the eight meanings and six business fears applies, stay candid about weight opacity, wrap the model in seven transparent system layers (A–G), and place high-stakes decisions at the right point on the hybrid spectrum.</span>
+    <div class="legend-items">
+      <span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> Opaque weight core</span>
+      <span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good)"></i> Verification &amp; rollout gates</span>
+      <span><i class="swatch-dot" style="background:var(--cyan-soft);border-color:var(--cyan)"></i> Data governance</span>
+      <span><i class="swatch-dot" style="background:var(--amber-soft);border-color:var(--amber)"></i> Diagnosis &amp; audit logs</span>
+      <span><i class="swatch-dot" style="background:var(--stop-soft);border-color:var(--stop)"></i> Human sign-off</span>
+    </div>
+  </div>
+</div>
+
+
+        <h3>3. Seven System Layers Around the Model</h3>
+        <p>
+          Each concern in <em>Table 1A</em> maps to a concrete engineering layer around the model:
+        </p>
+        <ol>
+          <li><strong>A · Ground Outputs in Evidence (Explainability):</strong> Pair retrieval with clickable inline citations linked to the customer's own documents, return structured JSON (<code>verbatim_quote</code>, <code>sources</code>, <code>assumptions</code>, <code>answer</code>), verify in server code that cited passages genuinely support the claim, and return an explicit <em>"not found in your documents"</em> response whenever evidence is absent.</li>
+          <li><strong>B · Measure It Openly with Customer Experts (Evaluation):</strong> Co-create a golden dataset of 100 to 300 real historical cases alongside the customer's domain specialists, track accuracy, groundedness, hallucination rate, refusal rate, latency, and cost on every prompt, retrieval, or model change like regression tests, and share the failure breakdown openly (<em>"94% pass rate on your test set, with these 6% boundary categories routed to review"</em>).</li>
+          <li><strong>C · Observe Every Step (Auditability):</strong> Log every interaction (input, retrieved chunks, prompt version, pinned model version, output, and reviewer feedback), record step-by-step traces across every tool call so any decision can be reconstructed months later, and expose live drift and quality dashboards to operators.</li>
+          <li><strong>D · Enforce Deterministic Guardrails and Version Pinning (Control &amp; Stability):</strong> Screen inputs and outputs for PII, toxicity, off-topic asks, and prompt injection; enforce permissions, dollar caps, and business rules in application code (<a href="https://www.anthropic.com/research/building-effective-agents" target="_blank" rel="noopener">Anthropic, Dec 2024</a>); isolate API <code>HTTP 429</code>/timeout faults safely into <code>RETRY_PENDING</code> queues; lower temperature with fixed schemas where repeatability matters; and <strong>pin exact model versions</strong> so upgrades occur strictly when the customer's eval suite passes.</li>
+          <li><strong>E · Keep Accountable Humans in the Loop (Accountability):</strong> Match autonomy to error cost by automating low-risk tasks while routing uncertain or high-impact cases via confidence thresholds and hash-locked dry-run previews to named human reviewers with clear sign-off ownership (<code>RACI</code>).</li>
+          <li><strong>F · Document Model and Data Provenance (Governance):</strong> Provide model cards (intended scope, limitations, benchmark results), compliance certifications (<code>SOC 2</code>, <code>ISO 27001 / 42001</code>, <code>HIPAA BAA</code>), and enforceable cloud data guarantees: contractual zero-training on customer data, regional residency, VPC perimeters, customer-managed encryption keys (<code>CMEK</code>), and explicit retention bounds.</li>
+          <li><strong>G · Roll Out Gradually (Earned Trust):</strong> Start on a low-risk, high-visibility wedge and earn promotion across stages: <code>Scoped Pilot → Shadow Mode</code> (running silently beside humans to compare outcomes) <code>→ Assisted Copilot → Partial Scoped Automation</code>, backed by an instant operational kill switch (<a href="https://martinfowler.com/articles/feature-toggles.html" target="_blank" rel="noopener">Hodgson, Oct 2017</a>).</li>
+        </ol>
+
+        <h3>4. Scoping Questions and the Spectrum of Alternatives</h3>
+        <p>
+          How far we go on those controls depends on seven practical questions we align on with the customer: (1) what exact decision the system makes and what an error costs; (2) <em>who</em> needs the explanation (end users need citations, operators need dashboards, auditors need logs and lineage, regulators need formal documentation); (3) which regulations apply; (4) where data lives and who can access it; (5) what measurable bar defines "good" before building; (6) how fast a bad output is detected and fixed; and (7) how model updates roll out. Depending on those answers, we place each step along a six-option spectrum trading open-ended language flexibility against structural transparency (<em>Table 1B</em>) (<a href="https://docs.cloud.google.com/architecture/choose-design-pattern-agentic-ai-system" target="_blank" rel="noopener">Google Cloud, Nov 2026</a>):
+        </p>
+
+        <div class="nine-q-wrap">
+          <div class="nine-q-head">Table 1B · The Six-Option Transparency vs. Flexibility Spectrum</div>
+          <div class="tbl-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Architectural Option</th>
+                  <th>Transparency &amp; Strengths</th>
+                  <th>Flexibility Trade-Off &amp; Best Fit</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><b>1. Deterministic Rules &amp; Solvers</b></td>
+                  <td>100% inspectable <code>if-then</code> logic, SQL, or math solvers</td>
+                  <td>Requires structured inputs; ideal for calculations, thresholds, &amp; hard policy gates</td>
+                </tr>
+                <tr>
+                  <td><b>2. Interpretable Classical ML + SHAP</b></td>
+                  <td>Decision trees, logistic regression, or GBDTs with per-feature SHAP attributions</td>
+                  <td>Tabular inputs; ideal for regulated credit scoring, risk grading, &amp; numerical forecasting</td>
+                </tr>
+                <tr>
+                  <td><b>3. Hybrid Architecture (Sweet Spot)</b></td>
+                  <td>LLM extracts structured fields or drafts; deterministic rules or scoring models decide</td>
+                  <td>Combines unstructured language understanding with 100% auditable final decision logic</td>
+                </tr>
+                <tr>
+                  <td><b>4. Pinned Small / Open-Weight Models</b></td>
+                  <td>Frozen weight hashes, customer-controlled hosting, &amp; full data/checkpoint provenance</td>
+                  <td>Weights remain neural parameters; ideal when strict version immutability or air-gapping rules</td>
+                </tr>
+                <tr>
+                  <td><b>5. Constrained Generation</b></td>
+                  <td>Classifies into fixed enums or selects from pre-approved legal/support templates</td>
+                  <td>Eliminates open-ended phrasing risk while keeping natural-language intent understanding</td>
+                </tr>
+                <tr>
+                  <td><b>6. Pure Search &amp; Retrieval</b></td>
+                  <td>Surfaces ranked original source passages directly to the human reader</td>
+                  <td>Zero synthesis hallucination risk when users prefer reading primary clauses themselves</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <h3>5. What Actually Builds Trust and Concrete Google Cloud Building Blocks</h3>
+        <p>
+          Technical transparency becomes genuine customer trust when six practices reinforce one another over time: <strong>evidence</strong> on their own data, <strong>customer control</strong> over guardrails, thresholds, version upgrades, and the kill switch, <strong>full visibility</strong> across citations and logs, <strong>candor</strong> about limitations up front, <strong>shared ownership</strong> by co-building the evaluation set with their experts, and <strong>fast responsiveness</strong> when the first production edge case surfaces. On Google Cloud's <strong>Gemini Enterprise Agent Platform</strong> (Agent Platform), those principles map directly to enterprise grounding over customer data stores, the Agent Platform evaluation service, <code>Cloud Logging</code> and <code>Cloud Trace</code>, <code>Model Armor</code> input/output screening, <code>VPC Service Controls</code> and <code>CMEK</code> for perimeter and key ownership, and explicit model version pinning.
+        </p>
+
+        <div class="closes">
+          <span><b>Takeaway:</b> Diagnose which of the eight "black box" concerns applies, be candid that model weights stay opaque, wrap the model in seven transparent system layers (grounding, co-owned evals, audit traces, code guardrails + version pinning, risk-matched HITL, provenance, and phased shadow-to-auto rollout), and use hybrid designs where deterministic logic makes high-stakes calls.</span>
+        </div>
+        <p>
+          Notice how Option 4 on that spectrum (pinned open-weight models) and Option 2 (classical tabular ML) point straight to the next question interviewers ask: when to choose open-weight models versus proprietary APIs or classical machine learning across the full model spectrum.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== QUESTION 2: OPEN VS CLOSED & MODEL SPECTRUM ==================== -->
+  <section class="sheet" id="q2">
+    <div class="sheet-h">
+      <div>
+        <span class="sec-badge">Question 02 · Model Selection &amp; Economics</span>
+        <h2>When Do We Use Open-Weight vs. Proprietary Models Across the Full Model Spectrum?</h2>
+        <p>Where we are: choosing between open-weight models, managed proprietary APIs, distilled small models, and classical machine learning by applying constraints, serving physics, and task evaluations in order.</p>
+      </div>
+    </div>
+    <div class="sheet-b">
+      <div class="post-prose">
+        <p>
+          Teams often treat model choice as a binary debate between "open source" and "closed APIs," or pick one flagship frontier model from a public leaderboard and route every request through it. In production, public leaderboards measure generic chat distributions, whereas production decisions depend on the customer's specific extraction or compliance workload, while sending high-volume routine tasks to a heavy reasoning model inflates latency and token spend by an order of magnitude. Conversely, spinning up dedicated GPU clusters for an open-weight model to "save money or protect privacy" frequently costs <em>more</em> than a managed enterprise API once idle nighttime GPU hours and engineering maintenance are counted.
+        </p>
+
+        <h3>1. What Actually Separates Open-Weight, Open-Source, and Proprietary Models</h3>
+        <p>
+          Ambiguous terminology causes legal, security, and platform stakeholders to talk past one another when evaluating model options.
+        </p>
+        <p>
+          Distinguish three precise release models across four operational dimensions (<em>Table 2</em>):
+        </p>
+        <ul>
+          <li><strong>Proprietary / Closed Managed Models</strong> (such as Gemini Pro / Flash / Flash-Lite, Claude Opus / Sonnet / Haiku, GPT-4o / o-series): Weights stay private behind a provider-managed endpoint. You consume tokens over an API with elastic capacity, built-in context caching, and zero GPU cluster operations, while accepting vendor model-deprecation calendars that require regression testing when versions rotate.</li>
+          <li><strong>Open-Weight Models</strong> (such as Google <a href="https://ai.google.dev/gemma/docs/core" target="_blank" rel="noopener">Gemma 4</a>, Alibaba Qwen3, <a href="https://arxiv.org/abs/2501.12948" target="_blank" rel="noopener">DeepSeek-R1</a> / V3, OpenAI gpt-oss under permissive Apache 2.0 or MIT licenses, and Meta Llama under community licenses with monthly-active-user commercial thresholds): Trained weight tensors are downloadable so you can inspect tokenization, freeze an exact SHA-256 checkpoint for multi-year regulated reproducibility, attach custom classification heads or multi-tenant LoRA adapters, run reinforcement learning with verifiable rewards (RLVR), or deploy inside disconnected environments. Training corpora and data recipes remain unpublished.</li>
+          <li><strong>Fully Open-Source Models</strong> (such as OLMo or Pythia): Publish weights, training code, and full pretraining datasets for scientific auditability, usually trailing frontier capability by a generation.</li>
+        </ul>
+
+        <h3>2. Clearing Up the Enterprise Privacy Boundary</h3>
+        <p>
+          Stakeholders frequently conflate consumer chat web apps with enterprise cloud model APIs and assume self-hosting open weights is the only way to keep proprietary data private.
+        </p>
+        <p>
+          On enterprise cloud platforms (such as Google Cloud's Gemini Enterprise Agent Platform / Vertex AI), contractual terms prohibit using customer prompts, responses, or fine-tuning weights to train foundation models (<a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/resources/zero-data-retention" target="_blank" rel="noopener">Google Cloud Zero Data Retention docs</a>). Traffic stays inside Private Service Connect and VPC Service Controls perimeters, regional endpoints enforce geographic data residency, customer-managed encryption keys (CMEK) control storage and tuned adapters, and configuring Zero Data Retention (disabling abuse-monitoring prompt logs, request-response logging, consumer web-search grounding, and stateful disk persistence) eliminates prompt retention at rest. Self-hosted open weights become mandatory for governance in three specific situations: physically air-gapped sovereign or defense networks, regulatory audits requiring immutable frozen weights with zero vendor version rotation, and countries lacking a local managed cloud region.
+        </p>
+
+        <h3>3. Serving Physics and Total Cost of Ownership (Why Utilization Decides Economics)</h3>
+        <p>
+          Comparing raw per-million-token API prices against hourly GPU rental prices ignores KV-cache memory limits, prefill-versus-decode hardware bottlenecks, and diurnal enterprise traffic curves.
+        </p>
+        <p>
+          Self-hosting a model requires sizing GPU High-Bandwidth Memory (HBM) for both static weights and live concurrent user context:
+        </p>
+        <div class="code-card">
+          <div class="code-title">GPU Memory &amp; Latency Physics for Self-Hosted Open Weights</div>
+<pre><span class="hl-c"># 1. Total VRAM must hold weights + live KV cache + runtime (~2 GB)</span>
+Weight_Bytes      = Parameters * Bytes_Per_Param          <span class="hl-c"># e.g., 12B at 8-bit = ~13.4 GB</span>
+KV_Bytes_Per_Tok  = <span class="hl-n">2</span> * Bytes * n_layers * n_kv_heads * d_head  <span class="hl-c"># GQA/MLA shrinks n_kv_heads</span>
+
+<span class="hl-c"># Worked check on 1x NVIDIA L4 (24 GB VRAM, ~300 GB/s bandwidth):</span>
+<span class="hl-c"># 24 GB - 13.4 GB (weights) - 2.0 GB (runtime) = ~8.6 GB left for KV cache</span>
+<span class="hl-c"># At ~100 KB/token (BF16), 8.6 GB holds ~85K live tokens (~20 concurrent users at 4K context).</span>
+
+<span class="hl-c"># 2. Prefill (Time to First Token) is compute-bound; Decode (per output token) is bandwidth-bound</span>
+TTFT_seconds      ≈ (<span class="hl-n">2</span> * Active_Params * Prompt_Tokens) / (GPU_TFLOPS * MFU)
+TPOT_seconds      ≈ Active_Weight_Bytes_Read / HBM_Bandwidth   <span class="hl-c"># Output tokens cost ~4x–8x input!</span></pre>
+        </div>
+        <p>
+          Sparse Mixture-of-Experts (MoE) open models (such as a <code>26B</code> total / <code>4B</code> active parameter architecture) require VRAM for all <code>26B</code> parameters while reading only <code>~4B</code> active weights per generated token, giving small-model decode speed once fitted into GPU memory. Even with fast engines like <code>vLLM</code> (PagedAttention, continuous batching, prefix caching) and KV-cache-aware load balancers, dedicated GPUs bill <strong>24 hours a day</strong>. Enterprise internal workflows typically send <code>70%–80%</code> of daily traffic during daytime business hours and sit nearly idle overnight and on weekends. Meanwhile, constant-capability managed token prices have fallen roughly <code>10x</code> per year (<a href="https://a16z.com/llmflation-llm-inference-cost/" target="_blank" rel="noopener">a16z LLMflation, Nov 2024</a>). Consequently, before provisioning GPUs, teams pull managed FinOps levers first: model routing, <code>-90%</code> prefix context caching, <code>-50%</code> batch APIs, per-step thinking budgets, and Provisioned Throughput for the steady baseline floor. Dedicated open-weight GPUs win economically when <strong>sustained 24/7 GPU utilization exceeds ~50%–65%</strong> (or when a compact <code>2B–12B</code> model runs on scale-to-zero serverless GPUs).
+        </p>
+
+        
+<div class="diagram-frame" id="fig-q2">
+  <svg viewBox="0 0 920 610" role="img" aria-label="Three-gate model selection funnel and the five-tier production model spectrum orchestrated by a two-to-three-tier hybrid router">
+    
+  <defs>
+    <marker id="arr-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:var(--ink)"/>
+    </marker>
+    <marker id="arr-good" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:var(--good)"/>
+    </marker>
+    <marker id="arr-cyan" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:var(--cyan)"/>
+    </marker>
+    <marker id="arr-stop" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:var(--stop)"/>
+    </marker>
+    <marker id="arr-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:var(--amber)"/>
+    </marker>
+  </defs>
+
+    <rect x="14" y="14" width="892" height="582" rx="14" style="fill:var(--panel-2);stroke:var(--line);stroke-width:1.8"/>
+    <text class="zl" x="34" y="42">CONSTRAINT-FIRST SELECTION FUNNEL · ORDER OF DECISIONS</text>
+
+    <!-- Gate 1, Gate 2, Gate 3 -->
+    <rect class="b-code" x="34" y="56" width="268" height="92" rx="9"/>
+    <text class="t-m-g" x="50" y="79">GATE 1 · HARD CONSTRAINTS</text>
+    <text class="t-b" x="50" y="101">Residency, Air-Gap &amp; Freeze</text>
+    <text class="t-s" x="50" y="122">VPC-SC, CMEK, ZDR, sovereign</text>
+    <text class="t-s" x="50" y="139">site, or frozen weight audit</text>
+
+    <line x1="302" y1="102" x2="322" y2="102" class="flow" marker-end="url(#arr-ink)"/>
+
+    <rect class="b-code" x="326" y="56" width="272" height="92" rx="9"/>
+    <text class="t-m-g" x="342" y="79">GATE 2 · TRAFFIC &amp; SERVING MATH</text>
+    <text class="t-b" x="342" y="101">Utilization &amp; Prefix Cache</text>
+    <text class="t-s" x="342" y="122">Diurnal bursts favor pay-per-token;</text>
+    <text class="t-s" x="342" y="139">steady 24/7 load fits GPU/GSU floor</text>
+
+    <line x1="598" y1="102" x2="618" y2="102" class="flow" marker-end="url(#arr-ink)"/>
+
+    <rect class="b-code" x="622" y="56" width="264" height="92" rx="9"/>
+    <text class="t-m-g" x="638" y="79">GATE 3 · EMPIRICAL QUALITY</text>
+    <text class="t-b" x="638" y="101">Cost per Resolved Task</text>
+    <text class="t-s" x="638" y="122">Measure pass rate, latency &amp;</text>
+    <text class="t-s" x="638" y="139">retry turns on customer eval set</text>
+
+    <!-- Router Band -->
+    <line x1="460" y1="148" x2="460" y2="174" class="flow-g" marker-end="url(#arr-good)"/>
+    <rect class="node-cyan" x="34" y="178" width="852" height="68" rx="9"/>
+    <text class="t-b" x="460" y="205" text-anchor="middle">Tunable Hybrid Router (Cap Each Session at 2–3 Tiers to Preserve KV Prefix Cache)</text>
+    <text class="t-s" x="460" y="228" text-anchor="middle">Static per-step assignment first · Calibrated confidence cascade on ambiguous turns · 2% live judge monitoring</text>
+
+    <!-- Connectors to 5 Spectrum Cards (3 top row + 2 bottom row for wide readable text!) -->
+    <text class="zl" x="34" y="274">FIVE-TIER PRODUCTION MODEL SPECTRUM</text>
+
+    <!-- Row 1: Tier 0, Tier 1, Tier 2 -->
+    <rect class="b-code" x="34" y="288" width="272" height="140" rx="9"/>
+    <text class="t-m-g" x="50" y="312">TIER 0 · DETERMINISTIC &amp; TABULAR</text>
+    <text class="t-b" x="50" y="335">Classical ML &amp; Solvers</text>
+    <text class="t-s" x="50" y="357">LightGBM, XGBoost, TimesFM,</text>
+    <text class="t-s" x="50" y="376">OR-Tools, dense/BM25 encoders</text>
+    <text class="t-s" x="50" y="400" style="font-weight:600;fill:var(--ink)">&lt; 15 ms · Forecasting &amp; optimization</text>
+
+    <rect class="b-model" x="324" y="288" width="272" height="140" rx="9"/>
+    <text class="t-m-v" x="340" y="312">TIER 1 · NARROW SLMs (2B–9B)</text>
+    <text class="t-b" x="340" y="335">Distilled &amp; LoRA Task Models</text>
+    <text class="t-s" x="340" y="357">Gemma E4B/12B, Qwen 4B–9B,</text>
+    <text class="t-s" x="340" y="376">cross-encoders, System-1 routers</text>
+    <text class="t-s" x="340" y="400" style="font-weight:600;fill:var(--ink)">50–250 ms · High-QPS triage &amp; PII</text>
+
+    <rect class="b-model" x="614" y="288" width="272" height="140" rx="9"/>
+    <text class="t-m-v" x="630" y="312">TIER 2 · MANAGED WORKHORSE</text>
+    <text class="t-b" x="630" y="335">Fast Multimodal &amp; Extraction</text>
+    <text class="t-s" x="630" y="357">Flash / Flash-Lite, Haiku,</text>
+    <text class="t-s" x="630" y="376">GPT-4o-mini + context caching</text>
+    <text class="t-s" x="630" y="400" style="font-weight:600;fill:var(--ink)">0.4–2 s · 80–90% of GenAI traffic</text>
+
+    <!-- Row 2: Tier 3, Tier 4 -->
+    <rect class="b-store" x="34" y="444" width="418" height="132" rx="9"/>
+    <text class="t-m-c" x="52" y="468" style="fill:var(--amber)">TIER 3 · OPEN-WEIGHT MID / LARGE (26B–671B MoE)</text>
+    <text class="t-b" x="52" y="491">Gemma 26B-A4B / 31B, Llama, Qwen3, DeepSeek</text>
+    <text class="t-s" x="52" y="513">Served via Managed MaaS, Cloud Run GPU, or GKE vLLM</text>
+    <text class="t-s" x="52" y="532">Fit: air-gapped sites, frozen regulated weights, custom SFT/RL,</text>
+    <text class="t-s" x="52" y="551">or steady high-utilization batch pipelines</text>
+
+    <rect class="b-model" x="468" y="444" width="418" height="132" rx="9"/>
+    <text class="t-m-v" x="486" y="468">TIER 4 · FRONTIER REASONING</text>
+    <text class="t-b" x="486" y="491">Pro, Opus / Sonnet, Deep Reasoning</text>
+    <text class="t-s" x="486" y="513">Multi-step deliberation over hard, low-frequency tasks</text>
+    <text class="t-s" x="486" y="532">Fit: top 2–15% ambiguous escalations, complex synthesis,</text>
+    <text class="t-s" x="486" y="551">offline golden-eval grading &amp; synthetic teacher distillation</text>
+  </svg>
+  <div class="fig-caption">
+    <span>Figure 2 — Filtering model choices through governance constraints, serving utilization math, and task evaluations across the five-tier model spectrum.</span>
+    <div class="legend-items">
+      <span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good)"></i> Classical ML / deterministic</span>
+      <span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> Managed or distilled neural tiers</span>
+      <span><i class="swatch-dot" style="background:var(--amber-soft);border-color:var(--amber)"></i> Open-weight MaaS / self-hosted</span>
+    </div>
+  </div>
+</div>
+
+
+        <div class="nine-q-wrap">
+          <div class="nine-q-head">Table 2 · Proprietary Managed APIs vs. Open-Weight MaaS vs. Self-Hosted Open Weights</div>
+          <div class="tbl-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Dimension</th>
+                  <th>Proprietary Managed API</th>
+                  <th>Open-Weight Serverless (MaaS)</th>
+                  <th>Self-Hosted Open Weights (GKE / Serverless GPU)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><b>Top Capability Ceiling</b></td>
+                  <td>Highest reasoning, multimodal, &amp; long-context ceiling</td>
+                  <td>Strong mid/frontier open models (Llama, Qwen3, DeepSeek, Gemma)</td>
+                  <td>Identical to MaaS plus custom domain checkpoints</td>
+                </tr>
+                <tr>
+                  <td><b>Weight Immutability</b></td>
+                  <td>Vendor lifecycle; pin versions &amp; gate upgrades with golden evals</td>
+                  <td>Provider-curated versions with deprecation schedule</td>
+                  <td><b>100% frozen SHA-256 weights</b> for multi-year regulated stability</td>
+                </tr>
+                <tr>
+                  <td><b>Privacy &amp; Residency</b></td>
+                  <td>VPC-SC, CMEK, regional residency, contractual no-training + ZDR</td>
+                  <td>Same cloud perimeter; verify regional availability</td>
+                  <td>Runs inside customer VPC or <b>air-gapped sovereign hardware</b></td>
+                </tr>
+                <tr>
+                  <td><b>Customization Depth</b></td>
+                  <td>Prompts, context caching, &amp; managed SFT on supported models</td>
+                  <td>Prompts &amp; managed LoRA tuning where offered</td>
+                  <td><b>Full weights, LoRA multi-adapter serving, custom heads &amp; RLVR</b></td>
+                </tr>
+                <tr>
+                  <td><b>Billing &amp; Traffic Fit</b></td>
+                  <td>Pay-per-token + cached prefix discount; ideal for spiky/diurnal load</td>
+                  <td>Pay-per-token with portable open weights; zero GPU ops</td>
+                  <td>Pay per GPU-second; wins at <b>high 24/7 duty cycle</b> or scale-to-zero SLMs</td>
+                </tr>
+                <tr>
+                  <td><b>Operations Owned</b></td>
+                  <td>Prompt, schema, quota &amp; eval suite</td>
+                  <td>Prompt, schema &amp; model selection</td>
+                  <td>CUDA/vLLM patching, KV-cache sizing, autoscaling, &amp; GPU quota</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <h3>4. Navigating All Five Tiers with a Tunable Hybrid Router</h3>
+        <p>
+          No single tier optimizes latency, accuracy, and unit economics across every step of an application.
+        </p>
+        <p>
+          Mature production architectures combine models across five distinct tiers (<em>Table 3</em>), assigning each workflow step statically first and escalating dynamically on ambiguous turns:
+        </p>
+
+        <div class="nine-q-wrap">
+          <div class="nine-q-head">Table 3 · The Five-Tier Production Model Spectrum and When to Use Each Tier</div>
+          <div class="tbl-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Spectrum Tier</th>
+                  <th>Representative Models</th>
+                  <th>Latency &amp; Cost</th>
+                  <th>Primary Production Use Cases</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="b-pill g">Tier 0</span> <b>Classical ML, TSFMs &amp; Solvers</b></td>
+                  <td><code>LightGBM</code>, <code>XGBoost</code>, <code>TimesFM</code>, <code>OR-Tools</code>, BM25 / bi-encoders</td>
+                  <td><code>1–15 ms</code> · pennies per million</td>
+                  <td>Tabular demand/churn prediction, anomaly scoring, routing math, first-stage retrieval</td>
+                </tr>
+                <tr>
+                  <td><span class="b-pill llm">Tier 1</span> <b>Distilled SLMs &amp; Fast Scorers (2B–12B)</b></td>
+                  <td>Fine-tuned <code>Gemma 4 E4B / 12B</code>, <code>Qwen 4B–9B</code>, cross-encoder rerankers</td>
+                  <td><code>50–250 ms</code> · single L4 GPU</td>
+                  <td>High-QPS intent routing, PII redaction, rubric guardrails, top-40 passage reranking</td>
+                </tr>
+                <tr>
+                  <td><span class="b-pill asi">Tier 2</span> <b>Managed Workhorse Models</b></td>
+                  <td><code>Gemini Flash / Flash-Lite</code>, <code>Claude Haiku</code>, <code>GPT-4o-mini</code></td>
+                  <td><code>0.4–2.0 s</code> · low per-token + 90% cache discount</td>
+                  <td>80%–90% of enterprise GenAI: structured JSON extraction, grounded RAG answers, summarization</td>
+                </tr>
+                <tr>
+                  <td><span class="b-pill api">Tier 3</span> <b>Open-Weight Mid / Large (26B–671B)</b></td>
+                  <td><code>Gemma 4 26B-A4B / 31B</code>, <code>Llama</code>, <code>Qwen3</code>, <code>DeepSeek-R1/V3</code></td>
+                  <td>MaaS per-token or multi-GPU H100/H200</td>
+                  <td>Air-gapped deployments, frozen regulated weights, custom RL/LoRA, steady 24/7 batch pipelines</td>
+                </tr>
+                <tr>
+                  <td><span class="b-pill t">Tier 4</span> <b>Frontier Reasoning Models</b></td>
+                  <td><code>Gemini Pro</code>, <code>Claude Opus / Sonnet</code>, deep-thinking models</td>
+                  <td><code>3–20+ s</code> · highest per-token compute</td>
+                  <td>Hardest 2%–15% escalations, complex multi-doc synthesis, golden-eval grading &amp; teacher distillation</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <p>
+          Two practical rules keep hybrid routing honest in production. First, optimize <strong>cost per resolved task</strong> alongside per-token price: on multi-step tool loops, a model that costs one-fifth per token while taking four times as many retry turns and failing more often raises total cost. Second, keep each multi-turn session within <strong>two to three model tiers</strong>; bouncing a conversation across four or five different model endpoints invalidates every provider's KV prefix cache and multiplies prefill token spend.
+        </p>
+
+        <div class="closes">
+          <span><b>Takeaway:</b> Filter by hard governance constraints first, compare optimized pay-per-token costs against 24/7 GPU utilization second, and combine classical ML, workhorse models, and frontier escalations via a 2-to-3-tier router.</span>
+        </div>
+        <p>
+          Nothing illustrates the boundary between Tier 0 numerical models and Tier 2–4 language models more clearly than a customer asking whether an LLM can run their retail demand forecasting.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== QUESTION 3: RETAIL DEMAND FORECASTING ==================== -->
+  <section class="sheet" id="q3">
+    <div class="sheet-h">
+      <div>
+        <span class="sec-badge">Question 03 · Retail Forecasting &amp; Honest Scoping</span>
+        <h2>How Does Production Retail Forecasting Work, Where Do LLMs Fit, and How Do We Avoid Overselling?</h2>
+        <p>Where we are: a retail stakeholder asks if a language model can forecast store-level SKU demand; we need to understand how retail forecasting works from the ground up and place each model family where it excels.</p>
+      </div>
+    </div>
+    <div class="sheet-b">
+      <div class="post-prose">
+        <p>
+          Retail demand forecasting predicts future unit demand across a massive three-dimensional panel (<code>Store × SKU × Day</code> or Week) spanning tens of thousands of products across hundreds or thousands of locations. Every downstream physical decision depends on those numbers: automated vendor purchase orders, distribution-center pallet allocation, store labor scheduling, and perishable markdowns. Understanding four domain mechanics explains immediately why specialized tabular and time-series models own the numerical core.
+        </p>
+
+        <h3>1. The Four Mechanics That Define Retail Demand</h3>
+        <ul>
+          <li>
+            <strong>Stockout Censoring (Observed Sales vs. True Demand):</strong> Point-of-sale (POS) cash registers record <em>units sold</em>, which equals true customer demand only while inventory sits on the shelf. If a store stocks 12 cartons of strawberries on Saturday morning, sells out by 11:00 a.m., and turns away 25 shoppers in the afternoon, POS logs record <code>sales = 12</code> on Saturday and <code>sales = 0</code> on Sunday. Feeding raw POS zeros directly into any forecasting model creates a <strong>replenishment death spiral</strong>: the model mistakes out-of-stock zeros for zero shopper interest, lowers next week's forecast, orders even fewer units, and triggers earlier stockouts. Production pipelines always join daily <code>inventory_on_hand</code> snapshots first, mask stockout periods (<code>inventory == 0</code>) as right-censored observations, and impute unconstrained latent demand before model fitting.
+          </li>
+          <li>
+            <strong>Three Distinct SKU Regimes (Dense, Cold-Start, and Intermittent Tail):</strong> High-velocity staples (milk, bananas, cola) generate smooth daily curves driven by price elasticity, promotions, holidays, payday cycles, and sibling-SKU cannibalization (putting 12-packs on 30% promo depresses 6-pack sales next to it). Newly launched seasonal apparel or electronics arrive with zero historical sales (cold start). Meanwhile, 50% to 70% of a typical catalog sits in the slow-moving intermittent tail (auto parts, specialty cookware, fringe sizes), where most days record legitimate zero sales punctuated by occasional 1-to-3-unit purchases.
+          </li>
+          <li>
+            <strong>Asymmetric Replenishment Economics and Quantile Forecasts (<code>P10 / P50 / P90</code>):</strong> Ordering strictly to a median point forecast (<code>P50</code>) leaves stores out of stock on roughly half of supplier lead-time cycles. Retail replenishment solves an asymmetric Newsvendor trade-off using probabilistic quantiles trained with <strong>pinball loss</strong>: fresh cut fruit with high 48-hour spoilage cost orders near <code>P55–P60</code>, whereas high-margin shelf-stable batteries with high lost-sale cost and negligible holding cost order at <code>P85–P95</code>. One critical mathematical rule governs lead times: daily <code>P90</code> predictions are per-day marginals, so summing seven daily <code>P90</code> values assumes perfect error correlation across all seven days and inflates safety stock; production pipelines forecast directly over the supplier lead-time window (such as 7-day cumulative demand) or simulate joint trajectories.
+          </li>
+          <li>
+            <strong>Hierarchical Coherence and Retail Error Metrics:</strong> Merchandising VPs plan national category budgets, regional warehouses allocate pallets, and local stores replenish shelves. Independent models rarely add up across levels, so production systems apply <strong>Minimum Trace (MinT) / weighted least-squares hierarchical reconciliation</strong> so noisy store-SKU forecasts borrow statistical strength from category trends and sum cleanly to regional totals. Teams evaluate accuracy using <strong>WAPE</strong> (Weighted Absolute Percentage Error: <code>sum(|actual - forecast|) / sum(actual)</code>, avoiding division-by-zero blowups on zero-sale days), <strong>Forecast Bias</strong> (<code>sum(forecast - actual) / sum(actual)</code> to catch systematic over- or under-ordering), and <strong>Pinball Loss</strong> across target quantiles.
+          </li>
+        </ul>
+
+        <h3>2. Why Text LLMs Fail on Raw Time Series and Which Numerical Models Own the Core</h3>
+        <p>
+          Passing historical sales arrays into a conversational text LLM produces miscalibrated numbers, breaks seasonality, and explodes inference budgets across millions of SKU-store combinations.
+        </p>
+        <p>
+          Autoregressive language models split numbers into arbitrary subword text tokens, lack continuous inductive bias for periodic frequencies or lag autocorrelation, shift seasonal phase if a single date is missing, and cannot calibrate pinball-loss quantiles. Controlled ablations confirm that replacing text-LLM backbones with lightweight attention or linear patching layers matches or improves forecasting accuracy at orders-of-magnitude lower compute cost (<a href="https://arxiv.org/abs/2406.16964" target="_blank" rel="noopener">Tan et al., NeurIPS 2024</a>). Production retail architectures instead run a three-part numerical ensemble (<em>Figure 3</em>):
+        </p>
+        <ol>
+          <li><strong>Global Tabular GBDTs (<code>LightGBM</code> / <code>XGBoost</code>) or Deep Tabular Encoders (<code>TiDE</code>):</strong> Own mature, promotion-sensitive SKUs because tree splits and dense covariates capture non-linear price thresholds, promo mechanics (BOGO vs. end-cap display), cross-SKU cannibalization, calendar flags, and local weather.</li>
+          <li><strong>Pretrained Time-Series Foundation Models (<code>TimesFM</code>, <a href="https://arxiv.org/abs/2310.10688" target="_blank" rel="noopener">Das et al., ICML 2024</a>):</strong> Crucial distinction: <code>TimesFM</code> is a patch-decoder foundation model pretrained directly on hundreds of billions of real and synthetic <em>numerical time-series</em> patches. Exposed directly in SQL via BigQuery <code>AI.FORECAST</code> (<a href="https://docs.cloud.google.com/bigquery/docs/reference/standard-sql/bigqueryml-syntax-ai-forecast" target="_blank" rel="noopener">BigQuery AI.FORECAST docs</a>), it produces strong zero-shot trend, multi-seasonality, and prediction-interval baselines for cold-start stores, short-history SKUs, and rapid SQL analytics without per-SKU training pipelines.</li>
+          <li><strong>Discrete Count and Hurdle Models (<code>Croston-TSB</code>, Negative Binomial, Two-Stage Hurdle GBDT):</strong> Own intermittent slow-moving tail SKUs where continuous instance normalization degenerates on near-zero variance, modeling demand occurrence probability (<code>P(demand &gt; 0)</code>) separately from conditional order size.</li>
+        </ol>
+
+        <p>
+          The SQL sketch below illustrates running zero-shot probabilistic 14-day forecasting across store-SKU series in BigQuery using <code>AI.FORECAST</code> (backed by <code>TimesFM</code>) <em>after</em> joining inventory snapshots to replace stockout zeros with imputed latent demand:
+        </p>
+        <div class="code-card">
+          <div class="code-title">Zero-Shot Probabilistic SKU-Store Baseline Forecast over Stockout-Uncensored Demand (BigQuery AI.FORECAST)</div>
+<pre><span class="hl-k">WITH</span> uncensored_daily_panel <span class="hl-k">AS</span> (
+  <span class="hl-k">SELECT</span>
+    store_id,
+    sku_id,
+    sales_date,
+    <span class="hl-c">-- Use observed POS units when stock is available; use imputed latent demand on stockout days</span>
+    <span class="hl-k">CASE</span>
+      <span class="hl-k">WHEN</span> ending_inventory_units &gt; <span class="hl-n">0</span> <span class="hl-k">THEN</span> CAST(pos_units_sold <span class="hl-k">AS</span> FLOAT64)
+      <span class="hl-k">ELSE</span> imputed_latent_demand_units
+    <span class="hl-k">END</span> <span class="hl-k">AS</span> true_demand_units
+  <span class="hl-k">FROM</span> <span class="hl-s">`retail_prod.daily_store_sku_panel`</span>
+  <span class="hl-k">WHERE</span> sales_date &gt;= DATE_SUB(CURRENT_DATE(), <span class="hl-k">INTERVAL</span> <span class="hl-n">365</span> DAY)
+    <span class="hl-k">AND</span> sku_regime <span class="hl-k">IN</span> (<span class="hl-s">'SEASONAL_SHORT_HISTORY'</span>, <span class="hl-s">'CORE_BASELINE'</span>)
+)
+<span class="hl-k">SELECT</span>
+  store_id,
+  sku_id,
+  forecast_timestamp,
+  forecast_value <span class="hl-k">AS</span> p50_demand,                     <span class="hl-c">-- Median (50th percentile) forecast</span>
+  prediction_interval_lower_bound <span class="hl-k">AS</span> p10_demand,    <span class="hl-c">-- Lower bound at confidence_level = 0.80</span>
+  prediction_interval_upper_bound <span class="hl-k">AS</span> p90_demand     <span class="hl-c">-- Upper bound (90th percentile safety stock)</span>
+<span class="hl-k">FROM</span>
+  <span class="hl-f">AI.FORECAST</span>(
+    (<span class="hl-k">SELECT</span> * <span class="hl-k">FROM</span> uncensored_daily_panel),
+    data_col =&gt; <span class="hl-s">'true_demand_units'</span>,
+    timestamp_col =&gt; <span class="hl-s">'sales_date'</span>,
+    id_cols =&gt; [<span class="hl-s">'store_id'</span>, <span class="hl-s">'sku_id'</span>],
+    horizon =&gt; <span class="hl-n">14</span>,
+    confidence_level =&gt; <span class="hl-n">0.80</span>
+  );</pre>
+        </div>
+
+        
+<div class="diagram-frame" id="fig-q3">
+  <svg viewBox="0 0 920 606" role="img" aria-label="Production retail demand forecasting pipeline separating the numerical forecasting core from scoped multimodal and language-model sidecars">
+    
+  <defs>
+    <marker id="arr-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:var(--ink)"/>
+    </marker>
+    <marker id="arr-good" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:var(--good)"/>
+    </marker>
+    <marker id="arr-cyan" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:var(--cyan)"/>
+    </marker>
+    <marker id="arr-stop" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:var(--stop)"/>
+    </marker>
+    <marker id="arr-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:var(--amber)"/>
+    </marker>
+  </defs>
+
+    <rect x="14" y="14" width="892" height="578" rx="14" style="fill:var(--panel-2);stroke:var(--line);stroke-width:1.8"/>
+
+    <!-- Top Sidecar Zone: Scoped LLM / Multimodal Feature Extractor -->
+    <rect class="zone-ours" x="32" y="30" width="856" height="118" rx="10" style="fill:var(--panel)"/>
+    <text class="t-m-v" x="50" y="53">SCOPED MULTIMODAL &amp; LLM SIDECAR A · UPSTREAM EXOGENOUS FEATURES (OFFLINE / ASYNC)</text>
+
+    <rect class="node-card" x="50" y="66" width="236" height="68" rx="8"/>
+    <text class="t-b" x="168" y="92" text-anchor="middle">Unstructured Inputs</text>
+    <text class="t-s" x="168" y="114" text-anchor="middle">Promo PDFs, supplier emails, photos</text>
+
+    <line x1="286" y1="100" x2="312" y2="100" class="flow" marker-end="url(#arr-ink)"/>
+
+    <rect class="b-model" x="316" y="66" width="258" height="68" rx="8"/>
+    <text class="t-b" x="445" y="92" text-anchor="middle">Multimodal / LLM Extractor</text>
+    <text class="t-s" x="445" y="114" text-anchor="middle">Typed promo flags &amp; cold-start analogs</text>
+
+    <line x1="574" y1="100" x2="600" y2="100" class="flow-g" marker-end="url(#arr-good)"/>
+
+    <rect class="b-code" x="604" y="66" width="266" height="68" rx="8"/>
+    <text class="t-b" x="737" y="92" text-anchor="middle">Backtest Validation Gate</text>
+    <text class="t-s" x="737" y="114" text-anchor="middle">Admits feature if WAPE drops &gt;= 3%</text>
+
+    <!-- Arrow down from feature gate into Numerical Core -->
+    <path d="M 737 134 L 737 156 L 448 156 L 448 176" class="flow-g" marker-end="url(#arr-good)"/>
+
+    <!-- Middle Zone: Deterministic & Numerical Forecasting Core -->
+    <rect x="32" y="178" width="856" height="270" rx="11" style="fill:var(--panel);stroke:var(--good);stroke-width:2.2"/>
+    <text class="t-m-g" x="50" y="202">NUMERICAL FORECASTING &amp; OPTIMIZATION CORE · ZERO TEXT LLMs ON RAW TIME SERIES</text>
+
+    <!-- Left: POS + Inventory Uncensoring -->
+    <rect class="b-store" x="50" y="218" width="180" height="210" rx="9"/>
+    <text class="t-b" x="140" y="246" text-anchor="middle">Structured Panel</text>
+    <text class="t-s" x="140" y="270" text-anchor="middle">• POS sales history</text>
+    <text class="t-s" x="140" y="291" text-anchor="middle">• Daily inventory</text>
+    <text class="t-s" x="140" y="312" text-anchor="middle">• Price &amp; calendar</text>
+    <line x1="68" y1="330" x2="212" y2="330" style="stroke:var(--line);stroke-width:1.2"/>
+    <text class="t-m-g" x="140" y="352" text-anchor="middle">UNCENSOR DEMAND</text>
+    <text class="t-s" x="140" y="373" text-anchor="middle">Mask stockout zeros</text>
+    <text class="t-s" x="140" y="392" text-anchor="middle">(inv == 0) &amp; impute</text>
+    <text class="t-s" x="140" y="411" text-anchor="middle">latent true demand</text>
+
+    <line x1="230" y1="323" x2="250" y2="323" class="flow-g" marker-end="url(#arr-good)"/>
+
+    <!-- Center: 3-Regime Model Ensemble -->
+    <rect class="b-code" x="254" y="218" width="348" height="64" rx="8"/>
+    <text class="t-b" x="428" y="243" text-anchor="middle">1 · Global GBDTs (LightGBM / XGBoost)</text>
+    <text class="t-s" x="428" y="264" text-anchor="middle">Dense SKUs: promos, price elasticity &amp; halos</text>
+
+    <rect class="b-code" x="254" y="291" width="348" height="64" rx="8"/>
+    <text class="t-b" x="428" y="316" text-anchor="middle">2 · Time-Series FM (TimesFM / AI.FORECAST)</text>
+    <text class="t-s" x="428" y="337" text-anchor="middle">Zero-shot cold-start, short history &amp; SQL baselines</text>
+
+    <rect class="b-code" x="254" y="364" width="348" height="64" rx="8"/>
+    <text class="t-b" x="428" y="389" text-anchor="middle">3 · Intermittent Count (Croston-TSB / Hurdle)</text>
+    <text class="t-s" x="428" y="410" text-anchor="middle">Slow-moving tail SKUs: occurrence × order size</text>
+
+    <line x1="602" y1="323" x2="620" y2="323" class="flow-g" marker-end="url(#arr-good)"/>
+
+    <!-- Right: Reconciliation + Quantiles + Replenishment -->
+    <rect class="b-code" x="624" y="218" width="246" height="210" rx="9"/>
+    <text class="t-b" x="747" y="246" text-anchor="middle">Reconcile &amp; Optimize</text>
+    <text class="t-s" x="747" y="270" text-anchor="middle">• MinT hierarchy coherence</text>
+    <text class="t-s" x="747" y="291" text-anchor="middle">  (SKU → Store → Region)</text>
+    <text class="t-s" x="747" y="314" text-anchor="middle">• Lead-time quantiles:</text>
+    <text class="t-s" x="747" y="334" text-anchor="middle">  P10 / P50 / P90 pinball</text>
+    <line x1="640" y1="350" x2="854" y2="350" style="stroke:var(--line);stroke-width:1.2"/>
+    <text class="t-m-g" x="747" y="372" text-anchor="middle">ORDER OPTIMIZER</text>
+    <text class="t-s" x="747" y="393" text-anchor="middle">Perishables ~P55 vs.</text>
+    <text class="t-s" x="747" y="412" text-anchor="middle">high-margin staples ~P90</text>
+
+    <!-- Arrow down to Planner Copilot Sidecar -->
+    <line x1="741" y1="428" x2="741" y2="462" class="flow" marker-end="url(#arr-cyan)" style="stroke:var(--cyan)"/>
+
+    <!-- Bottom Sidecar Zone: Planner Explainability & Bounded Shock Proposals -->
+    <rect class="zone-ours" x="32" y="466" width="856" height="108" rx="10" style="fill:var(--panel)"/>
+    <text class="t-m-v" x="50" y="489">SCOPED LLM SIDECARS B &amp; C · PLANNER DECISION SUPPORT (READS FORECAST OUTPUTS &amp; SHAP DRIVERS)</text>
+
+    <rect class="b-model" x="50" y="500" width="402" height="60" rx="8"/>
+    <text class="t-b" x="251" y="525" text-anchor="middle">Merchandiser Copilot &amp; Scenario Runner</text>
+    <text class="t-s" x="251" y="546" text-anchor="middle">Explains SHAP drivers &amp; runs parameterized what-if calls</text>
+
+    <rect class="b-model" x="470" y="500" width="400" height="60" rx="8"/>
+    <text class="t-b" x="670" y="525" text-anchor="middle">Human-Approved Shock Proposal Card</text>
+    <text class="t-s" x="670" y="546" text-anchor="middle">Bounded RESCALE / OVERWRITE for store closures or strikes</text>
+  </svg>
+  <div class="fig-caption">
+    <span>Figure 3 — Production retail demand forecasting: tabular GBDTs, time-series foundation models, and count models compute reconciled quantiles, while language models stay in validated upstream feature extraction and planner decision support.</span>
+    <div class="legend-items">
+      <span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good)"></i> Numerical ML &amp; optimization</span>
+      <span><i class="swatch-dot" style="background:var(--amber-soft);border-color:var(--amber)"></i> Structured retail panel</span>
+      <span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> Scoped multimodal / LLM sidecar</span>
+    </div>
+  </div>
+</div>
+
+
+        <h3>3. Where Language and Multimodal Models Genuinely Fit and How to Avoid Overselling</h3>
+        <p>
+          Important real-world demand shocks live in unstructured supplier emails, PDF promotional flyers, and catalog photos that tabular models cannot read natively, while asking a language model to predict raw SKU numbers directly produces noisy, miscalibrated orders.
+        </p>
+        <p>
+          Place multimodal and language models in three bounded sidecars around the numerical core, and hold every extracted feature to a strict backtest gate:
+        </p>
+        <ul>
+          <li><strong>Sidecar A · Upstream Exogenous Feature &amp; Cold-Start Analog Extraction:</strong> Parse unstructured vendor delay notices, regional promo calendars, and multimodal product images + fabric descriptions into typed tabular columns (<code>promo_mechanic = "BOGO"</code>, <code>supplier_lead_time_delta_days = +5</code>) or nearest-neighbor historical SKU analogs for Day-0 launches. Admit an LLM-extracted covariate into production only if historical walk-forward backtesting proves it reduces out-of-sample WAPE by a meaningful margin (for instance, <code>&gt;= 3%</code>) and passes a timestamp-shuffle check against spurious correlation.</li>
+          <li><strong>Sidecar B · Auditable Shock-Adjustment Proposals for Unprecedented Events:</strong> When a one-off event occurs outside historical training data (a temporary store remodel closure, port strike, or sudden tariff change), the model drafts a human-reviewed proposal card specifying bounded post-processing operators on the numerical quantile curve (such as <code>OVERWRITE = 0</code> during closure dates or a bounded <code>RESCALE</code> multiplier) with linked source evidence.</li>
+          <li><strong>Sidecar C · Merchandiser Explainability &amp; What-If Copilot:</strong> Translates a planner's natural-language question (<em>"Why did Northeast cold-brew orders jump 28% next week, and what if we shift the 20% promo by seven days?"</em>) into parameterized calls against SHAP feature attributions and the GBDT/TimesFM forecasting service, returning grounded explanations and exception summaries.</li>
+        </ul>
+
+        <div class="nine-q-wrap">
+          <div class="nine-q-head">Table 4 · Scoping Retail AI Honestly and Keeping Language-Model Claims Realistic</div>
+          <div class="tbl-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Executive Question</th>
+                  <th>Overpromised Pitch Risk</th>
+                  <th>Honest, High-Trust Architectural Framing</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><b>"Can an LLM replace our demand forecasting pipeline?"</b></td>
+                  <td>High token bills, broken seasonality, uncalibrated safety stock, and immediate pushback from customer data scientists</td>
+                  <td>"Tabular GBDTs and pretrained time-series foundation models (<code>TimesFM</code>) own the numerical quantiles at 1/100th the cost; language models extract unstructured promo/supply signals and power the planner copilot."</td>
+                </tr>
+                <tr>
+                  <td><b>"Can AI predict brand-new seasonal fashion launches?"</b></td>
+                  <td>Claiming deterministic accuracy on zero-history trends without inventory feedback</td>
+                  <td>"Multimodal embeddings match new items to historical lookalike launch curves for Day-0 allocation, then re-anchor rapidly to actual first-72-hour sell-through."</td>
+                </tr>
+                <tr>
+                  <td><b>"Can it read news and social media to adjust orders automatically?"</b></td>
+                  <td>Noisy sentiment hallucinates fake demand spikes and triggers bullwhip over-ordering</td>
+                  <td>"Every unstructured signal must prove out-of-sample WAPE lift on historical holdouts first; one-off disruptions surface as human-approved shock cards with hard volume clamps."</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="closes">
+          <span><b>Takeaway:</b> Uncensor stockouts first, let LightGBM, TimesFM, and count models own reconciled quantiles, and keep LLMs in backtest-gated feature extraction and planner decision support.</span>
+        </div>
+        <p>
+          Whenever a language model does sit in the path (whether powering that retail planner copilot or answering enterprise policy questions), its reliability depends on how external context is retrieved and assembled.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== QUESTION 4: MODERN RAG IN 2026 ==================== -->
+  <section class="sheet" id="q4">
+    <div class="sheet-h">
+      <div>
+        <span class="sec-badge">Question 04 · Retrieval &amp; Context Engineering</span>
+        <h2>How Has RAG Evolved, Do We Still Need It, and What Does It Combine With in Production?</h2>
+        <p>Where we are: moving beyond 2023 fixed-window vector chunking to understand how modern retrieval works and which complementary data engines it pairs with in production.</p>
+      </div>
+    </div>
+    <div class="sheet-b">
+      <div class="post-prose">
+        <p>
+          Retrieval-Augmented Generation remains essential in enterprise systems, though the early 2023 recipe of slicing PDFs into arbitrary 500-token windows, computing dense cosine similarity, and pasting the top five snippets into a prompt has evolved into a multi-stage retrieval architecture. Even with million-token context windows available, dumping an entire enterprise repository into a prompt fails on three operational grounds: enterprise knowledge bases hold millions of documents requiring pre-inference user access-control (ACL) and tenant filtering, uncached multi-hundred-thousand-token prompts add multi-second prefill latency and linear cost on every turn, and burying a few governing sentences inside massive noisy context degrades middle-of-prompt recall (<a href="https://arxiv.org/abs/2307.03172" target="_blank" rel="noopener">Liu et al., TACL 2024</a>). Modern architectures use retrieval to narrow millions of ACL-governed records down to the right three to five documents, and then use long context windows to hydrate complete, coherent sections intact.
+        </p>
+
+        <h3>1. Six Engineering Shifts That Evolved Naive Vector Search into Modern RAG</h3>
+        <p>
+          Each stage of the 2026 retrieval stack exists to fix a specific failure mode observed when early vector-only prototypes met real enterprise documents:
+        </p>
+        <ol>
+          <li>
+            <strong>Layout-Aware Structural Parsing (Fixes Severed Tables and Orphaned Exceptions):</strong> Fixed token splitters slice a 200-row pricing table away from its column headers and cut <em>"Except as provided in subsection (c)"</em> away from the rule above it. Modern ingestion parses document XML and PDF layout structure, keeps numbered clauses whole, preserves ancestor heading breadcrumbs, and repeats column headers on every table block.
+          </li>
+          <li>
+            <strong>Contextual Retrieval Prefaces (Fixes Anonymous Chunks):</strong> A chunk reading <em>"Quarterly revenue grew 3%, while service fees rise 4% in Region B"</em> lacks the company name, contract title, and fiscal year. Prepending a compact 50-to-100-token document-and-section context summary to each chunk prior to both dense embedding and lexical indexing reduced retrieval failure rates by <code>49%</code> on its own and by <code>67%</code> when combined with reranking (<a href="https://www.anthropic.com/research/contextual-retrieval" target="_blank" rel="noopener">Anthropic, Sep 2024</a>).
+          </li>
+          <li>
+            <strong>Inline Pre-Filtering + Hybrid Lexical BM25 + Dense Vector + RRF (Fixes Exact-Code Blindness and Recall Collapse):</strong> Dense embeddings capture semantic synonyms well while blurring exact SKU numbers, error codes, statute identifiers, and dosages (<code>10021</code> vs. <code>10022</code>). In parallel, filtering tenant ACLs <em>after</em> approximate nearest-neighbor graph search collapses recall when a user is allowed to see only 2% of the corpus. Modern stores enforce caller ACL principals and active date filters inline during index scan, execute sparse lexical BM25 alongside dense vector search, and merge the top 30 to 50 candidates via Reciprocal Rank Fusion (RRF).
+          </li>
+          <li>
+            <strong>Cross-Encoder Reranking (Fixes Bi-Encoder Precision Gaps):</strong> Fast bi-encoders compress query and document into single vectors independently. Running a compact cross-encoder reranker over the top 40 fused candidates attends across query and passage tokens jointly, promoting the 5 to 10 passages that directly answer the question.
+          </li>
+          <li>
+            <strong>Parent-Section and Whole-Document Hydration (Fixes Fragmented Reasoning):</strong> Indexing happens at fine clause or section granularity for sharp matching, while retrieval swaps matched child chunks for their complete parent section (or whole policy when under 15K–30K tokens) so qualifiers and definitions travel together.
+          </li>
+          <li>
+            <strong>Bounded Agentic Search and Supersession Lineage (Fixes Multi-Aspect Queries and Stale Re-Imports):</strong> A bounded retrieval loop decomposes compound questions into targeted sub-queries and checks whether retrieved passages leave an unresolved cross-reference (capped at 1 to 2 follow-up hops). In living workspaces, outdated meeting notes overridden by signed contracts are marked <code>role: "superseded"</code> with a <code>superseded_by</code> pointer so automated folder syncs preserve history without re-importing stale numbers.
+          </li>
+        </ol>
+
+        
+<div class="diagram-frame" id="fig-q4">
+  <svg viewBox="0 0 920 596" role="img" aria-label="Modern 2026 retrieval architecture combining structure-aware ingestion, hybrid lexical and dense search with reranking, parameterized SQL tools, graph traversal, and prefix-cached long-context hydration">
+    
+  <defs>
+    <marker id="arr-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:var(--ink)"/>
+    </marker>
+    <marker id="arr-good" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:var(--good)"/>
+    </marker>
+    <marker id="arr-cyan" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:var(--cyan)"/>
+    </marker>
+    <marker id="arr-stop" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:var(--stop)"/>
+    </marker>
+    <marker id="arr-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:var(--amber)"/>
+    </marker>
+  </defs>
+
+    <rect x="14" y="14" width="892" height="568" rx="14" style="fill:var(--panel-2);stroke:var(--line);stroke-width:1.8"/>
+
+    <!-- Top Band: Ingestion & Epistemic Indexing -->
+    <rect class="b-store" x="32" y="30" width="856" height="96" rx="10"/>
+    <text class="t-m-c" x="50" y="54" style="fill:var(--amber)">OFFLINE INGESTION · STRUCTURE, CONTEXTUAL PREFACES, ACLs &amp; SUPERSESSION LINEAGE</text>
+    <text class="t-b" x="50" y="79">Layout &amp; Table-Header Parser  →  Contextual Chunk Preface  →  ACL + Effective-Date + Supersession Tags</text>
+    <text class="t-s" x="50" y="103">Keeps section trees &amp; table headers intact, indexes BM25 + dense vectors + links, and marks old records superseded_by</text>
+
+    <!-- Query & ACL Router -->
+    <line x1="460" y1="126" x2="460" y2="148" class="flow" marker-end="url(#arr-ink)"/>
+    <rect class="b-code" x="32" y="152" width="856" height="66" rx="9"/>
+    <text class="t-b" x="460" y="179" text-anchor="middle">Runtime Query &amp; Identity Router (Propagates Caller ACL Token &amp; Effective-Date Scope First)</text>
+    <text class="t-s" x="460" y="201" text-anchor="middle">Dispatches structured sub-queries across specialized stores based on question shape</text>
+
+    <!-- 4 Parallel Context Paths -->
+    <line x1="150" y1="218" x2="150" y2="244" class="flow" marker-end="url(#arr-ink)"/>
+    <line x1="365" y1="218" x2="365" y2="244" class="flow" marker-end="url(#arr-ink)"/>
+    <line x1="585" y1="218" x2="585" y2="244" class="flow" marker-end="url(#arr-ink)"/>
+    <line x1="790" y1="218" x2="790" y2="244" class="flow" marker-end="url(#arr-ink)"/>
+
+    <!-- Path 1: Hybrid RAG + Rerank -->
+    <rect class="node-cyan" x="32" y="248" width="232" height="176" rx="9"/>
+    <text class="t-m-c" x="48" y="272">1 · HYBRID SEARCH + RERANK</text>
+    <text class="t-b" x="48" y="295">Unstructured Prose</text>
+    <text class="t-s" x="48" y="318">• Inline ACL + date pre-filter</text>
+    <text class="t-s" x="48" y="338">• Dense vector + lexical BM25</text>
+    <text class="t-s" x="48" y="358">• RRF rank fusion (top 40)</text>
+    <text class="t-s" x="48" y="378">• Cross-encoder rerank (top 5)</text>
+    <text class="t-s" x="48" y="398">• Hydrate parent section</text>
+
+    <!-- Path 2: SQL & Live APIs -->
+    <rect class="b-code" x="278" y="248" width="200" height="176" rx="9"/>
+    <text class="t-m-g" x="294" y="272">2 · SQL &amp; LIVE TOOLS</text>
+    <text class="t-b" x="294" y="295">Exact State &amp; Math</text>
+    <text class="t-s" x="294" y="318">• Parameterized SQL</text>
+    <text class="t-s" x="294" y="338">• Aggregations &amp; counts</text>
+    <text class="t-s" x="294" y="358">• Live ERP / ledger APIs</text>
+    <text class="t-s" x="294" y="378">• Numeric range bounds</text>
+    <text class="t-s" x="294" y="398">• Row-level security</text>
+
+    <!-- Path 3: Graph Traversal -->
+    <rect class="b-store" x="492" y="248" width="200" height="176" rx="9"/>
+    <text class="t-m-c" x="508" y="272" style="fill:var(--amber)">3 · GRAPH TRAVERSAL</text>
+    <text class="t-b" x="508" y="295">Multi-Hop Links</text>
+    <text class="t-s" x="508" y="318">• Cross-policy citations</text>
+    <text class="t-s" x="508" y="338">• Dependency &amp; org tiers</text>
+    <text class="t-s" x="508" y="358">• Vector seed → 1–2 hop</text>
+    <text class="t-s" x="508" y="378">  deterministic walk</text>
+    <text class="t-s" x="508" y="398">• Preserves exact clauses</text>
+
+    <!-- Path 4: Workspace & Episodic Memory -->
+    <rect class="node-card" x="706" y="248" width="182" height="176" rx="9"/>
+    <text class="t-m-c" x="722" y="272">4 · MEMORY &amp; INDEX</text>
+    <text class="t-b" x="722" y="295">2-Hop State</text>
+    <text class="t-s" x="722" y="318">• Compact root index</text>
+    <text class="t-s" x="722" y="338">• Domain files &lt;= 40 KB</text>
+    <text class="t-s" x="722" y="358">• Verified case history</text>
+    <text class="t-s" x="722" y="378">• Cuts turn tokens</text>
+    <text class="t-s" x="722" y="398">  by 80%–90%</text>
+
+    <!-- Converge into Long-Context Window + Corrective Check -->
+    <line x1="150" y1="424" x2="150" y2="452" class="flow-g" marker-end="url(#arr-good)"/>
+    <line x1="378" y1="424" x2="378" y2="452" class="flow-g" marker-end="url(#arr-good)"/>
+    <line x1="592" y1="424" x2="592" y2="452" class="flow-g" marker-end="url(#arr-good)"/>
+    <line x1="790" y1="424" x2="790" y2="452" class="flow-g" marker-end="url(#arr-good)"/>
+
+    <rect class="b-model" x="32" y="456" width="856" height="104" rx="10"/>
+    <text class="t-m-v" x="52" y="481">5 · PREFIX-CACHED LONG-CONTEXT SYNTHESIS + BOUNDED CORRECTIVE LOOP (MAX 2 HOPS)</text>
+    <text class="t-b" x="52" y="506">Static System &amp; Cached Reference Prefix First  →  Hydrated Whole Sections &amp; SQL Rows  →  Grounded Answer</text>
+    <text class="t-s" x="52" y="531">If evidence is missing a referenced section, executes one targeted follow-up lookup; emits server-verified inline citations</text>
+  </svg>
+  <div class="fig-caption">
+    <span>Figure 4 — Modern 2026 context architecture: retrieval narrows millions of ACL-governed records down to the right coherent sections, combining hybrid search and reranking with parameterized SQL, graph hops, two-hop memory, and prefix-cached long context.</span>
+    <div class="legend-items">
+      <span><i class="swatch-dot" style="background:var(--cyan-soft);border-color:var(--cyan)"></i> Hybrid search &amp; rerank</span>
+      <span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good)"></i> Deterministic router &amp; SQL</span>
+      <span><i class="swatch-dot" style="background:var(--amber-soft);border-color:var(--amber)"></i> Metadata &amp; graph store</span>
+      <span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> Grounded synthesis</span>
+    </div>
+  </div>
+</div>
+
+
+        <h3>2. What Modern RAG Combines With in Production and What Each Pairing Solves</h3>
+        <p>
+          Real business questions rarely live inside unstructured text alone; users ask questions that span prose rules, live database ledgers, multi-hop entity networks, domain formatting conventions, and ongoing session history.
+        </p>
+        <p>
+          In production, RAG functions as one specialized arm inside a multi-store context router (<em>Table 5</em>):
+        </p>
+
+        <div class="nine-q-wrap">
+          <div class="nine-q-head">Table 5 · Five Production Combinations with Modern RAG and What Each Pairing Solves</div>
+          <div class="tbl-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Production Combination</th>
+                  <th>Problem Solved</th>
+                  <th>Division of Labor</th>
+                  <th>Concrete Example</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><b>1. RAG + Parameterized SQL &amp; Live APIs</b></td>
+                  <td>Vector chunks cannot count rows, sum ledgers, or read live order state</td>
+                  <td><b>RAG</b> retrieves prose rules &amp; SLA terms; <b>SQL / MCP tools</b> fetch live counts, balances, &amp; row-secured records</td>
+                  <td>"Under our cold-chain SLA (RAG), which Q3 shipments qualify for temperature credits and what is total exposure (BigQuery SQL)?"</td>
+                </tr>
+                <tr>
+                  <td><b>2. RAG + Graph Traversal (GraphRAG)</b></td>
+                  <td>Top-k similarity misses multi-hop entity paths and explicit cross-document citations (<a href="https://arxiv.org/abs/2404.16130" target="_blank" rel="noopener">Edge et al., Apr 2024</a>)</td>
+                  <td><b>Vector/BM25</b> seeds entry nodes; <b>Property Graph</b> walks multi-hop entity networks (ownership, supply tiers) or <b>Citation Graph</b> walks linked policy sections</td>
+                  <td>Tracing how a tier-3 chip plant outage impacts customer SKUs, or following "Subject to Schedule C" across versioned contracts</td>
+                </tr>
+                <tr>
+                  <td><b>3. RAG + Long Context &amp; KV Prefix Caching</b></td>
+                  <td>Tiny 300-token chunks strip surrounding exceptions; raw corpus dumps exceed budget</td>
+                  <td><b>RAG</b> selects the 3–5 right documents out of millions; <b>Long Context</b> hydrates whole docs with static prefixes cached (<code>-90%</code> input cost)</td>
+                  <td>Routing a claim to 3 applicable 20-page policies and placing their full text in a prefix-cached reasoning window</td>
+                </tr>
+                <tr>
+                  <td><b>4. RAG + Fine-Tuning / LoRA Adapters</b></td>
+                  <td>Prompts waste tokens teaching specialized output syntax; weights go stale if trained on mutable facts</td>
+                  <td><b>Fine-tuning</b> teaches stable behavior, domain shorthand, &amp; strict JSON/rubric skill; <b>RAG</b> injects mutable facts, prices, &amp; revocable tenant data</td>
+                  <td>A fine-tuned clinical or legal rubric model grading fresh daily filings retrieved with caller ACLs</td>
+                </tr>
+                <tr>
+                  <td><b>5. RAG + Two-Hop Workspace / Episodic Memory</b></td>
+                  <td>Stateless retrieval forgets verified prior case resolutions; flat history logs overflow tool read limits</td>
+                  <td><b>Two-hop memory</b> reads a compact root index (<code>~12 KB</code>) + targeted domain file (<code>&lt;= 40 KB</code>); <b>RAG</b> searches the enterprise corpus</td>
+                  <td>Customer engineering or support agent combining verified account history with current product runbooks</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <p>
+          One subtle design distinction inside Pairing 2 (<code>RAG + Graph</code>) saves months of wasted engineering: reserve full entity-relation property graphs for genuine multi-hop network problems (corporate beneficial ownership, supply-chain dependencies, biomedical pathways). When documents reference one another by title, section number, or code range (as in legal contracts and compliance manuals), building a deterministic <strong>citation and metadata link index</strong> in code preserves exact clause wording and avoids lossy LLM triple extraction.
+        </p>
+
+        <div class="closes">
+          <span><b>Takeaway:</b> Modern RAG pairs structure-aware Contextual Retrieval, inline ACL pre-filtering, BM25 + dense RRF, and cross-encoder reranking with SQL tools, deterministic or entity graphs, and prefix-cached whole-section hydration.</span>
+        </div>
+        <p>
+          With trust controls, model selection, and modern multi-path retrieval in place, we can now bring all three together to build a lean, domain-specific agent equipped with specialized capabilities and domain language.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== QUESTION 5: POLICY PROCESSING ARCHITECTURE ==================== -->
+  <section class="sheet" id="q5">
+    <div class="sheet-h">
+      <div>
+        <span class="sec-badge">Question 05 · Domain-Specific Agent Design</span>
+        <h2>How Do We Build a Lean, Domain-Specific Agent with Specialized Capabilities and Domain Language?</h2>
+        <p>Where we are: equipping one lean agent with the specialized capabilities required to understand domain terminology, navigate cross-referenced rules, and handle conflicting information using minimal components.</p>
+      </div>
+    </div>
+    <div class="sheet-b">
+      <div class="post-prose">
+        <p>
+          Suppose an enterprise asks us to build a domain-specific agent for a vertical workflow such as policy and prior-authorization verification: evaluating incoming requests against hundreds of domain rulebooks, Master Services Agreements (MSAs), signed addenda, and regional regulations. Three core design questions test whether we know how to turn a generic model into a reliable domain specialist: how we make the agent understand specialized domain terminology and cross-references, how we handle conflicting rules across sources, and how we keep the component count minimal.
+        </p>
+
+        <h3>0. Starting from a Clean Single-Agent Whiteboard Sketch</h3>
+        <p>
+          A strong initial instinct on the whiteboard is shown in <em>Figure 5A</em>: place an <strong>Ingress + Guard</strong> and <strong>Gateway + Safety Screening</strong> layer in front of <strong>one LLM Agent</strong>, connect that agent to three knowledge sources (a <strong>DB</strong>, <strong>RAG</strong>, and a <strong><code>SKILL.md</code></strong> file for policy rules and terminology), pass its structured output (<code>status: ok / fail</code>, <code>confidence</code>, <code>resources</code>) through an egress gateway into a <strong>Verify using code</strong> gate, and escalate uncertain cases to <strong>HITL</strong>.
+        </p>
+
+        
+<div class="diagram-frame" id="fig-q5a">
+  <svg viewBox="0 0 920 420" role="img" aria-label="Initial single-agent whiteboard sketch for policy processing with ingress guard, gateway and safety screening, one LLM agent connected to DB, RAG, and SKILL.md, structured status output, code verifier, and HITL">
+    
+  <defs>
+    <marker id="arr-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:var(--ink)"/>
+    </marker>
+    <marker id="arr-good" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:var(--good)"/>
+    </marker>
+    <marker id="arr-cyan" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:var(--cyan)"/>
+    </marker>
+    <marker id="arr-stop" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:var(--stop)"/>
+    </marker>
+    <marker id="arr-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:var(--amber)"/>
+    </marker>
+  </defs>
+
+    <rect x="14" y="14" width="892" height="392" rx="14" style="fill:var(--panel-2);stroke:var(--line);stroke-width:1.8"/>
+    <text class="zl" x="34" y="42">FIGURE 5A · INITIAL WHITEBOARD SKETCH · STRONG SINGLE-AGENT BACKBONE</text>
+
+    <!-- Top Ingress + Gateway -->
+    <rect class="b-code" x="150" y="56" width="230" height="46" rx="8"/>
+    <text class="t-b" x="265" y="85" text-anchor="middle">Ingress + Guard</text>
+
+    <line x1="265" y1="102" x2="265" y2="118" class="flow" marker-end="url(#arr-ink)"/>
+
+    <rect class="node-cyan" x="120" y="122" width="290" height="40" rx="7"/>
+    <text class="t-m-c" x="265" y="147" text-anchor="middle">AGENT GATEWAY + MODEL ARMOR</text>
+
+    <line x1="265" y1="162" x2="265" y2="182" class="flow" marker-end="url(#arr-ink)"/>
+
+    <!-- Central LLM Agent -->
+    <rect class="b-model" x="180" y="186" width="170" height="84" rx="9"/>
+    <text class="t-b" x="265" y="222" text-anchor="middle">LLM Agent</text>
+    <text class="t-s" x="265" y="246" text-anchor="middle">Single policy agent</text>
+
+    <!-- Downward 3 arrows to DB, RAG, SKILL.md -->
+    <line x1="210" y1="270" x2="105" y2="312" class="flow" marker-end="url(#arr-ink)"/>
+    <line x1="265" y1="270" x2="265" y2="312" class="flow" marker-end="url(#arr-ink)"/>
+    <line x1="320" y1="270" x2="455" y2="312" class="flow" marker-end="url(#arr-ink)"/>
+
+    <rect class="b-store" x="42" y="316" width="126" height="68" rx="8"/>
+    <text class="t-b" x="105" y="345" text-anchor="middle">DB</text>
+    <text class="t-s" x="105" y="366" text-anchor="middle">Records</text>
+
+    <rect class="b-store" x="192" y="316" width="146" height="68" rx="8"/>
+    <text class="t-b" x="265" y="345" text-anchor="middle">RAG</text>
+    <text class="t-s" x="265" y="366" text-anchor="middle">Policy chunks</text>
+
+    <rect class="node-card" x="362" y="316" width="226" height="68" rx="8"/>
+    <text class="t-b" x="475" y="345" text-anchor="middle">SKILL.md</text>
+    <text class="t-s" x="475" y="366" text-anchor="middle">Policy rules &amp; terminology</text>
+
+    <!-- Rightward flow: Gateway -> Status JSON -> Verify using code -> HITL -->
+    <line x1="350" y1="228" x2="376" y2="228" class="flow" marker-end="url(#arr-ink)"/>
+
+    <rect class="node-cyan" x="380" y="190" width="64" height="76" rx="7"/>
+    <text class="t-m-c" x="412" y="224" text-anchor="middle">GW</text>
+    <text class="t-s" x="412" y="245" text-anchor="middle">Egress</text>
+
+    <line x1="444" y1="228" x2="468" y2="228" class="flow" marker-end="url(#arr-ink)"/>
+
+    <rect class="node-card" x="472" y="178" width="166" height="100" rx="8" style="stroke-dasharray:6 4"/>
+    <text class="t-b" x="555" y="206" text-anchor="middle">Status: ok / fail</text>
+    <text class="t-s" x="555" y="229" text-anchor="middle">• confidence</text>
+    <text class="t-s" x="555" y="250" text-anchor="middle">• resources</text>
+    <text class="t-m-c" x="555" y="269" text-anchor="middle">TYPED OUTPUT</text>
+
+    <line x1="638" y1="228" x2="662" y2="228" class="flow-g" marker-end="url(#arr-good)"/>
+
+    <rect class="b-code" x="666" y="168" width="92" height="120" rx="8"/>
+    <text class="t-b" x="712" y="208" text-anchor="middle">Verify</text>
+    <text class="t-s" x="712" y="230" text-anchor="middle">using</text>
+    <text class="t-s" x="712" y="250" text-anchor="middle">code</text>
+    <text class="t-m-g" x="712" y="274" text-anchor="middle">GATE</text>
+
+    <line x1="758" y1="228" x2="782" y2="228" class="flow" marker-end="url(#arr-stop)" style="stroke:var(--stop)"/>
+
+    <rect class="node-bad" x="786" y="178" width="104" height="100" rx="8"/>
+    <text class="t-b" x="838" y="208" text-anchor="middle">HITL</text>
+    <text class="t-s" x="838" y="231" text-anchor="middle">Escalation</text>
+    <text class="t-s" x="838" y="250" text-anchor="middle">or low</text>
+    <text class="t-s" x="838" y="269" text-anchor="middle">confidence</text>
+  </svg>
+  <div class="fig-caption">
+    <span>Figure 5A — Initial single-agent whiteboard sketch: right instinct to keep one LLM agent behind ingress/gateway guards and verify structured output in code, while leaving five policy-specific seams open under close inspection.</span>
+    <div class="legend-items">
+      <span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good)"></i> Code guard / verifier</span>
+      <span><i class="swatch-dot" style="background:var(--cyan-soft);border-color:var(--cyan)"></i> Gateway screen</span>
+      <span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> Single LLM agent</span>
+      <span><i class="swatch-dot" style="background:var(--stop-soft);border-color:var(--stop)"></i> Human escalation</span>
+    </div>
+  </div>
+</div>
+
+
+        <p>
+          That initial sketch already gets the four most important structural choices right: it avoids multi-agent swarm sprawl by starting with a single agent, screens inputs and outputs at a gateway boundary, recognizes that legal terminology needs explicit representation alongside retrieval and structured records, and puts deterministic code verification ahead of human escalation. Pressure-testing every arrow on <em>Figure 5A</em> then exposes five specific policy seams that turn that sketch into a production-ready legal engine (<em>Figure 5B</em>):
+        </p>
+        <ol>
+          <li><strong>Optional <code>SKILL.md</code> lookup vs. automatic per-contract <code>&lt;defined_terms&gt;</code> injection:</strong> Keep global review instructions in <code>SKILL.md</code>, while moving contract-specific Defined Terms into an indexed glossary injected automatically in code, since a model seeing an everyday English word like <em>"Affiliate"</em> or <em>"Customer"</em> assumes it knows the meaning and skips calling a terminology file, and flat Markdown files truncate past <code>~40 KB</code> across hundreds of contracts.</li>
+          <li><strong>Generic <code>RAG</code> box vs. an Offline Policy Compiler:</strong> Compile section trees, table headers, <code>effective_date</code> scope, and 1-hop cross-references deterministically before runtime so <em>"Notwithstanding Section 4.2, see Schedule B"</em> never arrives cut in half.</li>
+          <li><strong>Direct <code>LLM Agent → DB</code> arrow vs. parameterized read-only tools + intake quarantine:</strong> Front the database with typed, read-only parameterized queries scoped to the caller/tenant (<a href="ep01_securing_agent_to_database.html">Episode 01</a>), and parse untrusted uploaded claim text in a toolless step first.</li>
+          <li><strong>Self-reported model <code>confidence</code> float vs. quote checks + precedence code + <code>CONFLICT_ESCALATE</code>:</strong> Generative models frequently emit <code>confidence = 0.95</code> while hallucinating or guessing across contradictory rules; replace raw float trust with server-checked verbatim quotes, deterministic <code>authority_tier</code> precedence in code, and an explicit <code>CONFLICT_ESCALATE</code> status for same-tier contradictions.</li>
+          <li><strong>Single exit to <code>HITL</code> vs. two-branch completion + Audit Store:</strong> Split the exit of <code>Verify using code</code> so clean verified decisions write an immutable <code>AdjudicationRecord</code> while conflicts, missing referenced schedules, and low-clarity cases route to <code>HITL</code>.</li>
+        </ol>
+
+        <h3>1. Making the Agent Understand Specialized Domain Language and Cross-References</h3>
+        <p>
+          Legal and regulatory prose breaks standard semantic chunking in four specific ways (<a href="https://arxiv.org/abs/2308.11462" target="_blank" rel="noopener">Guha et al., LegalBench, NeurIPS 2023</a>). First, capitalized <strong>Defined Terms</strong> (such as <em>"Affiliate"</em>, <em>"Customer Data"</em>, <em>"Permitted Subprocessor"</em>, or <em>"Material Adverse Effect"</em>) carry bespoke definitions in Section 1 or a separate Glossary that routinely narrow or invert ordinary dictionary meanings. Second, <strong>cross-references and carve-outs</strong> split a single logical rule across distant sections or external schedules (<em>"Notwithstanding Section 4.2, and subject to Exhibit B..."</em>); reading Section 4.2 alone produces the exact opposite verdict. Third, <strong>effective dates and jurisdictional scope</strong> mean two 98%-similar policy versions coexist in storage while only one was legally in force on the event date. Fourth, <strong>numeric thresholds and code ranges</strong> (<em>"Applies to procedure codes 10000–69999"</em> or embedded fee tables) never match literal token queries for <code>10021</code> unless parsed structurally.
+        </p>
+        <p>
+          Solve document structure <em>once</em> at ingestion time using an <strong>Offline Deterministic Policy Compiler</strong> (zero LLM chunking calls), paired with structured context assembly at runtime:
+        </p>
+        <ul>
+          <li><strong>100%-Coverage Structural Clause &amp; Table Parsing:</strong> Parse native <code>.docx</code> XML and PDF layout into intact numbered clauses carrying full heading breadcrumbs (<code>MSA &gt; Art. 8 Liability &gt; 8.4 Data Breach Carve-Out</code>), repeat column headers on every split table block, and index numeric/code ranges for exact bounds checking. Block import automatically if any line of raw text is dropped.</li>
+          <li><strong>Automatic Defined-Terms Glossary Injection:</strong> Extract every defined term and its verbatim definition into a deterministic lookup dictionary per document family. At runtime, scan each routed policy clause in code (using fast exact lexical / Aho-Corasick matching) and automatically prepend a read-only <code>&lt;defined_terms&gt;</code> block containing the exact contractual definitions of every capitalized term used in that clause.</li>
+          <li><strong>Pre-Linked Cross-Reference Graph + Missing-Attachment Gate:</strong> Resolve internal section pointers (<code>Section 8.4(b)</code>, scoped per part/chapter) and cross-policy titles (<code>Information Security Addendum</code>) into explicit graph edges during compilation. At runtime, hydrate 1-hop cited passages alongside the primary policy. Equally important, record any reference whose target file is absent from the repository in an explicit <code>unresolved_references</code> field so the runtime fails closed with <code>MISSING_REFERENCED_DOC</code> whenever a referenced Schedule is absent from the repository.</li>
+          <li><strong>Atomic Predicate Evaluation with Verbatim Quotes:</strong> Ask the model to evaluate each applicable rule as a structured checklist item (<code>PASS</code>, <code>FAIL</code>, <code>NOT_APPLICABLE</code>, <code>DEFERRED_TO_LINK</code>, or <code>CONFLICT_ESCALATE</code>) accompanied by the exact verbatim sentence from the policy, which Python code verifies against the source text.</li>
+        </ul>
+
+        <h3>2. Dealing with Conflicting Information: Precedence Code vs. Human Escalation</h3>
+        <p>
+          When one document states <em>"Vendor invoices are payable Net-30"</em> and another states <em>"Vendor invoices are payable Net-60,"</em> or a global policy permits cloud backups in any region while a German addendum restricts storage to Frankfurt, letting a language model "weigh both sides and pick the most reasonable answer" creates silent legal liability.
+        </p>
+        <p>
+          Separate policy conflicts into two distinct categories: <strong>resolvable hierarchy overrides</strong> handled deterministically in code, and <strong>genuine equal-rank ambiguities</strong> escalated directly to a human reviewer (<em>Table 6</em>):
+        </p>
+
+        <div class="nine-q-wrap">
+          <div class="nine-q-head">Table 6 · Resolving Policy Conflicts: Deterministic Legal Hierarchy vs. Mandatory Human Escalation</div>
+          <div class="tbl-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Conflict Category</th>
+                  <th>Legal / Policy Principle</th>
+                  <th>Who Resolves It</th>
+                  <th>Exact Runtime Mechanism &amp; Audit Output</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><b>1. Temporal Supersession</b><br>(2024 Policy vs. 2026 Policy)</td>
+                  <td><i>Lex Posterior</i> (active version on event date governs)</td>
+                  <td><span class="b-pill g">Plain Code</span> (Pre-filter)</td>
+                  <td>Scope query filters <code>effective_start &lt;= event_date &lt;= effective_end</code> and excludes records marked <code>superseded_by</code> before any LLM call runs.</td>
+                </tr>
+                <tr>
+                  <td><b>2. Authority Tier Override</b><br>(Signed SOW / Statute vs. Global MSA)</td>
+                  <td><i>Lex Superior</i> / Order-of-Precedence clause</td>
+                  <td><span class="b-pill g">Plain Code</span> (Precedence Merger)</td>
+                  <td>Every doc carries explicit <code>authority_tier</code> (<code>1: Statute &gt; 2: Signed Amendment/SOW &gt; 3: MSA &gt; 4: Regional Policy &gt; 5: Global Baseline</code>). Higher rank wins in code and logs <code>overridden_clause_id</code>.</td>
+                </tr>
+                <tr>
+                  <td><b>3. Specific Carve-Out vs. General Rule</b><br>("Notwithstanding Sec 4.2...")</td>
+                  <td><i>Lex Specialis</i> (specific exception narrows baseline)</td>
+                  <td><span class="b-pill asi">Whole-Section Hydration + LLM #2</span></td>
+                  <td>Whole-section retrieval + 1-hop cross-reference hydration keeps the carve-out attached to the general clause in one evaluation window.</td>
+                </tr>
+                <tr>
+                  <td><b>4. Conjunctive Safety / Compliance Rules</b><br>(Security Gate + Privacy Gate)</td>
+                  <td>All mandatory gates must pass</td>
+                  <td><span class="b-pill g">Plain Code</span> (Severity Lattice)</td>
+                  <td>Independent domain checks merge via strict lattice: <code>FAIL &gt; CONFLICT_ESCALATE &gt; PASS &gt; NOT_APPLICABLE</code>.</td>
+                </tr>
+                <tr>
+                  <td><b>5. Equal-Rank Contradiction or Missing Schedule</b><br>(Two active Tier-2 Addenda disagree)</td>
+                  <td>Genuine legal ambiguity</td>
+                  <td><span class="b-pill t">Human Legal / Compliance Reviewer</span></td>
+                  <td>Code detects two opposing verdicts at identical <code>authority_tier</code> (or non-empty <code>unresolved_references</code>), emits <code>CONFLICT_ESCALATE</code>, and presents both verbatim quotes side by side.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <h3>3. How Many Agents Do We Need? Keeping the Single-Agent Spine</h3>
+        <p>
+          A common whiteboard mistake is to invent a conversational swarm of five to eight specialized agents (such as separate Definitions, Statute, Contract, Debate, and Summary agents) chatting in a shared thread. In practice, multi-agent chat swarms multiply latency and token cost, break KV prefix caching, paraphrase away critical legal modal verbs (turning <em>"shall"</em> into <em>"should"</em> across handoffs), and produce non-reproducible audit trails (<a href="https://www.anthropic.com/research/building-effective-agents" target="_blank" rel="noopener">Anthropic, Dec 2024</a>; <a href="ep02_designing_agentic_systems.html">Episode 02</a>).
+        </p>
+        <p>
+          Keep the exact single-agent spine from <em>Figure 5A</em> inside <strong>one deterministic workflow service</strong>, growing it in place into <em>Figure 5B</em>:
+        </p>
+        <ol>
+          <li><strong>Ingress + Guard + Agent Gateway &amp; Model Armor:</strong> Authenticates the caller, filters active policy scope by <code>effective_date</code> and <code>jurisdiction</code>, screens inputs for prompt injection via Model Armor, and (whenever intake arrives as raw unstructured prose) runs a single toolless <code>CaseFacts</code> extraction pass. When intake arrives from a structured form or API, that extra parse disappears completely, leaving <strong>just one LLM role</strong> in the entire architecture.</li>
+          <li><strong>Hardened Three-Source Context Assembly (<code>DB via MCP Tool</code> + <code>Compiled RAG</code> + <code>SKILL.md + Glossary</code>):</strong> Parameterized read-only SQL fetches live customer or claim records under tenant row ACLs; Compiled RAG loads the active whole policy sections and 1-hop cited clauses; <code>SKILL.md</code> supplies the global review rubric while plain code automatically injects the per-contract <code>&lt;defined_terms&gt;</code> block.</li>
+          <li><strong>Single Policy LLM Agent + Egress Gateway Screen:</strong> Evaluates <code>CaseFacts</code> against each routed policy in a clean single turn (<code>0</code> write tools, <code>include_contents="none"</code>), passing through egress Model Armor to emit the typed <code>Status &amp; Resources</code> schema with <code>verbatim_quote</code> placed ahead of <code>status</code> (<code>PASS</code>, <code>FAIL</code>, <code>DEFERRED_TO_LINK</code>, or <code>CONFLICT_ESCALATE</code>).</li>
+          <li><strong>Verify Using Code → Dual Exit (<code>HITL Domain Escalation</code> vs. <code>Immutable Audit Store</code>):</strong> Plain Python checks that every <code>verbatim_quote</code> appears in the source policy text, follows at most one bounded <code>DEFERRED_TO_LINK</code> hop, applies deterministic <code>authority_tier</code> precedence (<code>Statute &gt; Signed SOW/Addendum &gt; MSA &gt; Global</code>), writes clean resolved outcomes to the <code>Immutable Audit Store</code>, and routes <code>CONFLICT_ESCALATE</code>, <code>MISSING_REFERENCED_DOC</code>, or low-clarity cases to <code>HITL Domain Escalation</code>.</li>
+        </ol>
+
+        
+<div class="diagram-frame" id="fig-q5">
+  <svg viewBox="0 0 920 668" role="img" aria-label="Hardened policy adjudication architecture growing directly from the single-agent whiteboard sketch: preserving Ingress + Guard, bidirectional Agent Gateway and Model Armor, the Single Policy LLM Agent, DB + RAG + SKILL.md triad, structured verdict, Verify Using Code, and HITL while adding the offline policy compiler, auto-injected defined_terms, deterministic precedence, and audit store">
+    
+  <defs>
+    <marker id="arr-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:var(--ink)"/>
+    </marker>
+    <marker id="arr-good" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:var(--good)"/>
+    </marker>
+    <marker id="arr-cyan" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:var(--cyan)"/>
+    </marker>
+    <marker id="arr-stop" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:var(--stop)"/>
+    </marker>
+    <marker id="arr-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:var(--amber)"/>
+    </marker>
+  </defs>
+
+    <rect x="14" y="14" width="892" height="640" rx="14" style="fill:var(--panel-2);stroke:var(--good);stroke-width:2"/>
+    <text class="zl" x="34" y="42" style="fill:var(--good)">FIGURE 5B · SINGLE-AGENT SKETCH HARDENED IN PLACE · SAME SPINE + FIVE POLICY UPGRADES</text>
+
+    <!-- Added Top Band: Offline Deterministic Policy Compiler -->
+    <rect class="b-store" x="32" y="56" width="856" height="82" rx="9"/>
+    <text class="t-m-c" x="50" y="78" style="fill:var(--amber)">UPGRADE 2A · OFFLINE DETERMINISTIC POLICY COMPILER (0 LLM CHUNKING CALLS)</text>
+    <text class="t-b" x="50" y="101">100% Clause &amp; Table-Header Parser  +  Per-Policy Defined-Terms Index  +  1-Hop Citation &amp; Authority-Tier Registry</text>
+    <text class="t-s" x="50" y="123">Compiles .docx/.pdf structure once; stamps effective_date, authority_tier (Statute &gt; SOW &gt; MSA &gt; Global) &amp; missing refs</text>
+
+    <!-- Top-Left Ingress + Guard -> Agent Gateway + Model Armor (Preserved from Sketch + Hardened) -->
+    <rect class="b-code" x="32" y="156" width="320" height="68" rx="8"/>
+    <text class="t-b" x="192" y="181" text-anchor="middle">Ingress + Guard (+ Intake Parse)</text>
+    <text class="t-s" x="192" y="202" text-anchor="middle">Auth, active effective_date scope &amp; CaseFacts</text>
+
+    <line x1="192" y1="224" x2="192" y2="242" class="flow" marker-end="url(#arr-ink)"/>
+
+    <rect class="node-cyan" x="32" y="246" width="320" height="42" rx="7"/>
+    <text class="t-m-c" x="192" y="272" text-anchor="middle">AGENT GATEWAY + MODEL ARMOR (INGRESS)</text>
+
+    <line x1="192" y1="288" x2="192" y2="308" class="flow" marker-end="url(#arr-ink)"/>
+
+    <!-- Central Single Policy LLM Agent (Preserved!) -->
+    <rect class="b-model" x="52" y="312" width="280" height="106" rx="9"/>
+    <text class="t-b" x="192" y="340" text-anchor="middle">Single Policy LLM Agent</text>
+    <text class="t-s" x="192" y="362" text-anchor="middle">Evaluates CaseFacts vs. hydrated</text>
+    <text class="t-s" x="192" y="381" text-anchor="middle">whole policy + &lt;defined_terms&gt;</text>
+    <text class="t-m-v" x="192" y="403" text-anchor="middle">1 TURN / POLICY · 0 WRITE TOOLS</text>
+
+    <!-- Rightward Spine: Egress AG -> Typed Status/Quote/Resources -> Verify Using Code -> HITL + Audit -->
+    <line x1="332" y1="365" x2="352" y2="365" class="flow" marker-end="url(#arr-ink)"/>
+
+    <rect class="node-cyan" x="356" y="320" width="76" height="90" rx="7"/>
+    <text class="t-m-c" x="394" y="352" text-anchor="middle">AG +</text>
+    <text class="t-m-c" x="394" y="370" text-anchor="middle">ARMOR</text>
+    <text class="t-s" x="394" y="393" text-anchor="middle">Egress</text>
+
+    <line x1="432" y1="365" x2="452" y2="365" class="flow" marker-end="url(#arr-ink)"/>
+
+    <!-- Hardened Status Schema Box -->
+    <rect class="node-card" x="456" y="294" width="190" height="142" rx="8" style="stroke-dasharray:6 4"/>
+    <text class="t-b" x="551" y="320" text-anchor="middle">Status &amp; Resources</text>
+    <text class="t-s" x="551" y="342" text-anchor="middle">1. verbatim_quote</text>
+    <text class="t-s" x="551" y="362" text-anchor="middle">2. resource / tier</text>
+    <text class="t-s" x="551" y="382" text-anchor="middle">3. PASS | FAIL |</text>
+    <text class="t-s" x="551" y="401" text-anchor="middle">   CONFLICT_ESCALATE</text>
+    <text class="t-m-c" x="551" y="423" text-anchor="middle">QUOTE BEFORE STATUS</text>
+
+    <line x1="646" y1="365" x2="666" y2="365" class="flow-g" marker-end="url(#arr-good)"/>
+
+    <!-- Hardened Verify Using Code Vertical Bar -->
+    <rect class="b-code" x="670" y="264" width="218" height="202" rx="9"/>
+    <text class="t-b" x="779" y="292" text-anchor="middle">Verify Using Code</text>
+    <text class="t-s" x="779" y="316" text-anchor="middle">• Exact span check vs.</text>
+    <text class="t-s" x="779" y="335" text-anchor="middle">  source policy text</text>
+    <text class="t-s" x="779" y="358" text-anchor="middle">• Precedence rank:</text>
+    <text class="t-s" x="779" y="377" text-anchor="middle">  Statute &gt; SOW &gt; MSA</text>
+    <text class="t-s" x="779" y="400" text-anchor="middle">• Missing-ref &amp; calibrated</text>
+    <text class="t-s" x="779" y="419" text-anchor="middle">  clarity floor check</text>
+    <text class="t-m-g" x="779" y="446" text-anchor="middle">DETERMINISTIC GATE</text>
+
+    <!-- Upward Exit from Verify Using Code -> HITL (Preserved!) -->
+    <line x1="779" y1="264" x2="779" y2="242" class="flow" marker-end="url(#arr-stop)" style="stroke:var(--stop)"/>
+    <rect class="node-bad" x="634" y="156" width="254" height="82" rx="9"/>
+    <text class="t-b" x="761" y="182" text-anchor="middle">HITL Domain Escalation</text>
+    <text class="t-s" x="761" y="203" text-anchor="middle">Same-tier conflict, missing</text>
+    <text class="t-s" x="761" y="222" text-anchor="middle">schedule, or low clarity</text>
+
+    <!-- Downward Exit from Verify Using Code -> Resolved Decision + Audit Store (Upgrade 5) -->
+    <line x1="779" y1="466" x2="779" y2="496" class="flow-g" marker-end="url(#arr-good)"/>
+    <rect class="b-code" x="634" y="500" width="254" height="132" rx="9"/>
+    <text class="t-m-g" x="761" y="525" text-anchor="middle">UPGRADE 5 · HAPPY-PATH EXIT</text>
+    <text class="t-b" x="761" y="549" text-anchor="middle">Resolved Decision &amp;</text>
+    <text class="t-b" x="761" y="570" text-anchor="middle">Immutable Audit Store</text>
+    <text class="t-s" x="761" y="594" text-anchor="middle">Logs winning_doc, quotes &amp;</text>
+    <text class="t-s" x="761" y="613" text-anchor="middle">overridden_clause_id</text>
+
+    <!-- Bottom Three Sources Under Single Policy LLM Agent (DB + RAG + SKILL.md Triad, Hardened!) -->
+    <line x1="110" y1="418" x2="110" y2="496" class="flow-g" marker-end="url(#arr-good)"/>
+    <line x1="255" y1="418" x2="295" y2="496" class="flow-g" marker-end="url(#arr-good)"/>
+    <path d="M 305 418 L 365 468 L 510 468 L 510 496" class="flow-g" marker-end="url(#arr-good)"/>
+
+    <!-- Hardened Box 1: DB via Parameterized Read-Only Tool -->
+    <rect class="b-code" x="32" y="500" width="166" height="132" rx="9"/>
+    <text class="t-m-g" x="115" y="524" text-anchor="middle">UPGRADE 3 · SAFE DB</text>
+    <text class="t-b" x="115" y="547" text-anchor="middle">DB via MCP Tool</text>
+    <text class="t-s" x="115" y="570" text-anchor="middle">Parameterized</text>
+    <text class="t-s" x="115" y="589" text-anchor="middle">read-only SQL +</text>
+    <text class="t-s" x="115" y="608" text-anchor="middle">tenant row ACLs</text>
+
+    <!-- Hardened Box 2: Compiled Policy RAG -->
+    <rect class="b-store" x="212" y="500" width="190" height="132" rx="9"/>
+    <text class="t-m-c" x="307" y="524" text-anchor="middle" style="fill:var(--amber)">UPGRADE 2B · POLICY RAG</text>
+    <text class="t-b" x="307" y="547" text-anchor="middle">Compiled RAG</text>
+    <text class="t-s" x="307" y="570" text-anchor="middle">Pre-filtered date/tier,</text>
+    <text class="t-s" x="307" y="589" text-anchor="middle">whole sections &amp;</text>
+    <text class="t-s" x="307" y="608" text-anchor="middle">1-hop cited clauses</text>
+
+    <!-- Hardened Box 3: SKILL.md + Auto-Injected <defined_terms> -->
+    <rect class="b-code" x="416" y="500" width="204" height="132" rx="9"/>
+    <text class="t-m-g" x="518" y="524" text-anchor="middle">UPGRADE 1 · TERMINOLOGY</text>
+    <text class="t-b" x="518" y="547" text-anchor="middle">SKILL.md + Glossary</text>
+    <text class="t-s" x="518" y="570" text-anchor="middle">SKILL.md review rules;</text>
+    <text class="t-s" x="518" y="589" text-anchor="middle">code auto-injects</text>
+    <text class="t-s" x="518" y="608" text-anchor="middle">&lt;defined_terms&gt; spans</text>
+  </svg>
+  <div class="fig-caption">
+    <span>Figure 5B — Growing the single-agent sketch in place: keeping Ingress + Guard, bidirectional Agent Gateway + Model Armor, one Policy LLM Agent, DB + RAG + SKILL.md, and Verify Using Code, while hardening the five policy seams around them.</span>
+    <div class="legend-items">
+      <span><i class="swatch-dot" style="background:var(--amber-soft);border-color:var(--amber)"></i> Compiled policy store</span>
+      <span><i class="swatch-dot" style="background:var(--cyan-soft);border-color:var(--cyan)"></i> Gateway + Model Armor</span>
+      <span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> Single policy LLM</span>
+      <span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good)"></i> Deterministic guard / tool</span>
+      <span><i class="swatch-dot" style="background:var(--stop-soft);border-color:var(--stop)"></i> HITL escalation</span>
+    </div>
+  </div>
+</div>
+
+
+        <h3>4. Worked Example: How RAG Drives a Prior Authorization Check</h3>
+        <p>
+          To see what <code>Compiled RAG</code> actually does step by step, trace a single prior authorization request: a clinic requests a <strong>lumbar spine MRI (<code>CPT 72148</code>)</strong> for a patient on a Texas PPO plan (<code>service_date = 2026-11-15</code>), attaching a short clinical note (<em>"low back pain for 3 weeks, tried ibuprofen; neurological exam page omitted"</em>). We need to answer two exact questions: <strong>does the request comply with the governing policy</strong>, and <strong>is there enough supporting clinical evidence attached?</strong>
+        </p>
+        <ol>
+          <li><strong>Extract Structured Request &amp; Chart Facts (<code>Ingress + Intake Parse</code>):</strong> Parse the form and clinical note into a compact <code>CaseFacts</code> object containing the coded identifiers (<code>cpt = "72148"</code>, <code>plan = "TX_PPO"</code>, <code>service_date = "2026-11-15"</code>) alongside the documented clinical facts (<code>pain_duration_weeks = 3</code>, <code>therapies_tried = ["ibuprofen"]</code>, <code>neuro_exam_attached = false</code>). Meanwhile, <code>DB via MCP Tool</code> confirms active member eligibility.</li>
+          <li><strong>Filter Active Policy Scope First (<code>Plain Code</code>):</strong> Before computing any similarity score, restrict the search index to policies where <code>plan == "TX_PPO"</code> and <code>effective_start &lt;= 2026-11-15 &lt;= effective_end</code>. Expired 2024 rules and Medicare policies never enter retrieval.</li>
+          <li><strong>Run Hybrid Code + Indication Search (<code>Compiled RAG</code>):</strong> Query the scoped policies using <strong>exact/range lookup</strong> on <code>CPT 72148</code> (matching <em>Musculoskeletal Imaging Policy <code>MSK-04</code></em>, which covers <code>72141–72158</code>) combined with <strong>BM25 + dense vector + reranking</strong> on the clinical indication (<em>"lumbar MRI uncomplicated low back pain"</em>).</li>
+          <li><strong>Hydrate the Complete Criterion Tree, Linked Addendum, and Defined Terms (<code>Code Context Builder</code>):</strong> Return the <strong>entire governing section</strong> of <code>MSK-04</code> so its <code>AND / OR</code> criteria and red-flag exceptions stay attached: <em>"Approve lumbar MRI when EITHER (a) &gt;= 6 weeks of failed Conservative Therapy is documented OR (b) progressive neurological deficit is documented on exam."</em> Automatically pull any <strong>1-hop linked addendum</strong> (<code>TX-Mandate-2026</code>) and inject <code>&lt;defined_terms&gt;</code> from the glossary (<em>"<code>Conservative Therapy</code>: physician-supervised physical therapy across &gt;= 6 weeks; over-the-counter NSAIDs alone do not satisfy this requirement"</em>).</li>
+          <li><strong>Evaluate Criterion by Criterion with Evidence Status (<code>Single Policy LLM Agent</code>):</strong> Guided by <code>SKILL.md</code>, the agent checks the chart facts against each criterion separately, quoting the exact policy rule first and distinguishing a failed rule from missing chart paperwork: Criterion (a) evaluates to <code>FAIL</code> (3 weeks of ibuprofen vs. 6 weeks of supervised physical therapy), while Criterion (b) evaluates to <code>MISSING_EVIDENCE</code> (the neurological exam page was omitted).</li>
+          <li><strong>Verify Quotes, Apply Precedence, and Route Asymmetric Outcomes (<code>Verify Using Code</code>):</strong> Python verifies that every quoted rule exists verbatim inside <code>MSK-04</code>, applies <code>authority_tier</code> precedence if <code>TX-Mandate-2026</code> modifies <code>MSK-04</code>, and routes by outcome: all-criteria <code>PASS</code> with verified chart spans logs an approval to the <code>Immutable Audit Store</code>; <code>MISSING_EVIDENCE</code> sends a targeted checklist back to the clinic naming the missing neurological exam or physical-therapy notes; clinical denials (<code>FAIL</code>) and same-tier policy conflicts (<code>CONFLICT_ESCALATE</code>) route to <code>HITL</code> clinical review with highlighted quotes side by side.</li>
+        </ol>
+
+        <p>
+          The three compact payloads below trace that exact <code>CPT 72148</code> request across the spine of <em>Figure 5B</em>:
+        </p>
+
+        <div class="chain">
+          <div class="link">
+            <header><span>STEP 1 · INTAKE → RAG ROUTER</span>CaseFacts (Request + Chart)</header>
+<pre>{
+  <span class="hl-k">"request_id"</span>: <span class="hl-s">"PA-2026-4190"</span>,
+  <span class="hl-k">"plan"</span>: <span class="hl-s">"TX_PPO"</span>,
+  <span class="hl-k">"service_date"</span>: <span class="hl-s">"2026-11-15"</span>,
+  <span class="hl-k">"cpt_code"</span>: <span class="hl-s">"72148"</span>,
+  <span class="hl-k">"pain_weeks"</span>: <span class="hl-n">3</span>,
+  <span class="hl-k">"therapies"</span>: [<span class="hl-s">"ibuprofen"</span>],
+  <span class="hl-k">"neuro_exam_attached"</span>: <span class="hl-n">false</span>
+}</pre>
+            <footer>Code scopes RAG to active <code>TX_PPO</code> policies, hits <code>MSK-04</code> via <code>72148</code>, &amp; injects <code>&lt;defined_terms&gt;</code> for <i>Conservative Therapy</i>.</footer>
+          </div>
+          <div class="link">
+            <header><span>STEP 5 · POLICY AGENT → GATE</span>Status &amp; Resources (Per Criterion)</header>
+<pre>{
+  <span class="hl-k">"resource_doc_id"</span>: <span class="hl-s">"MSK-04-2026"</span>,
+  <span class="hl-k">"criteria"</span>: [
+    {<span class="hl-k">"id"</span>: <span class="hl-s">"4.1a_conservative_tx"</span>,
+     <span class="hl-k">"status"</span>: <span class="hl-s">"FAIL"</span>},
+    {<span class="hl-k">"id"</span>: <span class="hl-s">"4.1b_neuro_red_flag"</span>,
+     <span class="hl-k">"status"</span>: <span class="hl-s">"MISSING_EVIDENCE"</span>}
+  ],
+  <span class="hl-k">"verbatim_quote"</span>: <span class="hl-s">"Requires &gt;= 6 weeks supervised physical therapy OR documented neurological deficit."</span>
+}</pre>
+            <footer>Separates <code>FAIL</code> (3 weeks ibuprofen) from <code>MISSING_EVIDENCE</code> (missing neuro exam page).</footer>
+          </div>
+          <div class="link">
+            <header><span>STEP 6 · VERIFY IN CODE → EXIT</span>Verified Routing Outcome</header>
+<pre>{
+  <span class="hl-k">"quote_verified"</span>: <span class="hl-n">true</span>,
+  <span class="hl-k">"complies_now"</span>: <span class="hl-n">false</span>,
+  <span class="hl-k">"route"</span>: <span class="hl-s">"PEND_FOR_EVIDENCE"</span>,
+  <span class="hl-k">"missing_items"</span>: [
+    <span class="hl-s">"Neurological exam note"</span>,
+    <span class="hl-s">"6-week PT log (if done)"</span>
+  ]
+}</pre>
+            <footer>Clean approvals log to Audit Store; missing evidence pends with exact checklist; denials &amp; conflicts go to <code>HITL</code>.</footer>
+          </div>
+        </div>
+
+        <div class="closes">
+          <span><b>Takeaway:</b> Equip one lean domain-specific agent with compiled whole-section RAG, auto-injected <code>&lt;defined_terms&gt;</code>, parameterized DB lookup, and deterministic quote/precedence verification so compliance and missing-evidence checks stay auditable.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== APPENDIX: ADK 2.x POLICY ENGINE SKETCH ==================== -->
+  <section class="sheet" id="appendix-adk">
+    <div class="sheet-h">
+      <div>
+        <span class="sec-badge">Implementation Sketch · ADK 2.x</span>
+        <h2>Domain-Specific Policy Agent Workflow in ADK 2.x</h2>
+        <p>Wiring one domain-specific policy agent with <code>SKILL.md</code> rules, auto-injected <code>&lt;defined_terms&gt;</code>, compiled RAG, read-only DB access, and deterministic code verification.</p>
+      </div>
+    </div>
+    <div class="sheet-b">
+      <div class="post-prose">
+        <p>
+          Before reading the code below, notice how the ADK 2.x graph maps one-to-one onto <em>Figure 5B</em>: <code>ingress_and_guard</code> handles scope filtering, parameterized read-only DB lookup, compiled RAG hydration, and automatic <code>&lt;defined_terms&gt;</code> injection alongside <code>SKILL.md</code>; <code>single_policy_agent</code> runs behind ingress and egress Model Armor callbacks (<code>mode="single_turn"</code>, <code>include_contents="none"</code>, strict Pydantic <code>output_schema</code>); and <code>verify_using_code</code> checks verbatim quotes in Python, applies <code>authority_tier</code> precedence, and splits cleanly between <code>write_audit_decision_record</code> and <code>escalate_to_hitl</code>.
+        </p>
+      </div>
+      <div class="code-card">
+        <div class="code-title">Hardened single-agent policy workflow in ADK 2.x matching Figure 5B (verified against google-adk 2.14)</div>
+<pre><span class="hl-k">from</span> pathlib <span class="hl-k">import</span> Path
+<span class="hl-k">from</span> typing <span class="hl-k">import</span> Literal
+<span class="hl-k">from</span> pydantic <span class="hl-k">import</span> BaseModel, Field
+<span class="hl-k">from</span> google.adk <span class="hl-k">import</span> Agent, Context, Event, Workflow
+
+POLICY_REVIEW_SKILL_MD = Path(<span class="hl-s">"skills/policy_review/SKILL.md"</span>).read_text(encoding=<span class="hl-s">"utf-8"</span>)
+
+
+<span class="hl-k">class</span> <span class="hl-b">CaseFacts</span>(BaseModel):
+    case_id: str
+    event_date: str
+    jurisdiction: str
+    codes: list[str] = Field(default_factory=list)
+    summary_facts: str
+
+
+<span class="hl-k">class</span> <span class="hl-b">ClauseFinding</span>(BaseModel):
+    verbatim_quote: str = Field(description=<span class="hl-s">"Exact sentence copied from policy text first."</span>)
+    resource_doc_id: str
+    clause_id: str
+    authority_tier: int = Field(ge=<span class="hl-n">1</span>, le=<span class="hl-n">5</span>)
+    clarity_score: float = Field(ge=<span class="hl-n">0.0</span>, le=<span class="hl-n">1.0</span>)
+    status: Literal[<span class="hl-s">"PASS"</span>, <span class="hl-s">"FAIL"</span>, <span class="hl-s">"MISSING_EVIDENCE"</span>, <span class="hl-s">"NOT_APPLICABLE"</span>, <span class="hl-s">"DEFERRED_TO_LINK"</span>, <span class="hl-s">"CONFLICT_ESCALATE"</span>]
+
+
+<span class="hl-k">class</span> <span class="hl-b">StatusAndResources</span>(BaseModel):
+    findings: list[ClauseFinding]
+
+
+single_policy_agent = Agent(             <span class="hl-c"># Central Policy LLM Agent from Figure 5A &amp; 5B</span>
+    name=<span class="hl-s">"single_policy_agent"</span>,
+    model=<span class="hl-s">"gemini-3.8-flash"</span>,
+    mode=<span class="hl-s">"single_turn"</span>,
+    include_contents=<span class="hl-s">"none"</span>,
+    before_model_callback=model_armor_ingress_screen,   <span class="hl-c"># Agent Gateway / Model Armor ingress</span>
+    after_model_callback=model_armor_egress_screen,     <span class="hl-c"># Agent Gateway / Model Armor egress</span>
+    output_schema=StatusAndResources,
+    instruction=(
+        f<span class="hl-s">"{POLICY_REVIEW_SKILL_MD}
+"</span>
+        <span class="hl-s">"Evaluate CaseFacts against the compiled RAG sections, read-only DB facts, and "</span>
+        <span class="hl-s">"auto-injected &lt;defined_terms&gt;. Copy verbatim_quote before setting status."</span>
+    ),
+)
+
+
+<span class="hl-k">def</span> <span class="hl-f">ingress_and_guard</span>(ctx: Context, facts: CaseFacts) -&gt; Event:
+    db_row = query_parameterized_readonly_db(facts.case_id, ctx.state[<span class="hl-s">"tenant_id"</span>])
+    rag_bundle = load_compiled_rag_and_defined_terms(facts)       <span class="hl-c"># date + tier + 1-hop links</span>
+    <span class="hl-k">if</span> rag_bundle[<span class="hl-s">"unresolved_references"</span>]:
+        <span class="hl-k">return</span> Event(route=<span class="hl-s">"HITL"</span>, output={<span class="hl-s">"reason"</span>: <span class="hl-s">"MISSING_REFERENCED_DOC"</span>})
+    ctx.state[<span class="hl-s">"rag_bundle"</span>] = rag_bundle
+    <span class="hl-k">return</span> Event(route=<span class="hl-s">"EVALUATE"</span>, output={<span class="hl-s">"facts"</span>: facts, <span class="hl-s">"db"</span>: db_row, <span class="hl-s">"rag"</span>: rag_bundle})
+
+
+<span class="hl-k">def</span> <span class="hl-f">verify_using_code</span>(ctx: Context, verdict: StatusAndResources) -&gt; Event:
+    sources = ctx.state[<span class="hl-s">"rag_bundle"</span>][<span class="hl-s">"source_texts"</span>]
+    <span class="hl-k">for</span> f <span class="hl-k">in</span> verdict.findings:
+        <span class="hl-k">if</span> <span class="hl-k">not</span> alphanumeric_span_exists(f.verbatim_quote, sources.get(f.resource_doc_id, <span class="hl-s">""</span>)):
+            <span class="hl-k">return</span> Event(route=<span class="hl-s">"HITL"</span>, output={<span class="hl-s">"reason"</span>: <span class="hl-s">"UNVERIFIED_QUOTE"</span>})
+        <span class="hl-k">if</span> f.clarity_score &lt; <span class="hl-n">0.75</span>:
+            <span class="hl-k">return</span> Event(route=<span class="hl-s">"HITL"</span>, output={<span class="hl-s">"reason"</span>: <span class="hl-s">"LOW_CLARITY"</span>})
+    merged = merge_by_authority_tier(verdict.findings)            <span class="hl-c"># Statute(1) &gt; SOW(2) &gt; MSA(3)</span>
+    <span class="hl-k">if</span> merged[<span class="hl-s">"has_same_tier_conflict"</span>]:
+        <span class="hl-k">return</span> Event(route=<span class="hl-s">"HITL"</span>, output=merged)
+    <span class="hl-k">return</span> Event(route=<span class="hl-s">"AUDIT_RECORD"</span>, output=merged)
+
+
+policy_workflow = Workflow(
+    name=<span class="hl-s">"hardened_single_agent_policy_engine"</span>,
+    edges=[
+        (<span class="hl-s">"START"</span>, ingress_and_guard),
+        (ingress_and_guard, {
+            <span class="hl-s">"EVALUATE"</span>: single_policy_agent,
+            <span class="hl-s">"HITL"</span>: escalate_to_hitl,
+        }),
+        (single_policy_agent, verify_using_code),
+        (verify_using_code, {
+            <span class="hl-s">"AUDIT_RECORD"</span>: write_audit_decision_record,
+            <span class="hl-s">"HITL"</span>: escalate_to_hitl,
+        }),
+    ],
+)</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== MASTER CHEAT SHEET ==================== -->
+  <section class="sheet" id="cheatsheet">
+    <div class="sheet-h">
+      <div>
+        <span class="sec-badge">Synthesis · Printable Reference</span>
+        <h2>Five-Question Architectural Cheat Sheet</h2>
+        <p>One-page summary connecting the failure mode, core engineering principle, model role, and deterministic boundary for each question.</p>
+      </div>
+    </div>
+    <div class="sheet-b">
+      <div class="nine-q-wrap">
+        <div class="nine-q-head">Table 7 · Master Comparison Across All Five System-Design Questions</div>
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Question</th>
+                <th>Primary Naive Failure Mode</th>
+                <th>Foundational Architectural Pattern</th>
+                <th>Scoped Model Responsibility</th>
+                <th>Deterministic Code / Human Boundary</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><b>Q1 · Earning Customer Trust</b></td>
+                <td>Treating "black box" as one problem or overpromising interpretable weights</td>
+                <td>Diagnose 8 concerns &amp; 6 fears → stay candid on weights → 7 system layers (A–G) + hybrid spectrum</td>
+                <td>Extract fields, draft with clickable citations, &amp; abstain when unsupported</td>
+                <td>Customer controls guardrails, pinned versions, SME eval gates, HITL sign-off, &amp; deterministic decision logic</td>
+              </tr>
+              <tr>
+                <td><b>Q2 · Open vs. Closed &amp; Spectrum</b></td>
+                <td>Paying frontier prices for easy turns or buying idle GPUs for spiky load</td>
+                <td>Constraint-first funnel (Residency/ZDR → Utilization TCO → Task Eval) + 2–3 tier router</td>
+                <td>Tier 1 SLMs triage/rerank; Tier 2 workhorses run 85%; Tier 3/4 handle sovereign or hard reasoning</td>
+                <td>Static step routing first; cap session tiers at 2–3 to protect KV prefix cache; track cost/solved task</td>
+              </tr>
+              <tr>
+                <td><b>Q3 · Retail Demand Forecasting</b></td>
+                <td>Training on stockout zeros; asking text LLMs to predict raw SKU numbers</td>
+                <td>Uncensor inventory zeros → LightGBM + TimesFM (<code>AI.FORECAST</code>) + Count ensemble → MinT quantiles</td>
+                <td>Upstream promo/photo feature extraction, planner copilot, &amp; bounded shock proposals</td>
+                <td>Numerical core computes <code>P10/P50/P90</code> lead-time quantiles; backtest gate drops noisy LLM features</td>
+              </tr>
+              <tr>
+                <td><b>Q4 · Modern RAG &amp; Pairings</b></td>
+                <td>500-token chunks sever table headers, miss SKU codes, &amp; leak stale docs</td>
+                <td>Structural parsing + Contextual Retrieval + ACL pre-filter + BM25/Dense RRF + Reranker + Hydration</td>
+                <td>Decompose compound queries, synthesize hydrated whole sections, &amp; cite verified spans</td>
+                <td>SQL owns counts/ledgers; graphs walk citations &amp; entity hops; metadata marks superseded docs</td>
+              </tr>
+              <tr>
+                <td><b>Q5 · Domain-Specific Agent</b></td>
+                <td>Generic chat agents miss domain Defined Terms, sever cross-references, &amp; guess across conflicts</td>
+                <td>1 domain-specific agent equipped with compiled RAG, <code>SKILL.md</code> + Glossary, MCP DB tool, &amp; code verifier</td>
+                <td>Single Domain Agent evaluates hydrated sections + <code>&lt;defined_terms&gt;</code> &amp; quotes governing text before status</td>
+                <td>Code injects glossary, enforces <code>Statute &gt; SOW &gt; MSA</code> precedence, logs audit record, &amp; escalates equal-tier conflicts</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== REFERENCES ==================== -->
+  <section class="sheet" id="references">
+    <div class="sheet-h">
+      <div>
+        <span class="sec-badge">Sources</span>
+        <h2>References</h2>
+        <p>Primary research papers, engineering benchmarks, and platform documentation cited across the five questions.</p>
+      </div>
+    </div>
+    <div class="sheet-b">
+      <div class="post-prose">
+        <ul>
+          <li>Turpin et al., <a href="https://arxiv.org/abs/2305.04388" target="_blank" rel="noopener">Language Models Don't Always Say What They Think: Unfaithful Explanations in Chain-of-Thought Prompting</a> (arXiv:2305.04388), May 7, 2023 (NeurIPS 2023). Empirical demonstration that generated Chain-of-Thought rationales can diverge from the internal factors driving model predictions.</li>
+          <li>Anthropic, <a href="https://www.anthropic.com/research/building-effective-agents" target="_blank" rel="noopener">Building Effective Agents</a>, December 19, 2024. Separating deterministic workflows from open-ended agents and keeping control flow explicit.</li>
+          <li>Google Cloud, <a href="https://docs.cloud.google.com/architecture/choose-design-pattern-agentic-ai-system" target="_blank" rel="noopener">Choose a Design Pattern for Your Agentic AI System</a>, last reviewed November 13, 2026. Selecting deterministic workflows vs. single-agent and multi-agent architectures based on latency, cost, and auditability.</li>
+          <li>Pete Hodgson, <a href="https://martinfowler.com/articles/feature-toggles.html" target="_blank" rel="noopener">Feature Toggles (aka Feature Flags)</a>, martinfowler.com, October 9, 2017. Operational kill switches and runtime circuit breakers for safe production degradation.</li>
+          <li>Google Cloud, <a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/resources/zero-data-retention" target="_blank" rel="noopener">Gemini Enterprise Agent Platform and Zero Data Retention</a>, 2026. Enterprise training restrictions, regional residency, CMEK, and explicit Zero Data Retention configuration controls.</li>
+          <li>Google DeepMind, <a href="https://ai.google.dev/gemma/docs/core" target="_blank" rel="noopener">Gemma Models Overview</a>, 2026, and DeepSeek-AI, <a href="https://arxiv.org/abs/2501.12948" target="_blank" rel="noopener">DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning</a> (arXiv:2501.12948), January 22, 2025. Open-weight dense, Mixture-of-Experts, and reasoning model architectures under permissive licenses.</li>
+          <li>Andreessen Horowitz (a16z), <a href="https://a16z.com/llmflation-llm-inference-cost/" target="_blank" rel="noopener">Welcome to LLMflation: LLM Inference Cost Is Going Down Fast</a>, November 12, 2024. Empirical ~10x/year inference price decline at constant benchmark capability and its capital-allocation implications.</li>
+          <li>Das et al. (Google Research), <a href="https://arxiv.org/abs/2310.10688" target="_blank" rel="noopener">A Decoder-Only Foundation Model for Time-Series Forecasting (TimesFM)</a> (arXiv:2310.10688), October 14, 2023 (ICML 2024), and Google Cloud, <a href="https://docs.cloud.google.com/bigquery/docs/reference/standard-sql/bigqueryml-syntax-ai-forecast" target="_blank" rel="noopener">BigQuery <code>AI.FORECAST</code> Syntax Reference</a>, 2026. Pretrained patch-decoder numerical forecasting and SQL-native quantile prediction intervals.</li>
+          <li>Tan et al., <a href="https://arxiv.org/abs/2406.16964" target="_blank" rel="noopener">Are Language Models Actually Useful for Time Series Forecasting?</a> (arXiv:2406.16964), June 22, 2024 (NeurIPS 2024). Ablation benchmarks showing text-LLM backbones add compute overhead without outperforming lightweight time-series architectures.</li>
+          <li>Liu et al., <a href="https://arxiv.org/abs/2307.03172" target="_blank" rel="noopener">Lost in the Middle: How Language Models Use Long Contexts</a> (arXiv:2307.03172), July 6, 2023 (TACL 2024). Positional attention degradation when relevant facts sit buried inside long prompts.</li>
+          <li>Anthropic, <a href="https://www.anthropic.com/research/contextual-retrieval" target="_blank" rel="noopener">Introducing Contextual Retrieval</a>, September 19, 2024. Combining chunk-level context prefaces across dense embeddings and lexical BM25 with reranking to cut retrieval failures by 67%.</li>
+          <li>Edge et al. (Microsoft Research), <a href="https://arxiv.org/abs/2404.16130" target="_blank" rel="noopener">From Local to Global: A Graph RAG Approach to Query-Focused Summarization</a> (arXiv:2404.16130), April 24, 2024. Graph-indexed entity and community structures complementing vector search for multi-hop questions.</li>
+          <li>Guha et al., <a href="https://arxiv.org/abs/2308.11462" target="_blank" rel="noopener">LegalBench: A Collaboratively Built Benchmark for Measuring Legal Reasoning in Large Language Models</a> (arXiv:2308.11462), August 20, 2023 (NeurIPS 2023). Issue-spotting, rule-recall, defined-term interpretation, and rhetorical conclusion benchmarks across legal workflows.</li>
+          <li><a href="ep01_securing_agent_to_database.html">Episode 01: Securing the Agent-to-Database Connection</a> and <a href="ep02_designing_agentic_systems.html">Episode 02: A Mental Model for Designing Agentic Systems</a>. Companion episodes covering zero-trust database access, Dual-LLM isolation, and progressive workflow design.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <div class="back-home"><a id="back-home-link" href="https://evekhm.github.io/all-about-agents/">← All About Agents · all episodes</a></div>
+</main>
+
+<script>
+document.getElementById("theme-toggle").addEventListener("click", function() {
+  const root = document.documentElement;
+  const current = root.getAttribute("data-theme") || "light";
+  const next = current === "light" ? "dark" : "light";
+  root.setAttribute("data-theme", next);
+  this.textContent = next === "light" ? "◑ Switch to Dark Mode" : "◐ Switch to Light Mode";
+});
+</script>
+</body>
+</html>
