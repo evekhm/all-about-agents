@@ -883,7 +883,7 @@
       <div>
         <span class="sec-badge">Episode 03 · System Design Interview Foundations</span>
         <h1>Five Foundational Questions in AI System Design</h1>
-        <p>Core questions companies test in AI system-design interviews: opening the language-model black box, choosing across the full model spectrum, scoping numerical forecasting, combining modern RAG with structured stores, and building a lean domain-specific agent with specialized capabilities and domain language.</p>
+        <p>Core questions companies test in AI system-design interviews: opening the language-model black box, choosing across the full model spectrum, scoping numerical forecasting, combining modern RAG with structured stores, and building a lean domain-specific agent.</p>
       </div>
     </div>
     <div class="sheet-b">
@@ -966,12 +966,12 @@
                 <tr>
                   <td><b>"We don't know why it gave that answer."</b></td>
                   <td><b>Explainability</b></td>
-                  <td>Traceable source passages and structured criteria behind every claim</td>
+                  <td>Traceable source passages, structured criteria behind every claim, and faithful-by-construction reasoning (the model writes a checklist or program that code executes)</td>
                 </tr>
                 <tr>
                   <td><b>"It answers differently every time."</b></td>
                   <td><b>Predictability</b></td>
-                  <td>Low-variance decoding, fixed schemas, and measured <code>pass^k</code> consistency</td>
+                  <td>Low-variance decoding, fixed schemas, and measured <code>pass^k</code> consistency (each test case is run <code>k</code> times and counts as passed only when all <code>k</code> runs succeed)</td>
                 </tr>
                 <tr>
                   <td><b>"We don't know what data it was trained on."</b></td>
@@ -991,7 +991,7 @@
                 <tr>
                   <td><b>"We can't tell when it is wrong."</b></td>
                   <td><b>Reliability</b></td>
-                  <td>Groundedness checks, calibrated abstention, and known failure rates</td>
+                  <td>Groundedness checks, calibrated abstention (the system declines to answer when its confidence falls below a threshold tuned on the evaluation set), and known failure rates</td>
                 </tr>
                 <tr>
                   <td><b>"We can't audit a past decision."</b></td>
@@ -1027,11 +1027,18 @@
 
         <h3>2. Why the Model Core Remains Opaque</h3>
         <p>
-          Inside the model itself, there is real opacity that should be stated plainly up front:
+          Opacity is an inherent property of every large language model, independent of vendor, size, or training method:
         </p>
         <ul>
-          <li><strong>Distributed Weights and Probabilistic Sampling:</strong> Knowledge and pattern matching sit spread across billions of continuous parameters with zero human-readable <code>if-then</code> rules inside the weights, while next-token probability sampling introduces surface phrasing variation.</li>
-          <li><strong>Limits of Interpretability and Chain-of-Thought:</strong> Mechanistic interpretability is an active research area, yet it cannot explain individual production business decisions today. Similarly, generated Chain-of-Thought text helps task accuracy while remaining an unverified proxy for the internal factors driving an output (<a href="https://arxiv.org/abs/2305.04388" target="_blank" rel="noopener">Turpin et al., NeurIPS 2023</a>).</li>
+          <li><strong>Distributed Weights and Probabilistic Sampling:</strong> Knowledge and pattern matching are distributed across billions of continuous parameters with no human-readable <code>if-then</code> rules inside the weights. Each next token is sampled from a probability distribution, so the same prompt can produce differently worded answers.</li>
+          <li><strong>Three Ways to See the Reasoning Path, Each with a Different Guarantee:</strong> A model can share how it reached an answer in three ways.
+            <ul>
+              <li><strong>Thinking traces.</strong> Reasoning models return thought summaries (Gemini API, <a href="https://ai.google.dev/gemini-api/docs/thinking" target="_blank" rel="noopener">Google, 2026</a>) or raw thinking tokens (open-weight reasoning models such as DeepSeek-R1). The traces are useful for debugging and monitoring (<a href="https://arxiv.org/abs/2507.11473" target="_blank" rel="noopener">Korbak et al., Jul 2025</a>), yet they often leave out what actually drove the answer: when a planted hint changed the answer, reasoning models disclosed it in a minority of cases (<a href="https://arxiv.org/abs/2505.05410" target="_blank" rel="noopener">Chen et al., May 2025</a>; <a href="https://arxiv.org/abs/2305.04388" target="_blank" rel="noopener">Turpin et al., NeurIPS 2023</a>). Log them as supporting evidence, and base the justification of a decision on checks that code can verify.</li>
+              <li><strong>Reasoning that is faithful by construction.</strong> The model translates the case into a symbolic program or checklist and deterministic code executes it, so the written reasoning is the computation that produced the answer (<a href="https://arxiv.org/abs/2301.13379" target="_blank" rel="noopener">Lyu et al., Jan 2023</a>). This is the basis of the hybrid option in <em>Table 1B</em> and of the quote and precedence checks in Question 05.</li>
+              <li><strong>Circuit tracing.</strong> Attribution graphs and sparse autoencoders trace parts of the internal path behind an individual answer on open-weight models (<a href="https://transformer-circuits.pub/2025/attribution-graphs/biology.html" target="_blank" rel="noopener">Lindsey et al., Mar 2025</a>), with public tooling in the <a href="https://www.anthropic.com/research/open-source-circuit-tracing" target="_blank" rel="noopener">circuit-tracing library</a> and <a href="https://deepmind.google/blog/gemma-scope-2-helping-the-ai-safety-community-deepen-understanding-of-complex-language-model-behavior/" target="_blank" rel="noopener">Gemma Scope 2</a>. They capture a fraction of the computation and serve audits and investigations today, at research cost.</li>
+            </ul>
+          </li>
+          <li><strong>Tokens vs. Latent Space:</strong> Raw thinking tokens are sampled text that the model feeds back to itself, and thought summaries are a condensed rewrite of that text. The computation that produces each token happens in latent activations that are never written down, which is where a trace and the true cause of an answer can diverge. On hard multi-step tasks a transformer has to carry intermediate state through the written trace as working memory (<a href="https://arxiv.org/abs/2507.11473" target="_blank" rel="noopener">Korbak et al., Jul 2025</a>), which makes traces worth monitoring. Research models that reason directly in continuous latent space (<a href="https://arxiv.org/abs/2412.06769" target="_blank" rel="noopener">Hao et al., Dec 2024</a>) give up that visibility in exchange for efficiency, so system-level checks that are faithful by construction grow more important over time.</li>
           <li><strong>The New-Employee Analogy:</strong> Hiring a capable human analyst carries the same internal opacity: nobody inspects an employee's neurons. Organizations build trust through background checks, clear instructions, reference materials, checking their work on high-risk decisions, performance evaluations, and an audit trail.</li>
         </ul>
         <p>
@@ -1065,9 +1072,10 @@
 
     <!-- Step 1 Top Bar: Diagnose Stakeholder Meaning & Underlying Fear -->
     <rect class="b-store" x="32" y="56" width="856" height="78" rx="9"/>
-    <text class="t-m-c" x="50" y="78" style="fill:var(--amber)">1 · DIAGNOSE FIRST: CLARIFY WHICH "BLACK BOX" CONCERN &amp; BUSINESS RISK APPLIES</text>
-    <text class="t-b" x="50" y="101">Technical: Explainability · Predictability · Training Data · Weights · Privacy · Reliability · Audit · Drift · Metrics</text>
-    <text class="t-s" x="50" y="122">Underlying Risks: Liability · Regulators (EU AI Act / SR 11-7 / HIPAA) · Data Leak · Reputation · Lock-In · Champion Risk</text>
+    <text class="t-m-c" x="50" y="75" style="fill:var(--amber)">1 · DIAGNOSE FIRST: CLARIFY WHICH "BLACK BOX" CONCERN &amp; BUSINESS RISK APPLIES</text>
+    <text class="t-s" x="50" y="94" style="font-weight:600;fill:var(--ink)">Concerns: Explainability · Predictability · Training-Data Provenance · Model Weights · Data Governance ·</text>
+    <text class="t-s" x="50" y="111" style="font-weight:600;fill:var(--ink)">Reliability · Accountability · Version Stability · Quality</text>
+    <text class="t-s" x="50" y="128">Underlying Risks: Liability · Regulators (EU AI Act / SR 11-7 / HIPAA) · Data Leak · Reputation · Lock-In · Champion Risk</text>
 
     <line x1="460" y1="134" x2="460" y2="154" class="flow-g" marker-end="url(#arr-good)"/>
 
@@ -1108,7 +1116,7 @@
     <text class="t-m-v" x="460" y="325" text-anchor="middle">CANDID OPAQUE MODEL CORE</text>
     <text class="t-b" x="460" y="348" text-anchor="middle">Billions of Continuous Weights</text>
     <text class="t-s" x="460" y="369" text-anchor="middle">Distributed representations;</text>
-    <text class="t-s" x="460" y="388" text-anchor="middle">CoT is helpful text, unverified cause</text>
+    <text class="t-s" x="460" y="388" text-anchor="middle">Thought summaries: monitor and verify</text>
 
     <line x1="594" y1="352" x2="612" y2="352" class="flow-g" marker-end="url(#arr-good)"/>
 
@@ -1131,11 +1139,11 @@
 
     <!-- Bottom Spectrum Bar -->
     <rect class="node-card" x="32" y="536" width="856" height="72" rx="9"/>
-    <text class="t-m-c" x="50" y="558">3 · SPECTRUM OF ALTERNATIVES (HIGHER STRUCTURAL TRANSPARENCY ↔ HIGHER LANGUAGE FLEXIBILITY)</text>
-    <text class="t-b" x="50" y="582">Rules  →  Tabular ML + SHAP  →  Hybrid (LLM Extracts, Code Decides)  →  Pinned Weights  →  Constrained  →  Search</text>
+    <text class="t-m-c" x="50" y="558">3 · SIX ALTERNATIVES (TRADING STRUCTURAL TRANSPARENCY AGAINST LANGUAGE FLEXIBILITY)</text>
+    <text class="t-b" x="50" y="582">Rules  ·  Tabular ML + SHAP  ·  Hybrid (LLM Extracts, Code Decides)  ·  Pinned Weights  ·  Constrained  ·  Search</text>
   </svg>
   <div class="fig-caption">
-    <span>Figure 1 — Addressing the "black box" objection: diagnose which of the nine concerns and six business risks applies, stay candid about weight opacity, wrap the model in seven transparent system layers (A–G), and place high-stakes decisions at the right point on the hybrid spectrum.</span>
+    <span>Figure 1 — Addressing the "black box" objection: diagnose which of the nine concerns and six business risks applies, stay candid about weight opacity, wrap the model in seven transparent system layers (A–G), and pick the right one of six alternatives for high-stakes decisions.</span>
     <div class="legend-items">
       <span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> Opaque weight core</span>
       <span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good)"></i> Verification &amp; rollout gates</span>
@@ -1153,21 +1161,21 @@
         </p>
         <ol>
           <li><strong>A · Ground Outputs in Evidence (Explainability):</strong> Pair retrieval with clickable inline citations linked to the customer's own documents, return structured JSON (<code>verbatim_quote</code>, <code>sources</code>, <code>assumptions</code>, <code>answer</code>), verify in server code that cited passages genuinely support the claim, and return an explicit <em>"not found in your documents"</em> response whenever evidence is absent.</li>
-          <li><strong>B · Measure It Openly with Customer Experts (Evaluation):</strong> Co-create a golden dataset of 100 to 300 real historical cases alongside the customer's domain specialists, track accuracy, groundedness, hallucination rate, refusal rate, latency, and cost on every prompt, retrieval, or model change like regression tests, and share the failure breakdown openly (<em>"94% pass rate on your test set, with these 6% boundary categories routed to review"</em>).</li>
-          <li><strong>C · Observe Every Step (Auditability):</strong> Log every interaction (input, retrieved chunks, prompt version, pinned model version, output, and reviewer feedback), record step-by-step traces across every tool call so any decision can be reconstructed months later, and expose live drift and quality dashboards to operators.</li>
-          <li><strong>D · Enforce Deterministic Guardrails and Version Pinning (Control &amp; Stability):</strong> Screen inputs and outputs for PII, toxicity, off-topic asks, and prompt injection; enforce permissions, dollar caps, and business rules in application code (<a href="https://www.anthropic.com/research/building-effective-agents" target="_blank" rel="noopener">Anthropic, Dec 2024</a>); isolate API <code>HTTP 429</code>/timeout faults into retry queues; lower temperature with fixed schemas where repeatability matters; and <strong>pin exact model versions</strong> so upgrades occur strictly when the customer's eval suite passes.</li>
+          <li><strong>B · Measure It Openly with Customer Experts (Evaluation):</strong> Co-create a golden dataset of 100 to 300 real historical cases alongside the customer's domain specialists, track accuracy, groundedness, hallucination rate, refusal rate, latency, and cost and rerun them like regression tests on every prompt, retrieval, or model change, and share the failure breakdown openly (<em>"94% pass rate on your test set; the remaining 6% fall into these boundary categories, which route to review"</em>).</li>
+          <li><strong>C · Observe Every Step (Auditability):</strong> Log every interaction (input, retrieved chunks, prompt version, pinned model version, thought summaries as supporting evidence, output, and reviewer feedback), record step-by-step traces across every tool call so any decision can be reconstructed months later, and expose live drift and quality dashboards to operators.</li>
+          <li><strong>D · Enforce Deterministic Guardrails and Version Pinning (Control &amp; Stability):</strong> Screen inputs and outputs for PII, toxicity, off-topic asks, and prompt injection; enforce permissions, dollar caps, and business rules in application code (<a href="https://www.anthropic.com/research/building-effective-agents" target="_blank" rel="noopener">Anthropic, Dec 2024</a>); isolate API <code>HTTP 429</code>/timeout faults into retry queues; lower temperature with fixed schemas where repeatability matters; leave the model's reasoning trace free of training or prompt penalties so it stays useful for monitoring (<a href="https://arxiv.org/abs/2503.11926" target="_blank" rel="noopener">Baker et al., Mar 2025</a>); and <strong>pin exact model versions</strong> so upgrades occur strictly when the customer's eval suite passes.</li>
           <li><strong>E · Keep Accountable Humans in the Loop (Accountability):</strong> Match autonomy to error cost by automating low-risk tasks while routing uncertain or high-impact cases via confidence thresholds and dry-run previews to named human reviewers with clear sign-off ownership (<code>RACI</code>).</li>
           <li><strong>F · Document Model and Data Provenance (Governance):</strong> Provide model cards (intended scope, limitations, benchmark results), compliance certifications (<code>SOC 2</code>, <code>ISO 27001 / 42001</code>, <code>HIPAA BAA</code>), and enforceable cloud data guarantees: contractual zero-training on customer data, regional residency, VPC perimeters, customer-managed encryption keys (<code>CMEK</code>), and explicit retention bounds.</li>
           <li><strong>G · Roll Out Gradually (Earned Trust):</strong> Start on a low-risk, high-visibility wedge and earn promotion across stages: <code>Scoped Pilot → Shadow Mode</code> (running silently beside humans to compare outcomes) <code>→ Assisted Copilot → Partial Scoped Automation</code>, backed by an instant operational kill switch (<a href="https://martinfowler.com/articles/feature-toggles.html" target="_blank" rel="noopener">Hodgson, Oct 2017</a>).</li>
         </ol>
 
-        <h3>4. Scoping Questions and the Spectrum of Alternatives</h3>
+        <h3>4. Scoping Questions and the Six Alternatives</h3>
         <p>
-          How far we go on those controls depends on seven practical questions we align on with the customer: (1) what exact decision the system makes and what an error costs; (2) <em>who</em> needs the explanation (end users need citations, operators need dashboards, auditors need logs and lineage, regulators need formal documentation); (3) which regulations apply; (4) where data lives and who can access it; (5) what measurable bar defines "good" before building; (6) how fast a bad output is detected and fixed; and (7) how model updates roll out. Depending on those answers, we place each step along a six-option spectrum trading open-ended language flexibility against structural transparency (<em>Table 1B</em>):
+          How far we go on those controls depends on seven practical questions we align on with the customer: (1) what exact decision the system makes and what an error costs; (2) <em>who</em> needs the explanation (end users need citations, operators need dashboards, auditors need logs and lineage, regulators need formal documentation); (3) which regulations apply; (4) where data lives and who can access it; (5) what measurable bar defines "good" before building; (6) how fast a bad output is detected and fixed; and (7) how model updates roll out. Depending on those answers, we choose for each step among six options that trade open-ended language flexibility against structural transparency (<em>Table 1B</em>):
         </p>
 
         <div class="nine-q-wrap">
-          <div class="nine-q-head">Table 1B · The Six-Option Transparency vs. Flexibility Spectrum</div>
+          <div class="nine-q-head">Table 1B · Six Options Trading Transparency Against Flexibility</div>
           <div class="tbl-wrap">
             <table>
               <thead>
@@ -1222,7 +1230,7 @@
           <span><b>Takeaway:</b> Diagnose which of the nine "black box" concerns applies, be candid that model weights stay opaque, wrap the model in seven transparent system layers (grounding, co-owned evals, audit traces, code guardrails + version pinning, risk-matched HITL, provenance, and phased shadow-to-auto rollout), and use hybrid designs where deterministic logic makes high-stakes calls.</span>
         </div>
         <p>
-          Option 4 on that spectrum (pinned open-weight models) and Option 2 (classical tabular ML) point straight to the next question interviewers ask: when to choose open-weight models versus proprietary APIs or classical machine learning across the full model spectrum.
+          Option 4 in that table (pinned open-weight models) and Option 2 (classical tabular ML) point straight to the next question interviewers ask: when to choose open-weight models versus proprietary APIs or classical machine learning across the full model spectrum.
         </p>
       </div>
     </div>
@@ -1240,7 +1248,7 @@
     <div class="sheet-b">
       <div class="post-prose">
         <p>
-          Teams often treat model choice as a binary debate between "open source" and "closed APIs," or pick one flagship frontier model from a public leaderboard and route every request through it. Public leaderboards measure generic chat distributions, whereas production decisions depend on the customer's specific extraction or compliance workload. Sending high-volume routine tasks to a heavy reasoning model inflates latency and token spend by an order of magnitude. Conversely, spinning up dedicated GPU clusters for an open-weight model to "save money or protect privacy" frequently costs <em>more</em> than a managed enterprise API once idle nighttime GPU hours and engineering maintenance are counted.
+          Teams often treat model choice as a binary debate between "open source" and "closed APIs," or pick one flagship frontier model from a public leaderboard and route every request through it. Public leaderboards measure generic chat distributions, whereas production decisions depend on the customer's specific extraction or compliance workload. Sending high-volume routine tasks to a heavy reasoning model inflates latency and token spend several times over. Conversely, spinning up dedicated GPU clusters for an open-weight model to "save money or protect privacy" frequently costs <em>more</em> than a managed enterprise API once idle nighttime GPU hours and engineering maintenance are counted.
         </p>
 
         <h3>1. What Actually Separates Open-Weight, Open-Source, and Proprietary Models</h3>
@@ -1261,7 +1269,7 @@
           Stakeholders frequently conflate consumer chat web apps with enterprise cloud model APIs and assume self-hosting open weights is the only way to keep proprietary data private.
         </p>
         <p>
-          On enterprise cloud platforms (such as Google Cloud's Agent Platform), contractual terms prohibit using customer prompts, responses, or fine-tuning weights to train foundation models (<a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/resources/zero-data-retention" target="_blank" rel="noopener">Google Cloud, 2026</a>). Traffic stays inside Private Service Connect and VPC Service Controls perimeters, regional endpoints enforce geographic data residency, customer-managed encryption keys (CMEK) control storage and tuned adapters, and configuring Zero Data Retention (disabling abuse-monitoring prompt logs, request-response logging, consumer web-search grounding, and stateful disk persistence) eliminates prompt retention at rest. Self-hosted open weights become mandatory for governance in three specific situations: physically air-gapped sovereign or defense networks, regulatory audits requiring immutable frozen weights with zero vendor version rotation, and countries lacking a local managed cloud region.
+          On enterprise cloud platforms (such as Google Cloud's Agent Platform), contractual terms prohibit using customer prompts, responses, tuning data, or tuned weights to train foundation models (<a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/resources/zero-data-retention" target="_blank" rel="noopener">Google Cloud, 2026</a>). Traffic stays inside Private Service Connect and VPC Service Controls perimeters, regional endpoints enforce geographic data residency, customer-managed encryption keys (CMEK) control storage and tuned adapters, and configuring Zero Data Retention (disabling abuse-monitoring prompt logs, request-response logging, consumer web-search grounding, and stateful disk persistence) eliminates prompt retention at rest. Self-hosted open weights become mandatory for governance in three specific situations: physically air-gapped sovereign or defense networks, regulatory audits requiring immutable frozen weights with zero vendor version rotation, and countries lacking a local managed cloud region.
         </p>
 
         <h3>3. Serving Physics and Total Cost of Ownership (Why Utilization Decides Economics)</h3>
@@ -1275,7 +1283,7 @@
           <div class="code-title">GPU Memory &amp; Latency Physics for Self-Hosted Open Weights</div>
 <pre><span class="hl-c"># 1. Total VRAM must hold weights + live KV cache + runtime (~2 GB)</span>
 Weight_Bytes      = Parameters * Bytes_Per_Param          <span class="hl-c"># e.g., 12B at 8-bit = ~12 GB</span>
-KV_Bytes_Per_Tok  = <span class="hl-n">2</span> * Bytes_Per_Value * n_layers * n_kv_heads * d_head  <span class="hl-c"># GQA/MLA shrinks n_kv_heads</span>
+KV_Bytes_Per_Tok  = <span class="hl-n">2</span> * Bytes_Per_Value * n_layers * n_kv_heads * d_head  <span class="hl-c"># GQA shrinks n_kv_heads; MLA compresses KV into a latent</span>
 
 <span class="hl-c"># Worked check on 1x NVIDIA L4 (24 GB VRAM, ~300 GB/s bandwidth):</span>
 <span class="hl-c"># 24 GB - 12 GB (weights) - 2 GB (runtime) = ~10 GB left for KV cache</span>
@@ -1283,7 +1291,7 @@ KV_Bytes_Per_Tok  = <span class="hl-n">2</span> * Bytes_Per_Value * n_layers * n
 
 <span class="hl-c"># 2. Prefill (Time to First Token) is compute-bound; Decode (per output token) is bandwidth-bound</span>
 TTFT_seconds      ≈ (<span class="hl-n">2</span> * Active_Params * Prompt_Tokens) / (GPU_TFLOPS * MFU)
-TPOT_seconds      ≈ Active_Weight_Bytes_Read / Memory_Bandwidth   <span class="hl-c"># Output tokens cost ~4x–8x input!</span></pre>
+TPOT_seconds      ≈ Active_Weight_Bytes_Read / Memory_Bandwidth   <span class="hl-c"># why APIs price output ~4–8x input</span></pre>
         </div>
         <p>
           Sparse Mixture-of-Experts (MoE) open models (such as a <code>26B</code> total / <code>4B</code> active parameter architecture) require VRAM for all <code>26B</code> parameters while reading only <code>~4B</code> active weights per generated token, giving small-model decode speed once fitted into GPU memory. Even with fast engines like <code>vLLM</code> (PagedAttention, continuous batching, prefix caching) and KV-cache-aware load balancers, dedicated GPUs bill <strong>24 hours a day</strong>. Enterprise internal workflows typically send <code>70%–80%</code> of daily traffic during daytime business hours and sit nearly idle overnight and on weekends. Meanwhile, constant-capability managed token prices have fallen roughly <code>10x</code> per year (<a href="https://a16z.com/llmflation-llm-inference-cost/" target="_blank" rel="noopener">a16z LLMflation, Nov 2024</a>). Consequently, before provisioning GPUs, teams pull managed FinOps levers first: model routing, prefix context caching (up to <code>90%</code> off cached input), batch APIs (<code>50%</code> off), per-step thinking budgets, and Provisioned Throughput for the steady baseline floor. Dedicated open-weight GPUs win economically when <strong>sustained 24/7 GPU utilization exceeds ~50%–65%</strong> (or when a compact <code>2B–12B</code> model runs on scale-to-zero serverless GPUs).
@@ -1351,7 +1359,7 @@ TPOT_seconds      ≈ Active_Weight_Bytes_Read / Memory_Bandwidth   <span class=
     <text class="t-m-g" x="50" y="312">TIER 0 · DETERMINISTIC &amp; TABULAR</text>
     <text class="t-b" x="50" y="335">Classical ML &amp; Solvers</text>
     <text class="t-s" x="50" y="357">LightGBM, XGBoost, TimesFM,</text>
-    <text class="t-s" x="50" y="376">OR-Tools, dense/BM25 encoders</text>
+    <text class="t-s" x="50" y="376">OR-Tools, BM25 / bi-encoders</text>
     <text class="t-s" x="50" y="400" style="font-weight:600;fill:var(--ink)">&lt; 15 ms · Forecasting &amp; optimization</text>
 
     <rect class="b-model" x="324" y="288" width="272" height="140" rx="9"/>
@@ -1505,7 +1513,7 @@ TPOT_seconds      ≈ Active_Weight_Bytes_Read / Memory_Bandwidth   <span class=
         </div>
 
         <p>
-          Two practical rules keep hybrid routing honest in production. First, optimize <strong>cost per resolved task</strong> alongside per-token price: on multi-step tool loops, a model that costs one-third as much per token while taking four times as many retry turns and failing more often raises total cost. Second, keep each multi-turn session within <strong>two to three model tiers</strong>; bouncing a conversation across four or five different model endpoints invalidates every provider's KV prefix cache and multiplies prefill token spend.
+          Two practical rules keep hybrid routing honest in production. First, optimize <strong>cost per resolved task</strong> alongside per-token price: on multi-step tool loops, a model that costs one-third as much per token while taking four times as many retry turns and failing more often raises total cost. Second, keep each multi-turn session within <strong>two to three model tiers</strong>; bouncing a conversation across four or five different model endpoints forfeits prefix-cache hits at every provider and multiplies prefill token spend.
         </p>
 
         <div class="closes">
@@ -1530,7 +1538,7 @@ TPOT_seconds      ≈ Active_Weight_Bytes_Read / Memory_Bandwidth   <span class=
     <div class="sheet-b">
       <div class="post-prose">
         <p>
-          Retail demand forecasting predicts future unit demand across a massive three-dimensional panel (<code>Store × SKU × Day</code> or Week) spanning tens of thousands of products across hundreds or thousands of locations. Every downstream physical decision depends on those numbers: automated vendor purchase orders, distribution-center pallet allocation, store labor scheduling, and perishable markdowns. Understanding four domain mechanics explains immediately why specialized tabular and time-series models own the numerical core.
+          Retail demand forecasting predicts future unit demand across a massive three-dimensional panel (<code>Store × SKU × Day</code> or Week) spanning tens of thousands of products across hundreds or thousands of locations. Every downstream physical decision depends on those numbers: automated vendor purchase orders, distribution-center pallet allocation, store labor scheduling, and perishable markdowns. Four domain mechanics explain why specialized tabular and time-series models own the numerical core.
         </p>
 
         <h3>1. The Four Mechanics That Define Retail Demand</h3>
@@ -1539,7 +1547,7 @@ TPOT_seconds      ≈ Active_Weight_Bytes_Read / Memory_Bandwidth   <span class=
             <strong>Stockout Censoring (Observed Sales vs. True Demand):</strong> Point-of-sale (POS) systems record <em>units sold</em>, which equals true customer demand only while inventory sits on the shelf. If a store stocks 12 cartons of strawberries on Saturday morning, sells out by 11:00 a.m., and turns away 25 shoppers in the afternoon, POS logs record <code>sales = 12</code> on Saturday and <code>sales = 0</code> on Sunday, since the next delivery arrives on Monday. Feeding raw POS zeros directly into any forecasting model creates a <strong>replenishment death spiral</strong>: the model mistakes out-of-stock zeros for zero shopper interest, lowers next week's forecast, orders even fewer units, and triggers earlier stockouts. Production pipelines always join daily <code>inventory_on_hand</code> snapshots first, mask stockout periods (<code>inventory == 0</code>) as right-censored observations, and impute unconstrained latent demand before model fitting.
           </li>
           <li>
-            <strong>Three Distinct SKU Regimes (Dense, Cold-Start, and Intermittent Tail):</strong> High-velocity staples (milk, bananas, cola) generate smooth daily curves driven by price elasticity, promotions, holidays, payday cycles, and sibling-SKU cannibalization (putting 12-packs on 30% promo depresses 6-pack sales next to it). Newly launched seasonal apparel or electronics arrive with zero historical sales (cold start). Meanwhile, 50% to 70% of a typical catalog sits in the slow-moving intermittent tail (auto parts, specialty cookware, fringe sizes), where most days record legitimate zero sales punctuated by occasional 1-to-3-unit purchases.
+            <strong>Three Distinct SKU Regimes (Dense, Cold-Start, and Intermittent Tail):</strong> High-velocity staples (milk, bananas, cola) generate smooth daily curves driven by price elasticity, promotions, holidays, payday cycles, and sibling-SKU cannibalization (putting 12-packs on 30% promo depresses sales of the 6-packs next to them). Newly launched seasonal apparel or electronics arrive with zero historical sales (cold start). Meanwhile, 50% to 70% of a typical catalog sits in the slow-moving intermittent tail (auto parts, specialty cookware, fringe sizes), where most days record legitimate zero sales punctuated by occasional 1-to-3-unit purchases.
           </li>
           <li>
             <strong>Asymmetric Replenishment Economics and Quantile Forecasts (<code>P10 / P50 / P90</code>):</strong> Ordering strictly to a median point forecast (<code>P50</code>) leaves stores out of stock on roughly half of supplier lead-time cycles. Retail replenishment solves an asymmetric Newsvendor trade-off using probabilistic quantiles trained with <strong>pinball loss</strong>: fresh cut fruit with high 48-hour spoilage cost is ordered near <code>P55–P60</code>, whereas high-margin shelf-stable batteries with high lost-sale cost and negligible holding cost are ordered at <code>P85–P95</code>. One critical mathematical rule governs lead times: daily <code>P90</code> predictions are per-day marginals, so summing seven daily <code>P90</code> values assumes perfect error correlation across all seven days and inflates safety stock; production pipelines forecast directly over the supplier lead-time window (such as 7-day cumulative demand) or simulate joint trajectories.
@@ -1689,7 +1697,7 @@ TPOT_seconds      ≈ Active_Weight_Bytes_Read / Memory_Bandwidth   <span class=
     <line x1="640" y1="350" x2="854" y2="350" style="stroke:var(--line);stroke-width:1.2"/>
     <text class="t-m-g" x="747" y="372" text-anchor="middle">ORDER OPTIMIZER</text>
     <text class="t-s" x="747" y="393" text-anchor="middle">Perishables ~P55 vs.</text>
-    <text class="t-s" x="747" y="412" text-anchor="middle">high-margin staples ~P90</text>
+    <text class="t-s" x="747" y="412" text-anchor="middle">shelf-stable goods ~P90</text>
 
     <!-- Arrow down to Planner Copilot Sidecar -->
     <line x1="741" y1="428" x2="741" y2="462" class="flow" marker-end="url(#arr-cyan)" style="stroke:var(--cyan)"/>
@@ -1726,8 +1734,8 @@ TPOT_seconds      ≈ Active_Weight_Bytes_Read / Memory_Bandwidth   <span class=
         </p>
         <ul>
           <li><strong>Sidecar A · Upstream Exogenous Feature &amp; Cold-Start Analog Extraction:</strong> Parse unstructured vendor delay notices, regional promo calendars, and multimodal product images + fabric descriptions into typed tabular columns (<code>promo_mechanic = "BOGO"</code>, <code>supplier_lead_time_delta_days = +5</code>) or nearest-neighbor historical SKU analogs for Day-0 launches. Admit an LLM-extracted covariate into production only if historical walk-forward backtesting proves it reduces out-of-sample WAPE by a meaningful margin (for instance, <code>&gt;= 3%</code>) and passes a timestamp-shuffle check against spurious correlation.</li>
-          <li><strong>Sidecar B · Auditable Shock-Adjustment Proposals for Unprecedented Events:</strong> When a one-off event occurs outside historical training data (a temporary store remodel closure, port strike, or sudden tariff change), the model drafts a human-reviewed proposal card specifying bounded post-processing operators on the numerical quantile curve (such as <code>OVERWRITE = 0</code> during closure dates or a bounded <code>RESCALE</code> multiplier) with linked source evidence.</li>
-          <li><strong>Sidecar C · Merchandiser Explainability &amp; What-If Copilot:</strong> Translates a planner's natural-language question (<em>"Why is the Northeast cold-brew forecast up 28% next week, and what if we shift the 20% promo by seven days?"</em>) into parameterized calls against SHAP feature attributions and the GBDT/TimesFM forecasting service, returning grounded explanations and exception summaries.</li>
+          <li><strong>Sidecar B · Auditable Shock-Adjustment Proposals for Unprecedented Events:</strong> When a one-off event occurs outside historical training data (a temporary store remodel closure, port strike, or sudden tariff change), have the model draft a human-reviewed proposal card specifying bounded post-processing operators on the numerical quantile curve (such as <code>OVERWRITE = 0</code> during closure dates or a bounded <code>RESCALE</code> multiplier) with linked source evidence.</li>
+          <li><strong>Sidecar C · Merchandiser Explainability &amp; What-If Copilot:</strong> Translate a planner's natural-language question (<em>"Why is the Northeast cold-brew forecast up 28% next week, and what if we shift the 20% promo by seven days?"</em>) into parameterized calls against SHAP feature attributions and the GBDT/TimesFM forecasting service, and return grounded explanations and exception summaries.</li>
         </ul>
 
         <div class="nine-q-wrap">
@@ -1745,7 +1753,7 @@ TPOT_seconds      ≈ Active_Weight_Bytes_Read / Memory_Bandwidth   <span class=
                 <tr>
                   <td><b>"Can an LLM replace our demand forecasting pipeline?"</b></td>
                   <td>High token bills, broken seasonality, uncalibrated safety stock, and immediate pushback from customer data scientists</td>
-                  <td>"Tabular GBDTs and pretrained time-series foundation models (<code>TimesFM</code>) own the numerical quantiles at 1/100th the cost; language models extract unstructured promo/supply signals and power the planner copilot."</td>
+                  <td>"Tabular GBDTs and pretrained time-series foundation models (<code>TimesFM</code>) own the numerical quantiles at a small fraction of the cost; language models extract unstructured promo/supply signals and power the planner copilot."</td>
                 </tr>
                 <tr>
                   <td><b>"Can AI predict brand-new seasonal fashion launches?"</b></td>
@@ -1799,7 +1807,7 @@ TPOT_seconds      ≈ Active_Weight_Bytes_Read / Memory_Bandwidth   <span class=
             <strong>Contextual Retrieval Prefaces (Fixes Anonymous Chunks):</strong> A chunk reading <em>"Quarterly revenue grew 3%, while service fees rose 4% in Region B"</em> lacks the company name, contract title, and fiscal year. Prepending a compact 50-to-100-token document-and-section context summary to each chunk prior to both dense embedding and lexical indexing reduced retrieval failure rates by <code>49%</code> on its own and by <code>67%</code> when combined with reranking (<a href="https://www.anthropic.com/research/contextual-retrieval" target="_blank" rel="noopener">Anthropic, Sep 2024</a>).
           </li>
           <li>
-            <strong>Inline Pre-Filtering + Hybrid Lexical BM25 + Dense Vector + RRF (Fixes Exact-Code Blindness and Recall Collapse):</strong> Dense embeddings capture semantic synonyms well while blurring exact SKU numbers, error codes, statute identifiers (<code>10021</code> vs. <code>10022</code>), and dosages. In parallel, filtering tenant ACLs <em>after</em> approximate nearest-neighbor graph search collapses recall when a user is allowed to see only 2% of the corpus. Modern stores enforce caller ACL principals and active date filters inline during index scan, execute sparse lexical BM25 alongside dense vector search, and merge the top 30 to 50 candidates via Reciprocal Rank Fusion (RRF).
+            <strong>Inline Pre-Filtering + Hybrid Lexical BM25 + Dense Vector + RRF (Fixes Exact-Code Blindness and Recall Collapse):</strong> Dense embeddings capture semantic synonyms well while blurring exact SKU numbers, error codes, procedure codes (<code>10021</code> vs. <code>10022</code>), statute identifiers, and dosages. In parallel, filtering tenant ACLs <em>after</em> approximate nearest-neighbor graph search collapses recall when a user is allowed to see only 2% of the corpus. Modern stores enforce caller ACL principals and active date filters inline during index scan, execute sparse lexical BM25 alongside dense vector search, and merge the top 30 to 50 candidates via Reciprocal Rank Fusion (RRF).
           </li>
           <li>
             <strong>Cross-Encoder Reranking (Fixes Bi-Encoder Precision Gaps):</strong> Fast bi-encoders compress query and document into single vectors independently. Running a compact cross-encoder reranker over the top 40 fused candidates attends across query and passage tokens jointly, promoting the 5 to 10 passages that directly answer the question.
@@ -1891,8 +1899,8 @@ TPOT_seconds      ≈ Active_Weight_Bytes_Read / Memory_Bandwidth   <span class=
     <text class="t-s" x="722" y="318">• Compact root index</text>
     <text class="t-s" x="722" y="338">• Small domain files</text>
     <text class="t-s" x="722" y="358">• Verified case history</text>
-    <text class="t-s" x="722" y="378">• Cuts turn tokens</text>
-    <text class="t-s" x="722" y="398">  by 80%–90%</text>
+    <text class="t-s" x="722" y="378">• Fewer tokens read</text>
+    <text class="t-s" x="722" y="398">  on every turn</text>
 
     <!-- Converge into Long-Context Window + Corrective Check -->
     <line x1="150" y1="424" x2="150" y2="452" class="flow-g" marker-end="url(#arr-good)"/>
@@ -1981,7 +1989,7 @@ TPOT_seconds      ≈ Active_Weight_Bytes_Read / Memory_Bandwidth   <span class=
           <span><b>Takeaway:</b> Modern RAG pairs structure-aware Contextual Retrieval, inline ACL pre-filtering, BM25 + dense RRF, and cross-encoder reranking with SQL tools, deterministic or entity graphs, and prefix-cached whole-section hydration.</span>
         </div>
         <p>
-          With trust controls, model selection, and modern multi-path retrieval in place, we can now bring all three together to build a lean, domain-specific agent equipped with specialized capabilities and domain language.
+          With trust controls, model selection, and modern multi-path retrieval in place, we can now bring all three together to build a lean, domain-specific agent.
         </p>
       </div>
     </div>
@@ -2004,7 +2012,7 @@ TPOT_seconds      ≈ Active_Weight_Bytes_Read / Memory_Bandwidth   <span class=
 
         <h3>1. Starting from a Clean Single-Agent Whiteboard Sketch</h3>
         <p>
-          <em>Figure 5A</em> shows a first whiteboard sketch: place an <strong>Ingress + Guard</strong> and <strong>Gateway + Safety Screening</strong> layer in front of <strong>one LLM Agent</strong>, connect that agent to three knowledge sources (a <strong>DB</strong>, <strong>RAG</strong>, and a <strong><code>SKILL.md</code></strong> file for policy rules and terminology), pass its structured output (<code>status: ok / fail</code>, <code>confidence</code>, <code>resources</code>) through an egress gateway into a <strong>Verify using code</strong> gate, and escalate uncertain cases to <strong>HITL</strong>.
+          <em>Figure 5A</em> shows a first whiteboard sketch: place an <strong>Ingress + Guard</strong> and <strong>Gateway + Safety Screening</strong> layer in front of <strong>one LLM Agent</strong>, connect that agent to three knowledge sources (a <strong>DB</strong>, <strong>RAG</strong>, and a <strong><code>SKILL.md</code></strong> file for policy rules and terminology), pass its structured output (<code>status: ok / fail</code>, <code>confidence</code>, <code>resources</code>) through an egress gateway into a <strong>Verify Using Code</strong> gate, and escalate uncertain cases to <strong>HITL</strong>.
         </p>
 
         
@@ -2084,8 +2092,8 @@ TPOT_seconds      ≈ Active_Weight_Bytes_Read / Memory_Bandwidth   <span class=
 
     <rect class="b-code" x="666" y="168" width="92" height="120" rx="8"/>
     <text class="t-b" x="712" y="208" text-anchor="middle">Verify</text>
-    <text class="t-s" x="712" y="230" text-anchor="middle">using</text>
-    <text class="t-s" x="712" y="250" text-anchor="middle">code</text>
+    <text class="t-s" x="712" y="230" text-anchor="middle">Using</text>
+    <text class="t-s" x="712" y="250" text-anchor="middle">Code</text>
     <text class="t-m-g" x="712" y="274" text-anchor="middle">GATE</text>
 
     <line x1="758" y1="228" x2="782" y2="228" class="flow" marker-end="url(#arr-stop)" style="stroke:var(--stop)"/>
@@ -2097,7 +2105,7 @@ TPOT_seconds      ≈ Active_Weight_Bytes_Read / Memory_Bandwidth   <span class=
     <text class="t-s" x="838" y="269" text-anchor="middle">confidence</text>
   </svg>
   <div class="fig-caption">
-    <span>Figure 5A — Initial single-agent whiteboard sketch: right instinct to keep one LLM agent behind ingress/gateway guards and verify structured output in code, while leaving five policy-specific seams open under close inspection.</span>
+    <span>Figure 5A — Initial single-agent whiteboard sketch: the sketch has the right instinct to keep one LLM agent behind ingress/gateway guards and verify structured output in code, and it leaves five policy-specific seams open under close inspection.</span>
     <div class="legend-items">
       <span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good)"></i> Code guard / verifier</span>
       <span><i class="swatch-dot" style="background:var(--cyan-soft);border-color:var(--cyan)"></i> Gateway screen</span>
@@ -2109,14 +2117,14 @@ TPOT_seconds      ≈ Active_Weight_Bytes_Read / Memory_Bandwidth   <span class=
 
 
         <p>
-          That initial sketch already gets the four most important structural choices right: it avoids multi-agent swarm sprawl by starting with a single agent, screens inputs and outputs at a gateway boundary, recognizes that domain terminology needs explicit representation alongside retrieval and structured records, and puts deterministic code verification ahead of human escalation. Pressure-testing every arrow on <em>Figure 5A</em> then exposes five specific policy seams that turn that sketch into a production-ready policy engine (<em>Figure 5B</em>):
+          That initial sketch already gets the four most important structural choices right: it avoids multi-agent swarm sprawl by starting with a single agent, screens inputs and outputs at a gateway boundary, recognizes that domain terminology needs explicit representation alongside retrieval and structured records, and puts deterministic code verification ahead of human escalation. Pressure-testing every arrow on <em>Figure 5A</em> then exposes five policy seams whose fixes turn that sketch into a production-ready policy engine (<em>Figure 5B</em>):
         </p>
         <ol>
           <li><strong>Optional <code>SKILL.md</code> lookup vs. automatic per-contract <code>&lt;defined_terms&gt;</code> injection:</strong> Keep global review instructions in <code>SKILL.md</code>, while moving contract-specific Defined Terms into an indexed glossary injected automatically in code, since a model seeing an everyday English word like <em>"Affiliate"</em> or <em>"Customer"</em> assumes it knows the meaning and skips calling a terminology file, and a flat Markdown file covering hundreds of contracts outgrows the agent's file-read limit.</li>
           <li><strong>Generic <code>RAG</code> box vs. an Offline Policy Compiler:</strong> Compile section trees, table headers, <code>effective_date</code> scope, and 1-hop cross-references deterministically before runtime so <em>"Notwithstanding Section 4.2, see Schedule B"</em> never arrives cut in half.</li>
           <li><strong>Direct <code>LLM Agent → DB</code> arrow vs. parameterized read-only tools + intake quarantine:</strong> Front the database with typed, read-only parameterized queries scoped to the caller/tenant (<a href="ep01_securing_agent_to_database.html">Episode 01</a>), and parse untrusted uploaded claim text in a toolless step first.</li>
           <li><strong>Self-reported model <code>confidence</code> float vs. quote checks + precedence code + <code>CONFLICT_ESCALATE</code>:</strong> Generative models frequently emit <code>confidence = 0.95</code> while hallucinating or guessing across contradictory rules; replace raw float trust with server-checked verbatim quotes, deterministic <code>authority_tier</code> precedence in code, and an explicit <code>CONFLICT_ESCALATE</code> status for same-tier contradictions. A model-reported clarity score is kept as a one-way floor: a low value sends the case to <code>HITL</code>, and approval still rests on verified quotes.</li>
-          <li><strong>Single exit to <code>HITL</code> vs. two-branch completion + Audit Store:</strong> Split the exit of <code>Verify using code</code> so clean verified decisions write an immutable <code>AdjudicationRecord</code> while conflicts, missing referenced schedules, and low-clarity cases route to <code>HITL</code>.</li>
+          <li><strong>Single exit to <code>HITL</code> vs. three-way exit + Audit Store:</strong> Split the exit of <code>Verify Using Code</code> three ways: clean verified approvals write an immutable <code>AdjudicationRecord</code>, missing evidence returns a checklist to the requester, and denials, conflicts, missing referenced schedules, and low-clarity cases route to <code>HITL</code>.</li>
         </ol>
 
         <h3>2. Making the Agent Understand Specialized Domain Language and Cross-References</h3>
@@ -2176,7 +2184,7 @@ TPOT_seconds      ≈ Active_Weight_Bytes_Read / Memory_Bandwidth   <span class=
                   <td><b>4. Conjunctive Safety / Compliance Rules</b><br>(Security Gate + Privacy Gate)</td>
                   <td>All mandatory gates must pass</td>
                   <td><span class="b-pill g">Plain Code</span> (Severity Lattice)</td>
-                  <td>Independent domain checks merge via strict lattice: <code>FAIL &gt; CONFLICT_ESCALATE &gt; PASS &gt; NOT_APPLICABLE</code>.</td>
+                  <td>Independent domain checks merge via strict lattice: <code>FAIL &gt; CONFLICT_ESCALATE &gt; MISSING_EVIDENCE &gt; PASS &gt; NOT_APPLICABLE</code>; <code>DEFERRED_TO_LINK</code> is resolved by the one bounded hop before the merge.</td>
                 </tr>
                 <tr>
                   <td><b>5. Equal-Rank Contradiction or Missing Schedule</b><br>(Two active Tier-2 Addenda disagree)</td>
@@ -2198,9 +2206,9 @@ TPOT_seconds      ≈ Active_Weight_Bytes_Read / Memory_Bandwidth   <span class=
         </p>
         <ol>
           <li><strong>Ingress + Guard + Agent Gateway &amp; Model Armor:</strong> Authenticates the caller, filters active policy scope by <code>effective_date</code> and <code>jurisdiction</code>, screens inputs for prompt injection via Model Armor, and (whenever intake arrives as raw unstructured prose) runs a single toolless <code>CaseFacts</code> extraction pass. When intake arrives from a structured form or API, that extra parse disappears completely, leaving <strong>just one LLM role</strong> in the entire architecture.</li>
-          <li><strong>Hardened Three-Source Context Assembly (<code>DB via MCP Tool</code> + <code>Compiled RAG</code> + <code>SKILL.md + Glossary</code>):</strong> Parameterized read-only SQL fetches live customer or claim records under tenant row ACLs; Compiled RAG loads the active whole policy sections and 1-hop cited clauses; <code>SKILL.md</code> supplies the global review rubric while plain code automatically injects the per-contract <code>&lt;defined_terms&gt;</code> block.</li>
-          <li><strong>Single Policy LLM Agent + Egress Gateway Screen:</strong> Evaluates <code>CaseFacts</code> against each routed policy in a clean single turn (<code>0</code> write tools, <code>include_contents="none"</code>), passing through egress Model Armor to emit the typed <code>Status &amp; Resources</code> schema with <code>verbatim_quote</code> placed ahead of <code>status</code> (<code>PASS</code>, <code>FAIL</code>, <code>MISSING_EVIDENCE</code>, <code>NOT_APPLICABLE</code>, <code>DEFERRED_TO_LINK</code>, or <code>CONFLICT_ESCALATE</code>).</li>
-          <li><strong>Verify Using Code → Dual Exit (<code>HITL Domain Escalation</code> vs. <code>Immutable Audit Store</code>):</strong> Plain Python checks that every <code>verbatim_quote</code> appears in the source policy text, follows at most one bounded <code>DEFERRED_TO_LINK</code> hop, applies deterministic <code>authority_tier</code> precedence (<code>Statute &gt; Signed SOW/Addendum &gt; MSA &gt; Global</code>), writes clean resolved outcomes to the <code>Immutable Audit Store</code>, and routes <code>CONFLICT_ESCALATE</code>, <code>MISSING_REFERENCED_DOC</code>, or low-clarity cases to <code>HITL Domain Escalation</code>. Code raises <code>CONFLICT_ESCALATE</code> itself when two findings at the same <code>authority_tier</code> disagree, alongside any conflict the agent flags inside a single policy, and <code>MISSING_EVIDENCE</code> returns a checklist to the requester.</li>
+          <li><strong>Hardened Three-Source Context Assembly (<code>DB via MCP Tool</code> + <code>Compiled RAG</code> + <code>SKILL.md / Glossary</code>):</strong> Parameterized read-only SQL fetches live customer or claim records under tenant row ACLs; Compiled RAG loads the active whole policy sections and 1-hop cited clauses; <code>SKILL.md</code> supplies the global review rubric while plain code automatically injects the per-contract <code>&lt;defined_terms&gt;</code> block.</li>
+          <li><strong>Single Policy LLM Agent + Egress Gateway Screen:</strong> Evaluates <code>CaseFacts</code> against each routed policy in a clean single turn (<code>0</code> write tools, <code>include_contents="none"</code>), and emits the typed <code>Status &amp; Resources</code> schema with <code>verbatim_quote</code> placed ahead of <code>status</code> (<code>PASS</code>, <code>FAIL</code>, <code>MISSING_EVIDENCE</code>, <code>NOT_APPLICABLE</code>, <code>DEFERRED_TO_LINK</code>, or <code>CONFLICT_ESCALATE</code>), which then passes through egress Model Armor.</li>
+          <li><strong>Verify Using Code → Three-Way Exit (<code>Immutable Audit Store</code>, <code>Pend for Evidence</code>, <code>HITL Domain Escalation</code>):</strong> Plain Python checks that every <code>verbatim_quote</code> appears in the source policy text, follows at most one bounded <code>DEFERRED_TO_LINK</code> hop, applies deterministic <code>authority_tier</code> precedence (<code>Statute &gt; Signed SOW/Addendum &gt; MSA &gt; Global</code>), writes clean approvals to the <code>Immutable Audit Store</code>, returns a checklist to the requester on <code>MISSING_EVIDENCE</code>, and routes denials (<code>FAIL</code>), <code>CONFLICT_ESCALATE</code>, <code>MISSING_REFERENCED_DOC</code>, or low-clarity cases to <code>HITL Domain Escalation</code>. Code raises <code>CONFLICT_ESCALATE</code> itself when two findings at the same <code>authority_tier</code> disagree, alongside any conflict the agent flags inside a single policy.</li>
         </ol>
 
         
@@ -2289,17 +2297,20 @@ TPOT_seconds      ≈ Active_Weight_Bytes_Read / Memory_Bandwidth   <span class=
     <line x1="779" y1="264" x2="779" y2="242" class="flow" marker-end="url(#arr-stop)" style="stroke:var(--stop)"/>
     <rect class="node-bad" x="634" y="156" width="254" height="82" rx="9"/>
     <text class="t-b" x="761" y="182" text-anchor="middle">HITL Domain Escalation</text>
-    <text class="t-s" x="761" y="203" text-anchor="middle">Same-tier conflict, missing</text>
-    <text class="t-s" x="761" y="222" text-anchor="middle">schedule, or low clarity</text>
+    <text class="t-s" x="761" y="203" text-anchor="middle">Denial, same-tier conflict,</text>
+    <text class="t-s" x="761" y="222" text-anchor="middle">missing schedule, low clarity</text>
 
     <!-- Downward Exit from Verify Using Code -> Resolved Decision + Audit Store (Upgrade 5) -->
     <line x1="779" y1="466" x2="779" y2="496" class="flow-g" marker-end="url(#arr-good)"/>
-    <rect class="b-code" x="634" y="500" width="254" height="132" rx="9"/>
-    <text class="t-m-g" x="761" y="525" text-anchor="middle">UPGRADE 5 · HAPPY-PATH EXIT</text>
-    <text class="t-b" x="761" y="549" text-anchor="middle">Resolved Decision &amp;</text>
-    <text class="t-b" x="761" y="570" text-anchor="middle">Immutable Audit Store</text>
-    <text class="t-s" x="761" y="594" text-anchor="middle">Logs winning_doc, quotes &amp;</text>
-    <text class="t-s" x="761" y="613" text-anchor="middle">overridden_clause_id</text>
+    <rect class="b-code" x="634" y="500" width="242" height="62" rx="9"/>
+    <text class="t-m-g" x="755" y="519" text-anchor="middle">UPGRADE 5 · APPROVAL EXIT</text>
+    <text class="t-b" x="755" y="539" text-anchor="middle">Immutable Audit Store</text>
+    <text class="t-s" x="755" y="556" text-anchor="middle">Logs quotes &amp; overridden_clause_id</text>
+    <path d="M 888 440 L 898 440 L 898 601 L 880 601" class="flow-g" marker-end="url(#arr-good)"/>
+    <rect class="b-code" x="634" y="570" width="242" height="62" rx="9"/>
+    <text class="t-m-g" x="755" y="589" text-anchor="middle">UPGRADE 5 · PEND FOR EVIDENCE</text>
+    <text class="t-b" x="755" y="609" text-anchor="middle">Checklist to Requester</text>
+    <text class="t-s" x="755" y="626" text-anchor="middle">Names the missing documents</text>
 
     <!-- Bottom Three Sources Under Single Policy LLM Agent (DB + RAG + SKILL.md Triad, Hardened!) -->
     <line x1="110" y1="418" x2="110" y2="496" class="flow-g" marker-end="url(#arr-good)"/>
@@ -2353,7 +2364,7 @@ TPOT_seconds      ≈ Active_Weight_Bytes_Read / Memory_Bandwidth   <span class=
           <li><strong>Run Hybrid Code + Indication Search (<code>Compiled RAG</code>):</strong> Query the scoped policies using <strong>exact/range lookup</strong> on <code>CPT 72148</code> (matching <em>Musculoskeletal Imaging Policy <code>MSK-04</code></em>, which covers <code>72141–72158</code>) combined with <strong>BM25 + dense vector + reranking</strong> on the clinical indication (<em>"lumbar MRI uncomplicated low back pain"</em>).</li>
           <li><strong>Hydrate the Complete Criterion Tree, Linked Addendum, and Defined Terms (<code>Code Context Builder</code>):</strong> Return the <strong>entire governing section</strong> of <code>MSK-04</code> so its <code>AND / OR</code> criteria and red-flag exceptions stay attached: <em>"Approve lumbar MRI when EITHER (a) failed Conservative Therapy is documented OR (b) progressive neurological deficit is documented on exam."</em> Automatically pull any <strong>1-hop linked addendum</strong> (<code>TX-Mandate-2026</code>) and inject <code>&lt;defined_terms&gt;</code> from the glossary (<em>"<code>Conservative Therapy</code>: physician-supervised physical therapy across &gt;= 6 weeks; over-the-counter NSAIDs alone do not satisfy this requirement"</em>).</li>
           <li><strong>Evaluate Criterion by Criterion with Evidence Status (<code>Single Policy LLM Agent</code>):</strong> Guided by <code>SKILL.md</code>, the agent checks the chart facts against each criterion separately, quoting the exact policy rule first and distinguishing a failed rule from missing chart paperwork: Criterion (a) evaluates to <code>FAIL</code> (3 weeks of ibuprofen vs. 6 weeks of supervised physical therapy), while Criterion (b) evaluates to <code>MISSING_EVIDENCE</code> (the neurological exam page was omitted).</li>
-          <li><strong>Verify Quotes, Apply Precedence, and Route Asymmetric Outcomes (<code>Verify Using Code</code>):</strong> Python verifies that every quoted rule exists verbatim inside <code>MSK-04</code>, applies <code>authority_tier</code> precedence if <code>TX-Mandate-2026</code> modifies <code>MSK-04</code>, and routes by outcome: all-criteria <code>PASS</code> with verified chart spans logs an approval to the <code>Immutable Audit Store</code>; <code>MISSING_EVIDENCE</code> sends a targeted checklist back to the clinic naming the missing neurological exam or physical-therapy notes; clinical denials (<code>FAIL</code>) and same-tier policy conflicts (<code>CONFLICT_ESCALATE</code>) route to <code>HITL</code> clinical review with highlighted quotes side by side.</li>
+          <li><strong>Verify Quotes, Apply Precedence, and Route Asymmetric Outcomes (<code>Verify Using Code</code>):</strong> Python verifies that every quoted rule exists verbatim inside <code>MSK-04</code>, applies <code>authority_tier</code> precedence if <code>TX-Mandate-2026</code> modifies <code>MSK-04</code>, and routes by outcome: all-criteria <code>PASS</code> with verified chart spans logs an approval to the <code>Immutable Audit Store</code>; <code>MISSING_EVIDENCE</code> sends a targeted checklist back to the clinic naming the missing neurological exam; clinical denials (<code>FAIL</code>) and same-tier policy conflicts (<code>CONFLICT_ESCALATE</code>) route to <code>HITL</code> clinical review with highlighted quotes side by side. Here criterion (a) fails on the chart as submitted, and because the two criteria are joined by OR, the open criterion (b) can still approve the request, so the case pends for evidence ahead of any denial.</li>
         </ol>
 
         <p>
@@ -2386,7 +2397,7 @@ TPOT_seconds      ≈ Active_Weight_Bytes_Read / Memory_Bandwidth   <span class=
      <span class="hl-k">"status"</span>: <span class="hl-s">"MISSING_EVIDENCE"</span>}
   ]
 }</pre>
-            <footer>Separates <code>FAIL</code> (3 weeks ibuprofen) from <code>MISSING_EVIDENCE</code> (missing neuro exam page).</footer>
+            <footer>Simplified view: in the full schema each finding carries its own quote, tier, and clarity score. Separates <code>FAIL</code> (3 weeks ibuprofen) from <code>MISSING_EVIDENCE</code> (missing neuro exam page).</footer>
           </div>
           <div class="link">
             <header><span>STEP 6 · VERIFY IN CODE → EXIT</span>Verified Routing Outcome</header>
@@ -2395,8 +2406,7 @@ TPOT_seconds      ≈ Active_Weight_Bytes_Read / Memory_Bandwidth   <span class=
   <span class="hl-k">"complies_now"</span>: <span class="hl-n">false</span>,
   <span class="hl-k">"route"</span>: <span class="hl-s">"PEND_FOR_EVIDENCE"</span>,
   <span class="hl-k">"missing_items"</span>: [
-    <span class="hl-s">"Neurological exam note"</span>,
-    <span class="hl-s">"6-week PT log (if done)"</span>
+    <span class="hl-s">"Neurological exam note"</span>
   ]
 }</pre>
             <footer>Clean approvals log to Audit Store; missing evidence pends with exact checklist; denials &amp; conflicts go to <code>HITL</code>.</footer>
@@ -2432,7 +2442,7 @@ TPOT_seconds      ≈ Active_Weight_Bytes_Read / Memory_Bandwidth   <span class=
 <span class="hl-k">from</span> pydantic <span class="hl-k">import</span> BaseModel, Field
 <span class="hl-k">from</span> google.adk <span class="hl-k">import</span> Agent, Context, Event, Workflow
 
-POLICY_REVIEW_SKILL_MD = Path(<span class="hl-s">"skills/policy_review/SKILL.md"</span>).read_text(encoding=<span class="hl-s">"utf-8"</span>)
+POLICY_REVIEW_SKILL_MD: str = Path(<span class="hl-s">"skills/policy_review/SKILL.md"</span>).read_text(encoding=<span class="hl-s">"utf-8"</span>)
 
 
 <span class="hl-k">class</span> <span class="hl-b">CaseFacts</span>(BaseModel):  <span class="hl-c"># generic intake; prior-auth maps request_id, service_date, plan, cpt_code onto these</span>
@@ -2456,7 +2466,7 @@ POLICY_REVIEW_SKILL_MD = Path(<span class="hl-s">"skills/policy_review/SKILL.md"
     findings: list[ClauseFinding]
 
 
-single_policy_agent = Agent(             <span class="hl-c"># Central Policy LLM Agent from Figure 5A &amp; 5B</span>
+single_policy_agent: Agent = Agent(      <span class="hl-c"># Central Policy LLM Agent from Figure 5A &amp; 5B</span>
     name=<span class="hl-s">"single_policy_agent"</span>,
     model=<span class="hl-s">"gemini-3.8-flash"</span>,
     mode=<span class="hl-s">"single_turn"</span>,
@@ -2473,8 +2483,8 @@ single_policy_agent = Agent(             <span class="hl-c"># Central Policy LLM
 
 
 <span class="hl-k">def</span> <span class="hl-f">ingress_and_guard</span>(ctx: Context, facts: CaseFacts) -&gt; Event:
-    db_row = query_parameterized_readonly_db(facts.case_id, ctx.state[<span class="hl-s">"tenant_id"</span>])
-    rag_bundle = load_compiled_rag_and_defined_terms(facts)       <span class="hl-c"># date + tier + 1-hop links</span>
+    db_row: dict = query_parameterized_readonly_db(facts.case_id, ctx.state[<span class="hl-s">"tenant_id"</span>])
+    rag_bundle: dict = load_compiled_rag_and_defined_terms(facts) <span class="hl-c"># date + tier + 1-hop links</span>
     <span class="hl-k">if</span> rag_bundle[<span class="hl-s">"unresolved_references"</span>]:
         <span class="hl-k">return</span> Event(route=<span class="hl-s">"HITL"</span>, output={<span class="hl-s">"reason"</span>: <span class="hl-s">"MISSING_REFERENCED_DOC"</span>})
     ctx.state[<span class="hl-s">"rag_bundle"</span>] = rag_bundle
@@ -2482,21 +2492,23 @@ single_policy_agent = Agent(             <span class="hl-c"># Central Policy LLM
 
 
 <span class="hl-k">def</span> <span class="hl-f">verify_using_code</span>(ctx: Context, verdict: StatusAndResources) -&gt; Event:
-    sources = ctx.state[<span class="hl-s">"rag_bundle"</span>][<span class="hl-s">"source_texts"</span>]
+    sources: dict[str, str] = ctx.state[<span class="hl-s">"rag_bundle"</span>][<span class="hl-s">"source_texts"</span>]
     <span class="hl-k">for</span> f <span class="hl-k">in</span> verdict.findings:
         <span class="hl-k">if</span> <span class="hl-k">not</span> alphanumeric_span_exists(f.verbatim_quote, sources.get(f.resource_doc_id, <span class="hl-s">""</span>)):
             <span class="hl-k">return</span> Event(route=<span class="hl-s">"HITL"</span>, output={<span class="hl-s">"reason"</span>: <span class="hl-s">"UNVERIFIED_QUOTE"</span>})
         <span class="hl-k">if</span> f.clarity_score &lt; <span class="hl-n">0.75</span>:
             <span class="hl-k">return</span> Event(route=<span class="hl-s">"HITL"</span>, output={<span class="hl-s">"reason"</span>: <span class="hl-s">"LOW_CLARITY"</span>})
-    <span class="hl-k">if</span> any(f.status == <span class="hl-s">"MISSING_EVIDENCE"</span> <span class="hl-k">for</span> f <span class="hl-k">in</span> verdict.findings):
-        <span class="hl-k">return</span> Event(route=<span class="hl-s">"PEND_FOR_EVIDENCE"</span>, output={<span class="hl-s">"reason"</span>: <span class="hl-s">"MISSING_EVIDENCE"</span>})
-    merged = merge_by_authority_tier(verdict.findings)            <span class="hl-c"># Statute(1) &gt; SOW(2) &gt; MSA(3)</span>
+    merged: dict = merge_by_authority_tier(verdict.findings)      <span class="hl-c"># Statute(1) &gt; SOW(2) &gt; MSA(3)</span>
     <span class="hl-k">if</span> merged[<span class="hl-s">"has_same_tier_conflict"</span>]:               <span class="hl-c"># includes agent-flagged CONFLICT_ESCALATE</span>
         <span class="hl-k">return</span> Event(route=<span class="hl-s">"HITL"</span>, output=merged)
+    <span class="hl-k">if</span> merged[<span class="hl-s">"status"</span>] == <span class="hl-s">"FAIL"</span>:                     <span class="hl-c"># status applies the AND / OR criterion tree; denials get human review</span>
+        <span class="hl-k">return</span> Event(route=<span class="hl-s">"HITL"</span>, output=merged)
+    <span class="hl-k">if</span> merged[<span class="hl-s">"status"</span>] == <span class="hl-s">"MISSING_EVIDENCE"</span>:
+        <span class="hl-k">return</span> Event(route=<span class="hl-s">"PEND_FOR_EVIDENCE"</span>, output=merged)
     <span class="hl-k">return</span> Event(route=<span class="hl-s">"AUDIT_RECORD"</span>, output=merged)
 
 
-policy_workflow = Workflow(
+policy_workflow: Workflow = Workflow(
     name=<span class="hl-s">"hardened_single_agent_policy_engine"</span>,
     edges=[
         (<span class="hl-s">"START"</span>, ingress_and_guard),
@@ -2543,7 +2555,7 @@ policy_workflow = Workflow(
               <tr>
                 <td><b>Q1 · Earning Customer Trust</b></td>
                 <td>Treating "black box" as one problem or overpromising interpretable weights</td>
-                <td>Diagnose 9 concerns &amp; 6 risks → stay candid on weights → 7 system layers (A–G) + hybrid spectrum</td>
+                <td>Diagnose 9 concerns &amp; 6 risks → stay candid on weights → 7 system layers (A–G) + six alternatives</td>
                 <td>Extract fields, draft with clickable citations, &amp; abstain when unsupported</td>
                 <td>Customer controls guardrails, pinned versions, SME eval gates, HITL sign-off, &amp; deterministic decision logic</td>
               </tr>
@@ -2595,6 +2607,13 @@ policy_workflow = Workflow(
       <div class="post-prose">
         <ul>
           <li>Turpin et al., <a href="https://arxiv.org/abs/2305.04388" target="_blank" rel="noopener">Language Models Don't Always Say What They Think: Unfaithful Explanations in Chain-of-Thought Prompting</a> (arXiv:2305.04388), May 7, 2023 (NeurIPS 2023). Empirical demonstration that generated Chain-of-Thought rationales can diverge from the internal factors driving model predictions.</li>
+          <li>Chen et al. (Anthropic), <a href="https://arxiv.org/abs/2505.05410" target="_blank" rel="noopener">Reasoning Models Don't Always Say What They Think</a> (arXiv:2505.05410), May 8, 2025. Hint-based tests showing that reasoning traces frequently omit the factors that changed the answer.</li>
+          <li>Korbak et al., <a href="https://arxiv.org/abs/2507.11473" target="_blank" rel="noopener">Chain of Thought Monitorability: A New and Fragile Opportunity for AI Safety</a> (arXiv:2507.11473), July 15, 2025. Cross-lab position that reasoning traces are an imperfect but valuable monitoring signal.</li>
+          <li>Baker et al. (OpenAI), <a href="https://arxiv.org/abs/2503.11926" target="_blank" rel="noopener">Monitoring Reasoning Models for Misbehavior and the Risks of Promoting Obfuscation</a> (arXiv:2503.11926), March 14, 2025. Penalizing a model's reasoning trace teaches it to hide intent, which weakens monitoring.</li>
+          <li>Lyu et al., <a href="https://arxiv.org/abs/2301.13379" target="_blank" rel="noopener">Faithful Chain-of-Thought Reasoning</a> (arXiv:2301.13379), January 31, 2023 (IJCNLP-AACL 2023). The model translates a query into a symbolic chain that a deterministic solver executes, so the explanation is the computation.</li>
+          <li>Hao et al. (Meta FAIR), <a href="https://arxiv.org/abs/2412.06769" target="_blank" rel="noopener">Training Large Language Models to Reason in a Continuous Latent Space</a> (arXiv:2412.06769), December 9, 2024. The Coconut method feeds hidden states back as the next input, so intermediate reasoning stays in latent space.</li>
+          <li>Lindsey et al. (Anthropic), <a href="https://transformer-circuits.pub/2025/attribution-graphs/biology.html" target="_blank" rel="noopener">On the Biology of a Large Language Model</a>, March 2025, and Anthropic, <a href="https://www.anthropic.com/research/open-source-circuit-tracing" target="_blank" rel="noopener">Open-Sourcing Circuit-Tracing Tools</a>, May 2025. Attribution graphs that trace parts of a model's internal computation for individual prompts.</li>
+          <li>Google DeepMind, <a href="https://deepmind.google/blog/gemma-scope-2-helping-the-ai-safety-community-deepen-understanding-of-complex-language-model-behavior/" target="_blank" rel="noopener">Gemma Scope 2</a>, December 19, 2025, and Google, <a href="https://ai.google.dev/gemini-api/docs/thinking" target="_blank" rel="noopener">Gemini API: Thinking</a>, 2026. Open interpretability tooling for Gemma models and thought summaries in the Gemini API.</li>
           <li>Anthropic, <a href="https://www.anthropic.com/research/building-effective-agents" target="_blank" rel="noopener">Building Effective Agents</a>, December 19, 2024. Separating deterministic workflows from open-ended agents and keeping control flow explicit.</li>
           <li>Google Cloud, <a href="https://docs.cloud.google.com/architecture/choose-design-pattern-agentic-ai-system" target="_blank" rel="noopener">Choose a Design Pattern for Your Agentic AI System</a>, last reviewed November 13, 2026. Selecting deterministic workflows vs. single-agent and multi-agent architectures based on latency, cost, and auditability.</li>
           <li>Pete Hodgson, <a href="https://martinfowler.com/articles/feature-toggles.html" target="_blank" rel="noopener">Feature Toggles (aka Feature Flags)</a>, martinfowler.com, October 9, 2017. Operational kill switches and runtime circuit breakers for safe production degradation.</li>
