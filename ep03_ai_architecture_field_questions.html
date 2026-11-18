@@ -981,7 +981,7 @@
                 <tr>
                   <td><b>"We can't look inside the model."</b></td>
                   <td><b>Model Weights</b></td>
-                  <td>Open-weight models (such as Gemma or Llama) that the customer can download, inspect, fine-tune, and self-host at a pinned checksum; per-decision explanations come from the system layers around the weights (Section 2)</td>
+                  <td>Open-weight models (such as Gemma or Llama) that the customer can download, inspect, fine-tune, and self-host at a pinned checksum; per-decision explanations come from the system layers around the weights (Section 3)</td>
                 </tr>
                 <tr>
                   <td><b>"We don't know where our data goes."</b></td>
@@ -1025,20 +1025,20 @@
           <li><strong>Personal Career Risk for the Internal Champion:</strong> The sponsor backing the project carries personal accountability if an opaque failure embarrasses their team.</li>
         </ul>
 
-        <h3>2. Why the Model Core Remains Opaque</h3>
+        <h3>2. Why the Model Core Remains Opaque, and What We Can Still See</h3>
         <p>
-          Opacity is an inherent property of every large language model, independent of vendor, size, or training method:
+          At the weight level, every large language model is opaque today, regardless of vendor or size:
         </p>
         <ul>
           <li><strong>Distributed Weights and Probabilistic Sampling:</strong> Knowledge and pattern matching are distributed across billions of continuous parameters with no human-readable <code>if-then</code> rules inside the weights. Each next token is sampled from a probability distribution, so the same prompt can produce differently worded answers.</li>
-          <li><strong>Three Ways to See the Reasoning Path, Each with a Different Guarantee:</strong> A model can share how it reached an answer in three ways.
+          <li><strong>Tokens vs. Latent Space:</strong> Raw thinking tokens are sampled text that the model feeds back to itself, and thought summaries are a condensed rewrite of that text. The computation that produces each token happens in latent activations (the model's internal numeric state at each layer) that are never written down, which is where a trace and the true cause of an answer can diverge. On hard multi-step tasks a transformer has to carry intermediate state through the written trace as working memory (<a href="https://arxiv.org/abs/2507.11473" target="_blank" rel="noopener">Korbak et al., Jul 2025</a>), which makes traces worth monitoring. Research models that reason directly in continuous latent space (<a href="https://arxiv.org/abs/2412.06769" target="_blank" rel="noopener">Hao et al., Dec 2024</a>) give up that visibility in exchange for efficiency, so system-level checks that are faithful by construction grow more important over time.</li>
+          <li><strong>Three Ways to See the Reasoning Path, Each with a Different Guarantee:</strong> There are three ways to see how an answer was reached, and only one guarantees that the explanation matches the decision.
             <ul>
-              <li><strong>Thinking traces.</strong> Reasoning models return thought summaries (Gemini API, <a href="https://ai.google.dev/gemini-api/docs/thinking" target="_blank" rel="noopener">Google, 2026</a>) or raw thinking tokens (open-weight reasoning models such as DeepSeek-R1). The traces are useful for debugging and monitoring (<a href="https://arxiv.org/abs/2507.11473" target="_blank" rel="noopener">Korbak et al., Jul 2025</a>), yet they often leave out what actually drove the answer: when a planted hint changed the answer, reasoning models disclosed it in a minority of cases (<a href="https://arxiv.org/abs/2505.05410" target="_blank" rel="noopener">Chen et al., May 2025</a>; <a href="https://arxiv.org/abs/2305.04388" target="_blank" rel="noopener">Turpin et al., NeurIPS 2023</a>). Log them as supporting evidence, and base the justification of a decision on checks that code can verify.</li>
-              <li><strong>Reasoning that is faithful by construction.</strong> The model translates the case into a symbolic program or checklist and deterministic code executes it, so the written reasoning is the computation that produced the answer (<a href="https://arxiv.org/abs/2301.13379" target="_blank" rel="noopener">Lyu et al., Jan 2023</a>). This is the basis of the hybrid option in <em>Table 1B</em> and of the quote and precedence checks in Question 05.</li>
-              <li><strong>Circuit tracing.</strong> Attribution graphs and sparse autoencoders trace parts of the internal path behind an individual answer on open-weight models (<a href="https://transformer-circuits.pub/2025/attribution-graphs/biology.html" target="_blank" rel="noopener">Lindsey et al., Mar 2025</a>), with public tooling in the <a href="https://www.anthropic.com/research/open-source-circuit-tracing" target="_blank" rel="noopener">circuit-tracing library</a> and <a href="https://deepmind.google/blog/gemma-scope-2-helping-the-ai-safety-community-deepen-understanding-of-complex-language-model-behavior/" target="_blank" rel="noopener">Gemma Scope 2</a>. They capture a fraction of the computation and serve audits and investigations today, at research cost.</li>
+              <li><strong>Thinking traces.</strong> Reasoning models return thought summaries (<a href="https://ai.google.dev/gemini-api/docs/thinking" target="_blank" rel="noopener">Google, 2026</a>) or raw thinking tokens (open-weight reasoning models such as DeepSeek-R1). The traces are useful for debugging and monitoring (<a href="https://arxiv.org/abs/2507.11473" target="_blank" rel="noopener">Korbak et al., Jul 2025</a>), yet they often leave out what actually drove the answer: when a planted hint changed the answer, reasoning models often disclosed it in fewer than 20% of cases (<a href="https://arxiv.org/abs/2505.05410" target="_blank" rel="noopener">Chen et al., May 2025</a>), extending earlier results on prompted chain-of-thought (<a href="https://arxiv.org/abs/2305.04388" target="_blank" rel="noopener">Turpin et al., NeurIPS 2023</a>). Log them as supporting evidence, and base the justification of a decision on checks that code can verify.</li>
+              <li><strong>Reasoning that is faithful by construction.</strong> The model translates the case into a symbolic program or checklist and deterministic code executes it, so the written reasoning is the computation that produced the answer (<a href="https://arxiv.org/abs/2301.13379" target="_blank" rel="noopener">Lyu et al., Jan 2023</a>). This is the basis of the hybrid option in <em>Table 1B</em>, and Question 05 applies it partially: code verifies the quotes and applies precedence, while the per-criterion verdict remains a model judgment that could move into code for fully deterministic rules.</li>
+              <li><strong>Circuit tracing.</strong> Attribution graphs trace parts of the internal path behind an individual answer (<a href="https://transformer-circuits.pub/2025/attribution-graphs/biology.html" target="_blank" rel="noopener">Lindsey et al., Mar 2025</a>), and public tooling (the <a href="https://www.anthropic.com/research/open-source-circuit-tracing" target="_blank" rel="noopener">circuit-tracing library</a>, <a href="https://deepmind.google/blog/gemma-scope-2-helping-the-ai-safety-community-deepen-understanding-of-complex-language-model-behavior/" target="_blank" rel="noopener">Gemma Scope 2</a>) brings the method to open-weight models. It captures a fraction of the computation and serves audits and investigations today, at research cost.</li>
             </ul>
           </li>
-          <li><strong>Tokens vs. Latent Space:</strong> Raw thinking tokens are sampled text that the model feeds back to itself, and thought summaries are a condensed rewrite of that text. The computation that produces each token happens in latent activations that are never written down, which is where a trace and the true cause of an answer can diverge. On hard multi-step tasks a transformer has to carry intermediate state through the written trace as working memory (<a href="https://arxiv.org/abs/2507.11473" target="_blank" rel="noopener">Korbak et al., Jul 2025</a>), which makes traces worth monitoring. Research models that reason directly in continuous latent space (<a href="https://arxiv.org/abs/2412.06769" target="_blank" rel="noopener">Hao et al., Dec 2024</a>) give up that visibility in exchange for efficiency, so system-level checks that are faithful by construction grow more important over time.</li>
           <li><strong>The New-Employee Analogy:</strong> Hiring a capable human analyst carries the same internal opacity: nobody inspects an employee's neurons. Organizations build trust through background checks, clear instructions, reference materials, checking their work on high-risk decisions, performance evaluations, and an audit trail.</li>
         </ul>
         <p>
@@ -1075,7 +1075,7 @@
     <text class="t-m-c" x="50" y="75" style="fill:var(--amber)">1 · DIAGNOSE FIRST: CLARIFY WHICH "BLACK BOX" CONCERN &amp; BUSINESS RISK APPLIES</text>
     <text class="t-s" x="50" y="94" style="font-weight:600;fill:var(--ink)">Concerns: Explainability · Predictability · Training-Data Provenance · Model Weights · Data Governance ·</text>
     <text class="t-s" x="50" y="111" style="font-weight:600;fill:var(--ink)">Reliability · Accountability · Version Stability · Quality</text>
-    <text class="t-s" x="50" y="128">Underlying Risks: Liability · Regulators (EU AI Act / SR 11-7 / HIPAA) · Data Leak · Reputation · Lock-In · Champion Risk</text>
+    <text class="t-s" x="50" y="128">Underlying Risks: Liability · Regulatory Scrutiny · Confidential Data Exposure · Reputational Harm · Lock-In · Career Risk</text>
 
     <line x1="460" y1="134" x2="460" y2="154" class="flow-g" marker-end="url(#arr-good)"/>
 
@@ -1116,7 +1116,7 @@
     <text class="t-m-v" x="460" y="325" text-anchor="middle">CANDID OPAQUE MODEL CORE</text>
     <text class="t-b" x="460" y="348" text-anchor="middle">Billions of Continuous Weights</text>
     <text class="t-s" x="460" y="369" text-anchor="middle">Distributed representations;</text>
-    <text class="t-s" x="460" y="388" text-anchor="middle">Thought summaries: monitor and verify</text>
+    <text class="t-s" x="460" y="388" text-anchor="middle">summaries monitored as evidence</text>
 
     <line x1="594" y1="352" x2="612" y2="352" class="flow-g" marker-end="url(#arr-good)"/>
 
@@ -1130,7 +1130,7 @@
     <rect class="b-store" x="48" y="416" width="404" height="90" rx="8"/>
     <text class="t-m-c" x="64" y="438" style="fill:var(--amber)">C · FULL AUDITABILITY &amp; RECONSTRUCTION</text>
     <text class="t-b" x="64" y="460">Logs, Traces &amp; Drift Dashboards</text>
-    <text class="t-s" x="64" y="481">Every prompt, chunk, tool call, model version &amp; edit</text>
+    <text class="t-s" x="64" y="481">Prompts, chunks, tool calls, thought summaries &amp; edits</text>
 
     <rect class="b-code" x="468" y="416" width="404" height="90" rx="8"/>
     <text class="t-m-g" x="484" y="438">G · GRADUATED ROLLOUT &amp; KILL SWITCH</text>
@@ -1143,7 +1143,7 @@
     <text class="t-b" x="50" y="582">Rules  ·  Tabular ML + SHAP  ·  Hybrid (LLM Extracts, Code Decides)  ·  Pinned Weights  ·  Constrained  ·  Search</text>
   </svg>
   <div class="fig-caption">
-    <span>Figure 1 — Addressing the "black box" objection: diagnose which of the nine concerns and six business risks applies, stay candid about weight opacity, wrap the model in seven transparent system layers (A–G), and pick the right one of six alternatives for high-stakes decisions.</span>
+    <span>Figure 1 — Addressing the "black box" objection: diagnose which of the nine concerns and six business risks applies, stay candid about weight opacity, wrap the model in seven transparent system layers (A–G), and choose the right alternative for each high-stakes step.</span>
     <div class="legend-items">
       <span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> Opaque weight core</span>
       <span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good)"></i> Verification &amp; rollout gates</span>
@@ -1161,9 +1161,9 @@
         </p>
         <ol>
           <li><strong>A · Ground Outputs in Evidence (Explainability):</strong> Pair retrieval with clickable inline citations linked to the customer's own documents, return structured JSON (<code>verbatim_quote</code>, <code>sources</code>, <code>assumptions</code>, <code>answer</code>), verify in server code that cited passages genuinely support the claim, and return an explicit <em>"not found in your documents"</em> response whenever evidence is absent.</li>
-          <li><strong>B · Measure It Openly with Customer Experts (Evaluation):</strong> Co-create a golden dataset of 100 to 300 real historical cases alongside the customer's domain specialists, track accuracy, groundedness, hallucination rate, refusal rate, latency, and cost and rerun them like regression tests on every prompt, retrieval, or model change, and share the failure breakdown openly (<em>"94% pass rate on your test set; the remaining 6% fall into these boundary categories, which route to review"</em>).</li>
+          <li><strong>B · Measure It Openly with Customer Experts (Evaluation):</strong> Co-create a golden dataset of 100 to 300 real historical cases alongside the customer's domain specialists, track accuracy, groundedness, hallucination rate, refusal rate, latency, and cost; rerun the set like a regression suite on every prompt, retrieval, or model change; and share the failure breakdown openly (<em>"94% pass rate on your test set; the remaining 6% fall into these boundary categories, which route to review"</em>).</li>
           <li><strong>C · Observe Every Step (Auditability):</strong> Log every interaction (input, retrieved chunks, prompt version, pinned model version, thought summaries as supporting evidence, output, and reviewer feedback), record step-by-step traces across every tool call so any decision can be reconstructed months later, and expose live drift and quality dashboards to operators.</li>
-          <li><strong>D · Enforce Deterministic Guardrails and Version Pinning (Control &amp; Stability):</strong> Screen inputs and outputs for PII, toxicity, off-topic asks, and prompt injection; enforce permissions, dollar caps, and business rules in application code (<a href="https://www.anthropic.com/research/building-effective-agents" target="_blank" rel="noopener">Anthropic, Dec 2024</a>); isolate API <code>HTTP 429</code>/timeout faults into retry queues; lower temperature with fixed schemas where repeatability matters; leave the model's reasoning trace free of training or prompt penalties so it stays useful for monitoring (<a href="https://arxiv.org/abs/2503.11926" target="_blank" rel="noopener">Baker et al., Mar 2025</a>); and <strong>pin exact model versions</strong> so upgrades occur strictly when the customer's eval suite passes.</li>
+          <li><strong>D · Enforce Deterministic Guardrails and Version Pinning (Control &amp; Stability):</strong> Screen inputs and outputs for PII, toxicity, off-topic asks, and prompt injection; enforce permissions, dollar caps, and business rules in application code (<a href="https://www.anthropic.com/research/building-effective-agents" target="_blank" rel="noopener">Anthropic, Dec 2024</a>); isolate API <code>HTTP 429</code>/timeout faults into retry queues; lower temperature with fixed schemas where repeatability matters; if you fine-tune or run reinforcement learning, keep the reasoning trace out of the reward signal so it stays useful for monitoring (<a href="https://arxiv.org/abs/2503.11926" target="_blank" rel="noopener">Baker et al., Mar 2025</a>); and <strong>pin exact model versions</strong> so upgrades occur strictly when the customer's eval suite passes.</li>
           <li><strong>E · Keep Accountable Humans in the Loop (Accountability):</strong> Match autonomy to error cost by automating low-risk tasks while routing uncertain or high-impact cases via confidence thresholds and dry-run previews to named human reviewers with clear sign-off ownership (<code>RACI</code>).</li>
           <li><strong>F · Document Model and Data Provenance (Governance):</strong> Provide model cards (intended scope, limitations, benchmark results), compliance certifications (<code>SOC 2</code>, <code>ISO 27001 / 42001</code>, <code>HIPAA BAA</code>), and enforceable cloud data guarantees: contractual zero-training on customer data, regional residency, VPC perimeters, customer-managed encryption keys (<code>CMEK</code>), and explicit retention bounds.</li>
           <li><strong>G · Roll Out Gradually (Earned Trust):</strong> Start on a low-risk, high-visibility wedge and earn promotion across stages: <code>Scoped Pilot → Shadow Mode</code> (running silently beside humans to compare outcomes) <code>→ Assisted Copilot → Partial Scoped Automation</code>, backed by an instant operational kill switch (<a href="https://martinfowler.com/articles/feature-toggles.html" target="_blank" rel="noopener">Hodgson, Oct 2017</a>).</li>
@@ -1227,7 +1227,7 @@
         </p>
 
         <div class="closes">
-          <span><b>Takeaway:</b> Diagnose which of the nine "black box" concerns applies, be candid that model weights stay opaque, wrap the model in seven transparent system layers (grounding, co-owned evals, audit traces, code guardrails + version pinning, risk-matched HITL, provenance, and phased shadow-to-auto rollout), and use hybrid designs where deterministic logic makes high-stakes calls.</span>
+          <span><b>Takeaway:</b> Diagnose which of the nine "black box" concerns applies, be candid that model weights stay opaque, wrap the model in seven transparent system layers (grounding, co-owned evals, audit traces, code guardrails + version pinning, risk-matched HITL, provenance, and phased shadow-to-auto rollout), use hybrid designs where deterministic logic makes high-stakes calls, and treat reasoning traces as supporting evidence.</span>
         </div>
         <p>
           Option 4 in that table (pinned open-weight models) and Option 2 (classical tabular ML) point straight to the next question interviewers ask: when to choose open-weight models versus proprietary APIs or classical machine learning across the full model spectrum.
