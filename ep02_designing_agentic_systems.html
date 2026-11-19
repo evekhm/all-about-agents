@@ -1651,7 +1651,7 @@
           </g>
           <g class="stg-new">
             <path d="M705 374 V432 H398 V342 H412" style="fill:none;stroke:var(--stop);stroke-width:1.9;stroke-dasharray:5 4" marker-end="url(#ps5-stop)"/>
-            <text class="t-m-r" x="552" y="448" text-anchor="middle">RETRY (attempt &lt; 3) · RetryFeedback</text>
+            <text class="t-m-r" x="552" y="448" text-anchor="middle">RETRY (≤ 3 attempts) · RetryFeedback</text>
             <path d="M776 374 V414 H1010" style="fill:none;stroke:var(--ink);stroke-width:1.7" marker-end="url(#ps5-ink)"/>
             <rect class="b-ext" x="1014" y="388" width="168" height="58" rx="8"/>
             <text class="t-b" x="1098" y="411" text-anchor="middle" style="font-size:14.6px">ESCALATE to person</text>
@@ -1854,7 +1854,7 @@
           </g>
           <g class="stg-prev">
             <path d="M693 452 V468 H398 V342 H412" style="fill:none;stroke:var(--stop);stroke-width:1.9;stroke-dasharray:5 4" marker-end="url(#ps6-stop)"/>
-            <text class="t-m-r" x="545" y="484" text-anchor="middle">RETRY (attempt &lt; 3) · RetryFeedback</text>
+            <text class="t-m-r" x="545" y="484" text-anchor="middle">RETRY (≤ 3 attempts) · RetryFeedback</text>
             <path d="M788 374 V424 H1010" style="fill:none;stroke:var(--ink);stroke-width:1.7" marker-end="url(#ps6-ink)"/>
             <rect class="b-ext" x="1014" y="396" width="168" height="56" rx="8"/>
             <text class="t-b" x="1098" y="418" text-anchor="middle" style="font-size:14.6px">ESCALATE to person</text>
@@ -2046,7 +2046,7 @@
           <text class="t-s" x="700" y="436" text-anchor="middle" style="font-size:13px;fill:var(--ink)">fresh verification run</text>
 
           <path d="M693 452 V468 H398 V342 H412" style="fill:none;stroke:var(--stop);stroke-width:1.9;stroke-dasharray:5 4" marker-end="url(#pgcp-stop)"/>
-          <text class="t-m-r" x="545" y="484" text-anchor="middle">RETRY (attempt &lt; 3) · RetryFeedback</text>
+          <text class="t-m-r" x="545" y="484" text-anchor="middle">RETRY (≤ 3 attempts) · RetryFeedback</text>
 
           <path d="M788 374 V424 H1010" style="fill:none;stroke:var(--ink);stroke-width:1.7" marker-end="url(#pgcp-ink)"/>
           <rect class="b-ext" x="1014" y="396" width="168" height="56" rx="8"/>
@@ -2148,7 +2148,7 @@
               <tr><td><b><a href="#q2">Q2</a></b></td><td>How big is it really?</td><td>Over-built infra for filtered noise, or runaway model bills.</td><td>Multiply volume × filter rate; enforce step and budget caps per case.</td><td><code>10,000 × 1% = 100</code>/day</td><td><a href="#stage-1">Stage 1</a></td></tr>
               <tr><td><b><a href="#q3">Q3</a></b></td><td>What belongs in the workflow vs. outside?</td><td>Models wait on live outages or hold production deploy keys.</td><td>Scope workflow strictly to asynchronous <strong>diagnosis and repair</strong>.</td><td>Branch + draft PR; deploy stays outside</td><td><a href="#stage-1">Stage 1</a></td></tr>
               <tr><td><b><a href="#q4">Q4</a></b></td><td>How does work reach a worker safely?</td><td>Sender HTTP timeouts, dropped bursts, or lost runs.</td><td>Stateless <strong>Receiver</strong> + durable <strong>Queue</strong> + terminal <code>ack</code> + DLQ (5 tries).</td><td>Cloud Run → Pub/Sub → terminal <code>ack</code></td><td><a href="#stage-1">Stage 1</a></td></tr>
-              <tr><td><b><a href="#q5">Q5</a></b></td><td>How do I avoid doing work twice?</td><td>Duplicate PRs, tickets, or double mutations.</td><td>Code-computed duplicate key + atomic <strong>lock</strong> row + idempotent write.</td><td><code>(repo, failure_<wbr>fingerprint)</code> in Spanner</td><td><a href="#stage-2">Stage 2</a></td></tr>
+              <tr><td><b><a href="#q5">Q5</a></b></td><td>How do I avoid doing work twice?</td><td>Duplicate PRs, tickets, or double mutations.</td><td>Code-computed duplicate key + atomic <strong>lock</strong> row + idempotent write.</td><td><code>(repo, failure_<wbr>fingerprint)</code> in Cloud SQL</td><td><a href="#stage-2">Stage 2</a></td></tr>
               <tr><td><b><a href="#q6">Q6</a></b></td><td>One bug vs. everything on fire?</td><td>Shared infra outage makes bots "fix" healthy targets.</td><td>Count distinct targets in a short window; trip a <strong>storm breaker</strong>.</td><td>5+ repos in 5 min → pause &amp; page</td><td><a href="#stage-2">Stage 2</a></td></tr>
               <tr><td><b><a href="#q7">Q7</a></b></td><td>How does a person stop it, right now?</td><td>A bad prompt or model release keeps acting until a fix ships.</td><td>Manual <strong>kill switch</strong>: one flag, read at run start and before every write; events are parked.</td><td>Flag per repo or for all repos</td><td><a href="#stage-2">Stage 2</a></td></tr>
               <tr><td><b><a href="#q8">Q8</a></b></td><td>What if a worker dies halfway?</td><td>Lost work (early <code>ack</code>) or permanently stuck locks.</td><td>Expiring <strong>lease</strong> + heartbeat renewal + monotonic <strong>fencing token</strong>.</td><td>120-second lease, 30-second heartbeat, fencing token</td><td><a href="#stage-2">Stage 2</a></td></tr>
@@ -2202,7 +2202,7 @@
 
           <rect class="b-code" x="196" y="58" width="136" height="64" rx="7"/>
           <text class="t-b" x="264" y="83" text-anchor="middle" style="font-size:15.2px">Guard</text>
-          <text class="t-s" x="264" y="104" text-anchor="middle" style="font-size:13px">storm + Spanner lease</text>
+          <text class="t-s" x="264" y="104" text-anchor="middle" style="font-size:13px">storm + DB lease</text>
           <path class="flow" d="M332 90 H356" marker-end="url(#pbr-ink)"/>
 
           <rect class="b-model" x="360" y="58" width="128" height="64" rx="7"/>
@@ -2240,12 +2240,12 @@
           <rect class="b-code" x="588" y="58" width="280" height="74" rx="7"/>
           <text class="t-b" x="598" y="82" style="font-size:14.6px">1 · Auth, OBO &amp; Screen (L1, L2, L5)</text>
           <text class="t-s" x="598" y="102" style="font-size:13.2px">HMAC &amp; quotas · SPIFFE mTLS + OBO</text>
-          <text class="t-s" x="598" y="119" style="font-size:13.2px">Model Armor + Cloud SDP screening</text>
+          <text class="t-s" x="598" y="119" style="font-size:13.2px">Model Armor + Sensitive Data Protection</text>
           <path class="flow" d="M868 95 H890" marker-end="url(#pbr-ink)"/>
 
           <rect class="b-code" x="894" y="58" width="258" height="74" rx="7"/>
           <text class="t-b" x="906" y="82" style="font-size:14.6px">2 · Quarantine &amp; Tools (L3, L4)</text>
-          <text class="t-s" x="906" y="102" style="font-size:13.2px">Toolless Quarantine + harness;</text>
+          <text class="t-s" x="906" y="102" style="font-size:13.2px">Quarantined + harness;</text>
           <text class="t-s" x="906" y="119" style="font-size:13.2px">MCP Toolbox fixed SQL templates</text>
 
           <path class="flow" d="M1017 132 V166" marker-end="url(#pbr-ink)"/>
