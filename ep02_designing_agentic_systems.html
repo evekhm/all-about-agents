@@ -874,7 +874,7 @@
     <a href="#four-blocks">4 Blocks</a>
     <a href="#stage-1">Stage 1 · Boundary</a>
     <a href="#stage-2">Stage 2 · Control Plane</a>
-    <a href="#stage-3">Stage 3 · Core</a>
+    <a href="#stage-3">Stage 3 · Workflow</a>
     <a href="#stage-4">Stage 4 · Safeguards</a>
     <a href="ref/ep02-full-architecture.html">Full Architecture</a>
     <a href="#gcp">Google Cloud</a>
@@ -903,10 +903,10 @@
     <div class="sheet-b">
       <div class="post-prose">
         <p>
-          Carrying the habit of handing a model a goal and letting it work out the steps into system design makes it easy to sketch an architecture as a sequence of autonomous black boxes while leaving control flow, state, failure recovery, and security unspecified. My goal with this episode is to build muscle memory for the architectural questions that endure beneath changing frameworks, turning them into a reusable approach across domains.
+          As frontier language models get better in everyday interactive work, handing them a high-level goal and letting them work out the steps becomes routine. Carrying that habit into system design makes it easy to sketch an architecture as a sequence of autonomous black boxes, naming what each agent should accomplish while leaving control flow, state, failure recovery, and security unspecified. At the same time, new frameworks, SDKs, and agent protocols arrive constantly, while the architectural questions underneath that churn change far more slowly. My goal with this episode is to build muscle memory for the new set of questions we need to ask and answer when working with agent-based systems, and to turn them into a generic approach that applies across domains and problem types.
         </p>
         <p>
-          In this episode, we will look into the type of systems that wake up asynchronously on an external event, such as a webhook, a monitoring alert, an incoming document, or a scheduled feed. Once triggered, the system has to make sense of unstructured, potentially untrusted input, gather context across external stores and tools, check its proposed result against domain rules, and prepare or apply an external state change safely under traffic bursts, duplicate deliveries, and mid-run crashes. That same problem shape comes up across domains: resolving supplier invoice mismatches, triaging production incidents, reviewing updated client filings, or repairing failing builds.
+          Our focus is systems that wake up asynchronously on an external event, such as a webhook, a monitoring alert, an incoming document, or a scheduled feed. Once triggered, the system has to make sense of unstructured, potentially untrusted input, gather context across external stores and tools, check its proposed result against domain rules, and prepare or apply an external state change safely under traffic bursts, duplicate deliveries, and mid-run crashes. That same problem shape comes up across domains: resolving supplier invoice mismatches, triaging production incidents, reviewing updated client filings, or repairing failing builds.
         </p>
         <p>
           Classical software handles the predictable parts of that pipeline whenever inputs arrive in fixed schemas and rules are known up front. It breaks down at two boundaries: <strong>interpreting unstructured, noisy inputs</strong> that resist static parsers, and <strong>exploring an open-ended solution space</strong> where the next lookup or candidate change depends on what the previous step uncovered. Language models earn their place at those two points, while deterministic code owns the guarantees around them: queueing, deduplication, leases, verification, and write credentials. Production systems combine both in a <strong>hybrid architecture</strong> that embeds scoped <strong>agents</strong> inside deterministic <strong>workflows</strong> (<a href="https://www.anthropic.com/research/building-effective-agents" target="_blank" rel="noopener">Anthropic</a>, <a href="https://github.com/humanlayer/12-factor-agents" target="_blank" rel="noopener">12-Factor Agents</a>, <a href="https://docs.cloud.google.com/architecture/choose-design-pattern-agentic-ai-system" target="_blank" rel="noopener">Google Cloud</a>): <em>proposing</em> a diagnosis or candidate fix uses a model, whereas <em>verifying</em> that proposal against schemas, policies, and test suites, and committing the side effect once, stays in deterministic code.
@@ -968,12 +968,12 @@
         </p>
       </div>
       <div class="diagram-frame" id="fig-four-blocks">
-        <svg viewBox="0 0 1160 234" role="img" aria-label="Figure 2 — The 4-Block Mental Model: Boundary, Control Plane, Core, and Safeguards.">
+        <svg viewBox="0 0 1160 234" role="img" aria-label="Figure 2 — The 4-Block Mental Model: Boundary, Control Plane, Workflow, and Safeguards.">
           <defs>
             <marker id="fb-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--ink)"/></marker>
           </defs>
           <rect class="zone-box" x="12" y="12" width="1136" height="210" rx="12"/>
-          <text class="t-zone" x="30" y="38">FOUR-BLOCK ARCHITECTURE · BOUNDARY → CONTROL PLANE → CORE → SAFEGUARDS</text>
+          <text class="t-zone" x="30" y="38">FOUR-BLOCK ARCHITECTURE · BOUNDARY → CONTROL PLANE → WORKFLOW → SAFEGUARDS</text>
 
           <!-- Boundary -->
           <rect class="b-ext" x="28" y="56" width="248" height="150" rx="9"/>
@@ -995,9 +995,9 @@
 
           <path class="flow" d="M566 131 H598" marker-end="url(#fb-ink)"/>
 
-          <!-- Core -->
+          <!-- Workflow -->
           <rect class="b-model" x="602" y="56" width="260" height="150" rx="9"/>
-          <text class="t-b" x="618" y="88" style="font-size:19px;fill:var(--violet)">Core</text>
+          <text class="t-b" x="618" y="88" style="font-size:19px;fill:var(--violet)">Workflow</text>
           <text class="t-s" x="618" y="114" style="font-size:14.6px;font-weight:600;fill:var(--ink)">Read, think, verify, act</text>
           <text class="t-s" x="618" y="140" style="font-size:14.2px">• Quarantined → Privileged</text>
           <text class="t-s" x="618" y="162" style="font-size:14.2px">• Code verifier + Act gate</text>
@@ -1028,7 +1028,7 @@
             <tbody>
               <tr><td><b><a href="#stage-1">Boundary</a></b></td><td>Normalize triggers into pointer events, size real filtered volume, scope to asynchronous execution, and buffer behind a stateless receiver and durable queue with terminal acknowledgement.</td></tr>
               <tr><td><b><a href="#stage-2">Control Plane</a></b></td><td>Enforce dedupe locks, storm breakers, kill switches, expiring leases, and fencing.</td></tr>
-              <tr><td><b><a href="#stage-3">Core</a></b></td><td>Split untrusted reading from tool use, verify independently in plain code, keep write actions in code, pass small typed contracts without shared chat history, and keep state and memory writes in code.</td></tr>
+              <tr><td><b><a href="#stage-3">Workflow</a></b></td><td>Split untrusted reading from tool use, verify independently in plain code, keep write actions in code, pass small typed contracts without shared chat history, and keep state and memory writes in code.</td></tr>
               <tr><td><b><a href="#stage-4">Safeguards</a></b></td><td>Execute untrusted tools and tests in zero-network, zero-credential sandboxes and gate rollout on offline replays and live metrics.</td></tr>
             </tbody>
           </table>
@@ -1313,7 +1313,7 @@
     <div class="sheet-h">
       <div>
         <span class="sec-badge">Inside the Worker</span>
-        <h2>Stage 3 · Core: Agents, Handoffs, and State</h2>
+        <h2>Stage 3 · Workflow: Agents, Handoffs, and State</h2>
         <p>Give every step the lowest autonomy that works, pass small validated schemas between steps, cap retries, and keep state and memory writes in code.</p>
       </div>
     </div>
@@ -1354,7 +1354,7 @@
         </p>
       </div>
       <div class="diagram-frame" id="fig-s4">
-        <svg viewBox="0 0 1200 546" role="img" aria-label="Figure 5 — Stage 3 · Core (Agents): Black boxes split into Quarantined LLM, Privileged LLM, plain-code Verifier, and Act gate.">
+        <svg viewBox="0 0 1200 546" role="img" aria-label="Figure 5 — Stage 3 · Workflow (Agents): Black boxes split into Quarantined LLM, Privileged LLM, plain-code Verifier, and Act gate.">
           <defs>
             <marker id="ps4-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--ink)"/></marker>
             <marker id="ps4-mut" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--muted)"/></marker>
@@ -1449,7 +1449,7 @@
             <text class="t-s" x="1180" y="222" text-anchor="end" style="font-size:13.4px">step and cost cap per case</text>
           </g>
         </svg>
-        <div class="fig-caption"><span>Figure 5 — Stage 3 · Core (Agents): Black boxes split into Quarantined LLM, Privileged LLM, plain-code Verifier, and Act gate.</span>
+        <div class="fig-caption"><span>Figure 5 — Stage 3 · Workflow (Agents): Black boxes split into Quarantined LLM, Privileged LLM, plain-code Verifier, and Act gate.</span>
           <div class="legend-items"><span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good);border-width:2.2px;box-shadow:0 0 5px var(--good)"></i> <b>Bold glow = Added in this stage</b></span><span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good)"></i> Plain code</span><span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> LLM step</span><span><i class="swatch-dot" style="background:var(--amber-soft);border-color:var(--amber)"></i> Queue / store</span></div>
         </div>
       </div>
@@ -1554,7 +1554,7 @@
         </p>
       </div>
       <div class="diagram-frame" id="fig-s5">
-        <svg viewBox="0 0 1200 596" role="img" aria-label="Figure 6 — Stage 3 · Core (Handoffs and State): Six typed handoff contracts, bounded retry (≤ 3 attempts), human escalation, and session/memory stores.">
+        <svg viewBox="0 0 1200 596" role="img" aria-label="Figure 6 — Stage 3 · Workflow (Handoffs and State): Six typed handoff contracts, bounded retry (≤ 3 attempts), human escalation, and session/memory stores.">
           <defs>
             <marker id="ps5-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--ink)"/></marker>
             <marker id="ps5-mut" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--muted)"/></marker>
@@ -1677,7 +1677,7 @@
             <text class="t-s" x="346" y="438" text-anchor="end" style="font-size:13.4px">bounded reads by pointer</text>
           </g>
         </svg>
-        <div class="fig-caption"><span>Figure 6 — Stage 3 · Core (Handoffs and State): Six typed handoff contracts, bounded retry (≤ 3 attempts), human escalation, and session/memory stores.</span>
+        <div class="fig-caption"><span>Figure 6 — Stage 3 · Workflow (Handoffs and State): Six typed handoff contracts, bounded retry (≤ 3 attempts), human escalation, and session/memory stores.</span>
           <div class="legend-items"><span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good);border-width:2.2px;box-shadow:0 0 5px var(--good)"></i> <b>Bold glow = Added in this stage</b></span><span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good)"></i> Plain code</span><span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> LLM step</span><span><i class="swatch-dot" style="background:var(--amber-soft);border-color:var(--amber)"></i> Queue / store</span></div>
         </div>
       </div>
@@ -2136,7 +2136,7 @@
         Non-deterministic model steps generalize over messy inputs and explore candidate fixes that static rules cannot anticipate; deterministic controller code owns the workflow, verifies every result independently, and gates state, writes, and queue acknowledgement.
       </div>
       <div class="post-prose" style="margin-bottom:10px;">
-        <p><strong>Four-Block Shortcut:</strong> <strong>Boundary</strong> (triggers, real rate, async scope, receiver, queue) → <strong>Control Plane</strong> (Guard, lock, storm, kill switch, lease, fencing) → <strong>Core</strong> (Quarantined → Privileged → Verifier → Act gate, typed contracts) → <strong>Safeguards</strong> (zero-net sandboxes, narrow keys, replay evals).</p>
+        <p><strong>Four-Block Shortcut:</strong> <strong>Boundary</strong> (triggers, real rate, async scope, receiver, queue) → <strong>Control Plane</strong> (Guard, lock, storm, kill switch, lease, fencing) → <strong>Workflow</strong> (Quarantined → Privileged → Verifier → Act gate, typed contracts) → <strong>Safeguards</strong> (zero-net sandboxes, narrow keys, replay evals).</p>
       </div>
       <div class="nine-q-wrap" id="tbl-7" style="margin:14px 0 16px;">
         <div class="nine-q-head">Table 8 · Master Cheat Sheet — All Thirteen Questions Mapped to Progressive Stages</div>
@@ -2305,7 +2305,7 @@
         <ul>
           <li><strong>Fix the boundary and intake (Boundary — Stage 1):</strong> normalize triggers into pointer events, size real filtered volume, scope workflows to asynchronous diagnosis and repair, and decouple senders behind a stateless receiver and durable queue with terminal acknowledgement.</li>
           <li><strong>Coordinate and recover in one control plane (Control Plane — Stage 2):</strong> coordinate concurrent runs through one transactional store holding dedupe locks, a storm breaker, a manual kill switch, and expiring leases with pre-write fencing.</li>
-          <li><strong>Scope autonomy inside one harness (Core — Stage 3):</strong> reserve language models for interpreting messy, untrusted text (a toolless Quarantined LLM) and exploring open-ended fixes (a bounded Privileged LLM), pass code-validated typed handoff contracts between steps with shared chat history disabled, verify every candidate independently in plain code, and restrict long-term memory writes to post-approval code.</li>
+          <li><strong>Scope autonomy inside one harness (Workflow — Stage 3):</strong> reserve language models for interpreting messy, untrusted text (a toolless Quarantined LLM) and exploring open-ended fixes (a bounded Privileged LLM), pass code-validated typed handoff contracts between steps with shared chat history disabled, verify every candidate independently in plain code, and restrict long-term memory writes to post-approval code.</li>
           <li><strong>Isolate execution and prove quality (Safeguards — Stage 4):</strong> run untrusted tools and clean-room test suites inside networkless, credential-free sandboxes, keep external write tokens narrow on a plain-code gate, and promote changes through offline golden replays and live acceptance metrics.</li>
         </ul>
         <p>
