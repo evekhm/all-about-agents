@@ -1010,7 +1010,7 @@
 </g>
 <g>
 <rect class="b-code" height="92" rx="7" width="184" x="236" y="66"></rect>
-<text class="t-b" style="font-size:15.8px" x="248" y="90">Ingress / Receiver</text>
+<text class="t-b" style="font-size:15.8px" x="248" y="90">Receiver</text>
 <text class="t-s" style="font-size:13.4px" x="248" y="110">authenticate, filter,</text>
 <text class="t-s" style="font-size:13.4px" x="248" y="127">fingerprint, reply 200</text>
 <text class="t-s" style="font-size:13px" x="248" y="144">stateless receiver</text>
@@ -1031,7 +1031,7 @@
 <text class="t-b" style="font-size:15.8px" text-anchor="middle" x="102" y="290">Guard</text>
 <text class="t-m-g" style="font-size:11.8px" text-anchor="middle" x="102" y="309">PLAIN CODE</text>
 <text class="t-s" style="font-size:13.4px" text-anchor="middle" x="102" y="327">kill switch &amp; storm,</text>
-<text class="t-s" style="font-size:13.4px" text-anchor="middle" x="102" y="343">claims 120s lease</text>
+<text class="t-s" style="font-size:13.4px" text-anchor="middle" x="102" y="343">claims 120-second lease</text>
 <path class="flow" d="M184 320 H204" marker-end="url(#ps6-ink)"></path>
 </g>
 <g>
@@ -1175,12 +1175,12 @@
       <div class="step-grid">
         <div class="step-card">
           <div class="step-head">
-            <div class="step-title"><span class="step-num">03</span><span>Ingress / Receiver</span></div>
+            <div class="step-title"><span class="step-num">03</span><span>Receiver</span></div>
             <span class="step-tag">Plain Code · Standalone Service #1</span>
           </div>
           <div class="step-why"><b>Problem solved:</b> Webhook senders time out after a few seconds, public HTTP endpoints attract spoofed requests, and 99% of deployment events represent healthy builds.</div>
           <p class="step-how">
-            A lightweight stateless HTTP service verifies the caller's HMAC or OIDC signature, filters incoming webhooks down to real failures, computes a deterministic <code>failure_fingerprint</code> hash from error type, location, and cleaned message, publishes a typed <code>FailureEvent</code> to the queue, and replies <code>200 OK</code> in under 100 milliseconds.
+            A lightweight stateless HTTP service verifies the caller's HMAC or OIDC signature, filters incoming webhooks down to real failures, computes a deterministic <code>failure_fingerprint</code> hash from structured webhook fields (no log download needed), publishes a typed <code>FailureEvent</code> to the queue, and replies <code>200 OK</code> in under 100 milliseconds.
           </p>
         </div>
 
@@ -1224,7 +1224,7 @@
   <span class="hl-k">"repo"</span>: <span class="hl-s">"acme/payments"</span>,
   <span class="hl-k">"commit_sha"</span>: <span class="hl-s">"a3f91c2"</span>,
   <span class="hl-k">"failure_fingerprint"</span>: <span class="hl-s">"fp_8d4e"</span>,
-  <span class="hl-k">"rollback_status"</span>: <span class="hl-s">"ROLLED_BACK"</span>,
+  <span class="hl-k">"rollback_status"</span>: <span class="hl-s">"PENDING"</span>,
   <span class="hl-k">"log_pointer"</span>: <span class="hl-s">"dep_4471"</span>
 }</pre>
 <footer>Carries parallel rollback status and a log pointer; the 50 MB log stays in storage.</footer>
@@ -1331,7 +1331,7 @@
   <section class="sheet" id="gcp">
     <div class="sheet-h">
       <div>
-        <span class="sec-badge">Cloud Reference · Google Cloud &amp; Gemini Enterprise Agent Platform</span>
+        <span class="sec-badge">Cloud Reference · Google Cloud &amp; Gemini Enterprise</span>
         <h2>The Full Architecture Mapped to Google Cloud</h2>
         <p>Every box and wire from <em>Figure 1</em> mapped 1-to-1 onto managed Google Cloud services—deployed as two services plus ephemeral gVisor sandboxes.</p>
       </div>
@@ -1339,12 +1339,12 @@
     <div class="sheet-b">
       <div class="post-prose">
         <p>
-          <a href="#fig-gcp-full"><em>Figure 2</em></a> maps the platform-agnostic architecture directly onto Google Cloud and the <strong>Gemini Enterprise Agent Platform</strong> (shortened to <strong>Agent Platform</strong>; model calls stay family-neutral). At ~100 failures a day, one <strong>Spanner</strong> database handles the operator kill switch, the 5-minute distinct-repo storm query, and the per-incident lock, 120-second lease, and fencing token.
+          <a href="#fig-gcp-full"><em>Figure 2</em></a> maps the platform-agnostic architecture directly onto Google Cloud and <strong>Gemini Enterprise</strong> (model calls stay family-neutral). At ~100 failures a day, one <strong>Spanner</strong> database (or <strong>Cloud SQL</strong> / <strong>Firestore</strong> if you prefer a lighter single-region store) handles the operator kill switch, the 5-minute distinct-repo storm query, and the per-incident lock, 120-second lease, and fencing token—chosen here for strongly consistent multi-region transactions and monotonic commit timestamps.
         </p>
       </div>
 
       <div class="diagram-frame" id="fig-gcp-full">
-<svg aria-label="Figure 2: Complete architecture mapped 1-to-1 onto Google Cloud and Gemini Enterprise Agent Platform" role="img" viewbox="0 0 1200 638">
+<svg aria-label="Figure 2: Complete architecture mapped 1-to-1 onto Google Cloud and Gemini Enterprise" role="img" viewbox="0 0 1200 638">
 <defs>
 <marker id="pgcp-ink" markerheight="6" markerwidth="6" orient="auto-start-reverse" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--ink)"></path></marker>
 <marker id="pgcp-mut" markerheight="6" markerwidth="6" orient="auto-start-reverse" refx="9" refy="5" viewbox="0 0 10 10"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--muted)"></path></marker>
@@ -1360,7 +1360,7 @@
 <path d="M18.085 21.57A18.11 18.11 0 0 0 0 39.654c0 5.873 2.813 11.095 7.166 14.403l8.064-8.064a6.96 6.96 0 0 1-4.099-6.339c0-3.837 3.124-6.954 6.954-6.954 2.82 0 5.244 1.7 6.34 4.1l8.064-8.064c-3.307-4.353-8.53-7.166-14.403-7.166z" fill="#fbbc05"></path>
 </g>
 <text class="t-b" style="font-size:16px" x="60" y="36">Google Cloud</text>
-<text class="zl" x="176" y="36">· GEMINI ENTERPRISE AGENT PLATFORM</text>
+<text class="zl" x="176" y="36">· GEMINI ENTERPRISE</text>
 <g transform="translate(0, 44)">
 <rect class="b-ext" height="92" rx="7" width="170" x="20" y="66"></rect>
 <text class="t-b" style="font-size:15.8px" x="32" y="90">Event Sources</text>
@@ -1451,7 +1451,7 @@
 <path class="flow-d" d="M356 374 V494" marker-end="url(#pgcp-mut)"></path>
 <rect class="b-store" height="70" rx="7" width="316" x="342" y="498"></rect>
 <text class="t-b" style="font-size:15.8px" x="354" y="520">Session, GCS &amp; Memory Bank</text>
-<text class="t-s" style="font-size:13.4px" x="354" y="539">Agent Platform Session + GCS blobs</text>
+<text class="t-s" style="font-size:13.4px" x="354" y="539">Gemini Enterprise Session + GCS blobs</text>
 <text class="t-s" style="font-size:13.4px" x="354" y="556">Memory Bank: past merged fixes only</text>
 <path class="flow-d" d="M907 374 V494" marker-end="url(#pgcp-mut)"></path>
 <path class="flow-d" d="M1098 452 V533 H990" marker-end="url(#pgcp-mut)"></path>
@@ -1463,7 +1463,7 @@
 <text class="zl" x="128" y="257">WORKER SERVICE #2 (CLOUD RUN OR AGENT RUNTIME) · AGENT IDENTITY · ADK WORKFLOW</text>
 </g>
 </svg>
-<div class="fig-caption"><span>Figure 2 — Complete architecture mapped 1-to-1 onto Google Cloud and Gemini Enterprise Agent Platform.</span>
+<div class="fig-caption"><span>Figure 2 — Complete architecture mapped 1-to-1 onto Google Cloud and Gemini Enterprise.</span>
 <div class="legend-items"><span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good)"></i> Plain code</span><span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> LLM step</span><span><i class="swatch-dot" style="background:var(--amber-soft);border-color:var(--amber)"></i> Queue / store</span><span><i class="swatch-dot" style="background:var(--panel-2);border-color:var(--cyan)"></i> Sandbox</span></div>
 </div>
 </div>
@@ -1473,7 +1473,7 @@
         <ul>
           <li><strong>Parallel Existing Rollback &amp; Stateless Intake (Steps 01–04):</strong> When a canary SLO burn-rate alert fires in <strong>Cloud Monitoring</strong>, pre-existing <strong>Cloud Deploy</strong> automation rolls back the canary in seconds outside our agent design while posting the failure webhook (carrying <code>rollback_status</code>) in parallel to the standalone <strong>Cloud Run Receiver</strong> (Service #1). The Receiver verifies HMAC/OIDC signatures, computes <code>failure_fingerprint</code>, enqueues <code>FailureEvent</code> into <strong>Cloud Pub/Sub</strong> (configured with exponential backoff and a dead-letter topic), and returns <code>200</code> in under 100 ms.</li>
           <li><strong>Single Worker Service &amp; Spanner Guard (Step 05):</strong> <strong>Worker Service #2</strong> (deployed on <strong>Cloud Run</strong> or <strong>Agent Runtime</strong> with keyless <strong>Agent Identity</strong>) runs the entire <strong>ADK 2.x <code>Workflow</code></strong> graph in-process so sequential steps avoid network hops. Its entry <code>guard_node</code> function runs a <strong>Spanner</strong> transaction checking the kill switch, running the 5-minute storm query, and claiming a 120-second row lease with a monotonic fencing token.</li>
-          <li><strong>Quarantined &amp; Privileged LLM Nodes + gVisor Sandboxes (Steps 06–08):</strong> The <code>Quarantined LLM</code> node reads ≤100 log lines from <strong>Cloud Logging / Cloud Storage</strong> through <strong>Model Armor</strong> inline prompt-injection screening with zero tools to produce <code>IncidentReport</code>. The <code>Privileged LLM</code> ADK agent loop reads past merged fixes from <strong>Memory Bank</strong> and dispatches repo search/edit/test tools into <strong>Agent Platform Code Execution Sandbox 1</strong> (ephemeral gVisor sandbox with no network and no IAM credentials). The plain-code <code>Verifier Node</code> tracks <code>fix_attempts</code> in <strong>Agent Platform Session</strong> and runs the clean-room test suite in a fresh <strong>Code Execution Sandbox 2</strong>.</li>
+          <li><strong>Quarantined &amp; Privileged LLM Nodes + gVisor Sandboxes (Steps 06–08):</strong> The <code>Quarantined LLM</code> node reads ≤100 log lines from <strong>Cloud Logging / Cloud Storage</strong> through <strong>Model Armor</strong> inline prompt-injection screening with zero tools to produce <code>IncidentReport</code>. The <code>Privileged LLM</code> ADK agent loop reads past merged fixes from <strong>Memory Bank</strong> and dispatches repo search/edit/test tools into <strong>Gemini Enterprise Code Execution Sandbox 1</strong> (ephemeral gVisor sandbox with no network and no IAM credentials). The plain-code <code>Verifier Node</code> tracks <code>fix_attempts</code> in <strong>Gemini Enterprise Session</strong> and runs the clean-room test suite in a fresh <strong>Code Execution Sandbox 2</strong>.</li>
           <li><strong>Act Gate, Post-Merge Memory &amp; ADK Eval (Steps 09–11):</strong> On <code>PASS</code>, the plain-code <code>Act gate</code> function node re-verifies the Spanner kill switch and fencing token, fetches the narrow <code>autofix/*</code> GitHub token from <strong>Secret Manager</strong>, opens the draft PR, and sends the terminal <strong>Pub/Sub <code>ack</code></strong>. Post-merge automation writes human-approved fixes into <strong>Memory Bank</strong>, while <strong>Cloud Trace</strong>, <strong>BigQuery</strong>, and <strong>ADK Eval</strong> capture every trajectory and run offline golden replays.</li>
         </ul>
       </div>
@@ -1484,15 +1484,15 @@
 <table>
 <thead><tr><th style="width:24%">Generic component</th><th style="width:30%">Google Cloud service</th><th>In the self-healing repo</th></tr></thead>
 <tbody>
-<tr><td><b>Ingress / Receiver</b></td><td>Cloud Run service</td><td>Verifies HMAC/OIDC, hashes the fingerprint, publishes <code>FailureEvent</code>.</td></tr>
-<tr><td><b>Queue</b></td><td>Pub/Sub with a dead-letter topic</td><td>Holds the event until the terminal <code>ack</code>; dead-letters after 5 failed deliveries.</td></tr>
+<tr><td><b>Receiver</b></td><td>Cloud Run service</td><td>Verifies HMAC/OIDC, hashes the fingerprint, publishes <code>FailureEvent</code>.</td></tr>
+<tr><td><b>Queue</b></td><td>Pub/Sub with a dead-letter topic</td><td>Holds the event until a terminal or <code>PARKED</code> <code>ack</code>; dead-letters after 5 failed deliveries.</td></tr>
 <tr><td><b>Existing deployment infra (outside agent design)</b></td><td>Cloud Monitoring SLO alert + Cloud Deploy rollback</td><td>Rolls back the failing canary in parallel when SLO burn rate exceeds threshold.</td></tr>
 <tr><td><b>Worker and harness</b></td><td>Cloud Run or Agent Runtime, running an ADK 2.x <code>Workflow</code></td><td>All workflow nodes run in-process; one message drives one run.</td></tr>
-<tr><td><b>Coordination store and kill switch</b></td><td>One Spanner database</td><td>A control row for the kill switch, the 5-minute storm query, and an <code>incidents</code> table with lock, 120s lease and fencing. An in-memory cache such as Memorystore becomes useful at thousands of events per second.</td></tr>
+<tr><td><b>Coordination store and kill switch</b></td><td>One Spanner database</td><td>A control row for the kill switch, the 5-minute storm query, and an <code>incidents</code> table with lock, 120-second lease and fencing. An in-memory cache such as Memorystore becomes useful at thousands of events per second.</td></tr>
 <tr><td><b>Quarantined LLM input</b></td><td>Cloud Logging and Model Armor</td><td>At most 100 log lines, screened before the single model call.</td></tr>
-<tr><td><b>Session and blobs</b></td><td>Agent Platform Session and Cloud Storage</td><td><code>fix_attempts</code> and typed outputs in the session; logs and diffs by pointer.</td></tr>
+<tr><td><b>Session and blobs</b></td><td>Gemini Enterprise Session and Cloud Storage</td><td><code>fix_attempts</code> and typed outputs in the session; logs and diffs by pointer.</td></tr>
 <tr><td><b>Long-term memory</b></td><td>Memory Bank</td><td>Human-merged fixes, written after the merge and read-only during a run.</td></tr>
-<tr><td><b>Sandboxes 1 and 2</b></td><td>Agent Platform Code Execution</td><td>Tool calls and the verifier's test run, with no network and no credentials.</td></tr>
+<tr><td><b>Sandboxes 1 and 2</b></td><td>Gemini Enterprise Code Execution</td><td>Tool calls and the verifier's test run, with no network and no credentials.</td></tr>
 <tr><td><b>Act gate credential</b></td><td>Secret Manager</td><td>The repository token, limited to <code>autofix/*</code> branches.</td></tr>
 <tr><td><b>Audit and eval store</b></td><td>Cloud Trace, BigQuery and ADK Eval</td><td>One trace per case and the golden replay set.</td></tr>
 </tbody>
