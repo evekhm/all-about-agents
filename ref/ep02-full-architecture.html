@@ -1002,7 +1002,7 @@
 <text class="t-s" style="font-size:14px" x="32" y="111">events, alerts, users</text>
 <text class="t-s" style="font-size:13.4px" x="32" y="130">pointer to raw data</text>
 <rect class="b-ext" height="92" rx="7" width="420" x="760" y="66"></rect>
-<text class="t-b" style="font-size:15.4px" x="774" y="90">Existing SRE / CD infra (outside agent design)</text>
+<text class="t-b" style="font-size:15.4px" x="774" y="90">Existing deployment infra (outside agent design)</text>
 <text class="t-s" style="font-size:13.8px" x="774" y="112">SLO burn rate &gt; threshold → controller rollback</text>
 <text class="t-s" style="font-size:13.2px" x="774" y="134">fires in parallel; passes rollback_status in event</text>
 <path class="flow-d" d="M105 66 V32 H970 V62" marker-end="url(#ps6-mut)"></path>
@@ -1130,7 +1130,7 @@
 <text class="t-s" style="font-size:13.4px" text-anchor="end" x="346" y="438">bounded reads by pointer</text>
 </g>
 </svg>
-<div class="fig-caption"><span>Figure 1 — Complete platform-agnostic architecture: parallel existing SRE/CD infra outside the agent design, stateless intake, coordination store, Dual-LLM harness, isolated sandboxes, human gate, and audit/eval store.</span><div class="legend-items"><span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good)"></i> Plain code</span><span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> LLM step</span><span><i class="swatch-dot" style="background:var(--amber-soft);border-color:var(--amber)"></i> Queue / store</span><span><i class="swatch-dot" style="background:var(--panel-2);border-color:var(--cyan)"></i> Isolated sandbox</span></div></div>
+<div class="fig-caption"><span>Figure 1 — Complete platform-agnostic architecture: parallel existing deployment infra outside the agent design, stateless intake, coordination store, Dual-LLM harness, isolated sandboxes, human gate, and audit/eval store.</span><div class="legend-items"><span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good)"></i> Plain code</span><span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> LLM step</span><span><i class="swatch-dot" style="background:var(--amber-soft);border-color:var(--amber)"></i> Queue / store</span><span><i class="swatch-dot" style="background:var(--panel-2);border-color:var(--cyan)"></i> Isolated sandbox</span></div></div>
 </div>
     </div>
   </section>
@@ -1161,7 +1161,7 @@
 
         <div class="step-card">
           <div class="step-head">
-            <div class="step-title"><span class="step-num">02</span><span>Existing SRE / CD Infrastructure (Outside the Agent Design)</span></div>
+            <div class="step-title"><span class="step-num">02</span><span>Existing Deployment Infrastructure (Outside the Agent Design)</span></div>
             <span class="step-tag">Pre-Existing External Infrastructure</span>
           </div>
           <div class="step-why"><b>Problem solved:</b> Live users hit by a bad canary rollout require relief in seconds, whereas reading source files, synthesizing a patch, and running test suites takes minutes.</div>
@@ -1205,7 +1205,7 @@
             As the entry node of the single worker process, the Guard executes three transactional checks against the <strong>Coordination store</strong> before any model runs:
             (1) reads the operator <strong>kill switch</strong> flag—if tripped for that repo or globally, marks the case <code>PARKED</code> and sends <code>ack</code> so work pauses cleanly and resumes when cleared;
             (2) counts distinct repositories failing over a <strong>5-minute sliding window</strong>—if 5 or more fail together, trips the <strong>storm breaker</strong>, pauses automated PRs for 15 minutes, and pages on-call once;
-            (3) atomically claims the <code>(repo, failure_fingerprint)</code> row as <code>IN_PROGRESS</code> with a <strong>120-second expiring lease</strong> (renewed every 30 seconds by worker heartbeats) and increments a monotonic <strong>fencing generation (<code>epoch</code>)</strong>. Duplicate or already-finished rows record <code>SKIPPED</code> and send <code>ack</code>.
+            (3) atomically claims the <code>(repo, failure_fingerprint)</code> row as <code>IN_PROGRESS</code> with a <strong>120-second expiring lease</strong> (renewed every 30 seconds by worker heartbeats) and increments a monotonic <strong>fencing token</strong>. Duplicate or already-finished rows record <code>SKIPPED</code> and send <code>ack</code>.
           </p>
         </div>
       </div>
@@ -1240,13 +1240,13 @@
 <footer><strong>Raw logs stop here.</strong> Agent 2 never sees log text or Agent 1's prompt.</footer>
 </div>
 <div class="link">
-<header><span>AGENT 2 → VERIFIER → AGENT 3</span>ProposedPatch</header>
+<header><span>AGENT 2 → VERIFIER</span>ProposedPatch</header>
 <pre>{
   <span class="hl-k">"target_files"</span>: [<span class="hl-s">"payments/tax.py"</span>],
   <span class="hl-k">"unified_diff"</span>: <span class="hl-s">"--- a/… +++ b/…"</span>,
   <span class="hl-k">"explanation"</span>: <span class="hl-s">"Default missing vat_rate"</span>
 }</pre>
-<footer>Agent 3 receives it only after the verifier's own test run passes.</footer>
+<footer>Checked in fresh Sandbox 2; on PASS, the Verifier emits VerifiedPatch to Agent 3.</footer>
 </div>
 </div>
 
@@ -1281,7 +1281,7 @@
           <div class="step-why"><b>Problem solved:</b> Models grading their own diffs overlook broken edge cases or weakened assertions, and <code>Sandbox 1</code> may carry leftover state from exploratory edits.</div>
           <p class="step-how">
             Plain code first enforces path and diff policies on <code>ProposedPatch</code> (blocking edits to CI workflows, secrets, auth rules, or oversized diffs). Next, it boots a brand-new, networkless <strong>Sandbox 2</strong> at <code>commit_sha</code>, confirms that <code>target_test</code> fails <em>before</em> the patch (proving the bug was reproduced), applies <code>git_diff</code>, and runs the full test suite and linter.
-            If verification passes (<code>PASS</code>), control advances to the Act gate.
+            If verification passes (<code>PASS</code>), the Verifier wraps the diff and clean-room test output into <code>VerifiedPatch</code> for the Act gate.
             If verification fails and <code>fix_attempts &lt; 3</code> in <strong>Session state</strong> (<code>RETRY</code>—allowing at most 3 total attempts, or the initial try plus up to 2 retries), the harness attaches a code-built <code>RetryFeedback</code> contract carrying <code>stderr[-2000:]</code> and loops back to the Privileged LLM.
             Once <code>fix_attempts</code> reaches <code>3</code> (<code>ESCALATE</code>), the harness marks the case <code>ESCALATED</code>, pages/opens a diagnostic ticket for a human engineer, and sends terminal <code>ack</code>.
           </p>
@@ -1297,7 +1297,7 @@
           </div>
           <div class="step-why"><b>Problem solved:</b> Opening a pull request follows a fixed API contract that needs zero model reasoning, and a worker stalled past its 120-second lease could wake up late and double-write after another worker took over.</div>
           <p class="step-how">
-            Implemented strictly as plain deterministic code holding a repository credential restricted to <code>autofix/*</code> branches. Right before calling the repository API, it performs a second transactional check on the <strong>Coordination store</strong>—verifying that the manual <strong>kill switch</strong> remains clear and that its <strong>fencing generation (<code>epoch</code>)</strong> still owns the row—then pushes the branch idempotently, opens a <strong>draft pull request</strong>, marks the row <code>PR_OPENED</code>, and sends terminal <code>ack</code> to the queue.
+            Implemented strictly as plain deterministic code holding a repository credential restricted to <code>autofix/*</code> branches. Right before calling the repository API, it performs a second transactional check on the <strong>Coordination store</strong>—verifying that the manual <strong>kill switch</strong> remains clear and that its <strong>fencing token</strong> still owns the row—then pushes the branch idempotently, opens a <strong>draft pull request</strong>, marks the row <code>PR_OPENED</code>, and sends terminal <code>ack</code> to the queue.
           </p>
         </div>
 
@@ -1339,7 +1339,7 @@
     <div class="sheet-b">
       <div class="post-prose">
         <p>
-          <a href="#fig-gcp-full"><em>Figure 2</em></a> maps the platform-agnostic architecture directly onto Google Cloud and the <strong>Gemini Enterprise Agent Platform</strong> (shortened to <strong>Agent Platform</strong>; model calls stay family-neutral). At ~100 failures a day, one <strong>Spanner</strong> database handles the operator kill switch, the 5-minute distinct-repo storm query, and the per-incident lock, 120-second lease, and fencing generation check.
+          <a href="#fig-gcp-full"><em>Figure 2</em></a> maps the platform-agnostic architecture directly onto Google Cloud and the <strong>Gemini Enterprise Agent Platform</strong> (shortened to <strong>Agent Platform</strong>; model calls stay family-neutral). At ~100 failures a day, one <strong>Spanner</strong> database handles the operator kill switch, the 5-minute distinct-repo storm query, and the per-incident lock, 120-second lease, and fencing token.
         </p>
       </div>
 
@@ -1373,11 +1373,11 @@
 <text class="t-s" style="font-size:13px" x="248" y="144">standalone service #1</text>
 <rect class="b-store" height="92" rx="7" width="174" x="466" y="66"></rect>
 <text class="t-b" style="font-size:15.8px" x="478" y="90">Cloud Pub/Sub</text>
-<text class="t-s" style="font-size:13.4px" x="478" y="110">ack at completion,</text>
+<text class="t-s" style="font-size:13.4px" x="478" y="110">ack at terminal exit,</text>
 <text class="t-s" style="font-size:13.4px" x="478" y="127">backoff + DLQ topic</text>
 <text class="t-s" style="font-size:13px" x="478" y="144">durable queue</text>
 <rect class="b-ext" height="92" rx="7" width="420" x="760" y="66"></rect>
-<text class="t-b" style="font-size:15.4px" x="774" y="90">Existing SRE / CD infra (outside agent design)</text>
+<text class="t-b" style="font-size:15.4px" x="774" y="90">Existing deployment infra (outside agent design)</text>
 <text class="t-s" style="font-size:13.8px" x="774" y="112">SLO burn-rate alert → Cloud Deploy rollback</text>
 <text class="t-s" style="font-size:13.2px" x="774" y="134">fires in parallel; passes rollback_status in event</text>
 <path class="flow" d="M190 112 H232" marker-end="url(#pgcp-ink)"></path>
@@ -1472,9 +1472,9 @@
         <h3>How the Flow Runs on Google Cloud</h3>
         <ul>
           <li><strong>Parallel Existing Rollback &amp; Stateless Intake (Steps 01–04):</strong> When a canary SLO burn-rate alert fires in <strong>Cloud Monitoring</strong>, pre-existing <strong>Cloud Deploy</strong> automation rolls back the canary in seconds outside our agent design while posting the failure webhook (carrying <code>rollback_status</code>) in parallel to the standalone <strong>Cloud Run Receiver</strong> (Service #1). The Receiver verifies HMAC/OIDC signatures, computes <code>failure_fingerprint</code>, enqueues <code>FailureEvent</code> into <strong>Cloud Pub/Sub</strong> (configured with exponential backoff and a dead-letter topic), and returns <code>200</code> in under 100 ms.</li>
-          <li><strong>Single Worker Service &amp; Spanner Guard (Step 05):</strong> <strong>Worker Service #2</strong> (deployed on <strong>Cloud Run</strong> or <strong>Agent Runtime</strong> with keyless <strong>Agent Identity</strong>) runs the entire <strong>ADK 2.x <code>Workflow</code></strong> graph in-process so sequential steps avoid network hops. Its entry <code>guard_node</code> function runs a <strong>Spanner</strong> transaction checking the kill switch, running the 5-minute storm query, and claiming a 120-second row lease with a fencing epoch.</li>
+          <li><strong>Single Worker Service &amp; Spanner Guard (Step 05):</strong> <strong>Worker Service #2</strong> (deployed on <strong>Cloud Run</strong> or <strong>Agent Runtime</strong> with keyless <strong>Agent Identity</strong>) runs the entire <strong>ADK 2.x <code>Workflow</code></strong> graph in-process so sequential steps avoid network hops. Its entry <code>guard_node</code> function runs a <strong>Spanner</strong> transaction checking the kill switch, running the 5-minute storm query, and claiming a 120-second row lease with a monotonic fencing token.</li>
           <li><strong>Quarantined &amp; Privileged LLM Nodes + gVisor Sandboxes (Steps 06–08):</strong> The <code>Quarantined LLM</code> node reads ≤100 log lines from <strong>Cloud Logging / Cloud Storage</strong> through <strong>Model Armor</strong> inline prompt-injection screening with zero tools to produce <code>IncidentReport</code>. The <code>Privileged LLM</code> ADK agent loop reads past merged fixes from <strong>Memory Bank</strong> and dispatches repo search/edit/test tools into <strong>Agent Platform Code Execution Sandbox 1</strong> (ephemeral gVisor sandbox with no network and no IAM credentials). The plain-code <code>Verifier Node</code> tracks <code>fix_attempts</code> in <strong>Agent Platform Session</strong> and runs the clean-room test suite in a fresh <strong>Code Execution Sandbox 2</strong>.</li>
-          <li><strong>Act Gate, Post-Merge Memory &amp; ADK Eval (Steps 09–11):</strong> On <code>PASS</code>, the plain-code <code>Act gate</code> function node re-verifies the Spanner kill switch and fencing epoch, fetches the narrow <code>autofix/*</code> GitHub token from <strong>Secret Manager</strong>, opens the draft PR, and sends the terminal <strong>Pub/Sub <code>ack</code></strong>. Post-merge automation writes human-approved fixes into <strong>Memory Bank</strong>, while <strong>Cloud Trace</strong>, <strong>BigQuery</strong>, and <strong>ADK Eval</strong> capture every trajectory and run offline golden replays.</li>
+          <li><strong>Act Gate, Post-Merge Memory &amp; ADK Eval (Steps 09–11):</strong> On <code>PASS</code>, the plain-code <code>Act gate</code> function node re-verifies the Spanner kill switch and fencing token, fetches the narrow <code>autofix/*</code> GitHub token from <strong>Secret Manager</strong>, opens the draft PR, and sends the terminal <strong>Pub/Sub <code>ack</code></strong>. Post-merge automation writes human-approved fixes into <strong>Memory Bank</strong>, while <strong>Cloud Trace</strong>, <strong>BigQuery</strong>, and <strong>ADK Eval</strong> capture every trajectory and run offline golden replays.</li>
         </ul>
       </div>
 
@@ -1486,7 +1486,7 @@
 <tbody>
 <tr><td><b>Ingress / Receiver</b></td><td>Cloud Run service</td><td>Verifies HMAC/OIDC, hashes the fingerprint, publishes <code>FailureEvent</code>.</td></tr>
 <tr><td><b>Queue</b></td><td>Pub/Sub with a dead-letter topic</td><td>Holds the event until the terminal <code>ack</code>; dead-letters after 5 failed deliveries.</td></tr>
-<tr><td><b>Existing SRE / CD infra (outside agent design)</b></td><td>Cloud Monitoring SLO alert + Cloud Deploy rollback</td><td>Rolls back the failing canary in parallel when SLO burn rate exceeds threshold.</td></tr>
+<tr><td><b>Existing deployment infra (outside agent design)</b></td><td>Cloud Monitoring SLO alert + Cloud Deploy rollback</td><td>Rolls back the failing canary in parallel when SLO burn rate exceeds threshold.</td></tr>
 <tr><td><b>Worker and harness</b></td><td>Cloud Run or Agent Runtime, running an ADK 2.x <code>Workflow</code></td><td>All workflow nodes run in-process; one message drives one run.</td></tr>
 <tr><td><b>Coordination store and kill switch</b></td><td>One Spanner database</td><td>A control row for the kill switch, the 5-minute storm query, and an <code>incidents</code> table with lock, 120s lease and fencing. An in-memory cache such as Memorystore becomes useful at thousands of events per second.</td></tr>
 <tr><td><b>Quarantined LLM input</b></td><td>Cloud Logging and Model Armor</td><td>At most 100 log lines, screened before the single model call.</td></tr>

@@ -9,9 +9,9 @@
 <meta property="og:description" content="Growing a simple sequence of AI agents into a reliable architecture for asynchronous, event-driven workflows.">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://evekhm.github.io/all-about-agents/ep02_designing_agentic_systems.html">
-<meta property="og:image" content="https://evekhm.github.io/all-about-agents/ref/ep02-hero-banner.png">
+<meta property="og:image" content="https://evekhm.github.io/all-about-agents/ref/ep02-hero-banner.png?v=3">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://evekhm.github.io/all-about-agents/ref/ep02-hero-banner.png">
+<meta name="twitter:image" content="https://evekhm.github.io/all-about-agents/ref/ep02-hero-banner.png?v=3">
 <title>All About Agents — A Mental Model for Designing Agentic Systems</title>
 <style>
   :root,
@@ -1033,7 +1033,7 @@
         </p>
       </div>
       <div class="diagram-frame" id="fig-s1">
-        <svg viewBox="0 0 1200 390" role="img" aria-label="Figure 2 — Stage 1 · Framing, Volume, and Scope Boundary: Normalized pointer triggers and parallel existing SRE/CD rollback outside the agent design.">
+        <svg viewBox="0 0 1200 390" role="img" aria-label="Figure 2 — Stage 1 · Framing, Volume, and Scope Boundary: Normalized pointer triggers and parallel existing deployment rollback outside the agent design.">
           <defs>
             <marker id="ps1-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--ink)"/></marker>
             <marker id="ps1-mut" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--muted)"/></marker>
@@ -1043,7 +1043,7 @@
           </defs>
           <g class="stg-prev">
             <rect class="b-ext" x="760" y="66" width="420" height="92" rx="7"/>
-            <text class="t-b" x="774" y="90" style="font-size:15.4px">Existing SRE / CD infra (outside agent design)</text>
+            <text class="t-b" x="774" y="90" style="font-size:15.4px">Existing deployment infra (outside agent design)</text>
             <text class="t-s" x="774" y="112" style="font-size:13.8px">SLO burn rate &gt; threshold → controller rollback</text>
             <text class="t-s" x="774" y="134" style="font-size:13.2px">fires in parallel; passes rollback_status in event</text>
             <path class="flow-d" d="M105 66 V32 H970 V62" marker-end="url(#ps1-mut)"/>
@@ -1089,7 +1089,7 @@
             <text class="t-s" x="1180" y="222" text-anchor="end" style="font-size:13.4px">step and cost cap per case</text>
           </g>
         </svg>
-        <div class="fig-caption"><span>Figure 2 — Stage 1 · Framing, Volume, and Scope Boundary: Normalized pointer triggers and parallel existing SRE/CD rollback kept outside the agent design.</span>
+        <div class="fig-caption"><span>Figure 2 — Stage 1 · Framing, Volume, and Scope Boundary: Normalized pointer triggers and parallel existing deployment rollback kept outside the agent design.</span>
           <div class="legend-items"><span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good);border-width:2.2px;box-shadow:0 0 5px var(--good)"></i> <b>Bold glow = Framed in this stage</b></span><span><i class="swatch-dot" style="background:var(--panel);border-color:var(--muted);border-style:dashed"></i> Existing external infra</span><span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> Unexamined black-box agent</span></div>
         </div>
       </div>
@@ -1111,15 +1111,15 @@
       <div class="beat">Where we are</div>
       <div class="post-prose">
         <p>
-          In <a href="#fig-s1"><em>Figure 2</em></a>, upstream triggers still deliver events directly to the worker. In production that direct wire fails under three routine conditions: CI and monitoring webhooks time out after a few seconds while reproducing a bug and running tests takes minutes; a broken shared dependency fires a burst of failures at once; and an unauthenticated public endpoint accepts spoofed requests or noisy passing-build events. Question 4 decouples fast webhook edge handling from slow asynchronous execution.
+          In <a href="#fig-s1"><em>Figure 2</em></a>, upstream triggers still post directly to the worker over HTTP. In production that direct wire fails under three routine conditions: if the worker blocks until a multi-minute diagnosis and test run finishes, the webhook sender's HTTP timeout (typically 5–10 seconds) expires and triggers duplicate retries—whereas replying <code>200</code> immediately in memory loses the run if the worker restarts; a broken shared dependency fires a burst of failures at once; and an unauthenticated public endpoint accepts spoofed requests or noisy passing-build events. Question 4 decouples fast webhook edge handling from slow asynchronous execution.
         </p>
       </div>
       <div class="qb" id="q4" style="margin-top:20px;">
         <div class="qh"><div class="n">4</div><h3>How does work get from the event to a worker without being lost?</h3></div>
         <div class="q3">
           <div class="a"><span class="lab">Skip it and…</span><ul><li>The webhook sender times out waiting for a slow model run.</li><li>A burst drops events, or an unverified endpoint accepts spoofed webhooks.</li></ul></div>
-          <div class="b"><span class="lab">Decide</span><ul><li>Place a stateless <strong>Receiver</strong> in front: verify sender signature/token, drop healthy noise, reply <code>200</code> at once.</li><li>Buffer in a durable <strong>Queue</strong>; send <code>ack</code> only at a terminal exit, with exponential backoff and a dead-letter queue after N crashes.</li></ul></div>
-          <div class="c"><span class="lab">In the self-healing repo</span><ul><li>Webhook receiver → durable queue → worker.</li><li>HMAC/OIDC check, reply in &lt;100 ms, <code>ack</code> once the case row records <code>PR_OPENED</code>, <code>SKIPPED</code>, <code>ESCALATED</code>, or <code>PARKED</code>; DLQ after 5 crashes.</li></ul></div>
+          <div class="b"><span class="lab">Decide</span><ul><li>Place a stateless <strong>Receiver</strong> in front: verify sender signature/token, drop healthy noise, reply <code>200</code> at once.</li><li>Buffer in a durable <strong>Queue</strong>; send <code>ack</code> only at a terminal exit, with exponential backoff and a dead-letter queue after repeated failed deliveries.</li></ul></div>
+          <div class="c"><span class="lab">In the self-healing repo</span><ul><li>Webhook receiver → durable queue → worker.</li><li>HMAC/OIDC check, reply in &lt;100 ms, <code>ack</code> at terminal exit (<code>PR_OPENED</code>, <code>SKIPPED</code>, <code>ESCALATED</code>, or <code>PARKED</code>); DLQ after 5 failed deliveries.</li></ul></div>
         </div>
       </div>
       <div class="post-prose" style="margin-top:18px;">
@@ -1142,7 +1142,7 @@
             <text class="t-s" x="32" y="111" style="font-size:14px">events, alerts, users</text>
             <text class="t-s" x="32" y="130" style="font-size:13.4px">pointer to raw data</text>
             <rect class="b-ext" x="760" y="66" width="420" height="92" rx="7"/>
-            <text class="t-b" x="774" y="90" style="font-size:15.4px">Existing SRE / CD infra (outside agent design)</text>
+            <text class="t-b" x="774" y="90" style="font-size:15.4px">Existing deployment infra (outside agent design)</text>
             <text class="t-s" x="774" y="112" style="font-size:13.8px">SLO burn rate &gt; threshold → controller rollback</text>
             <text class="t-s" x="774" y="134" style="font-size:13.2px">fires in parallel; passes rollback_status in event</text>
             <path class="flow-d" d="M105 66 V32 H970 V62" marker-end="url(#ps2-mut)"/>
@@ -1214,7 +1214,7 @@
       <div class="beat">Where we are</div>
       <div class="post-prose">
         <p>
-          Because queues deliver at least once and CI retries webhooks, two workers can pull the same bug at the same time—or a broken base image can break twenty repositories at once. <a href="#fig-s3"><em>Figure 4</em></a> adds a deterministic <strong>Guard</strong> backed by a transactional <strong>Coordination store &amp; kill switch</strong>. Three related safeguards on the case row prevent race conditions: an atomic <strong>lock</strong> (only one worker claims the case), an expiring <strong>lease</strong> renewed by heartbeats (so a crashed worker's claim expires after 120 seconds and the case becomes available again), and a monotonic <strong>fencing</strong> generation number checked right before writing (so if Worker A stalls past 120 seconds and Worker B takes over at generation 2, Worker A is blocked from writing late).
+          Because queues deliver at least once and CI retries webhooks, two workers can pull the same bug at the same time—or a broken base image can break twenty repositories at once. <a href="#fig-s3"><em>Figure 4</em></a> adds a deterministic <strong>Guard</strong> backed by a transactional <strong>Coordination store &amp; kill switch</strong>. Three related safeguards on the case row prevent race conditions: an atomic <strong>lock</strong> (only one worker claims the case), an expiring <strong>lease</strong> renewed by heartbeats (so a crashed worker's claim expires after 120 seconds and the case becomes available again), and a monotonic <strong>fencing token</strong> checked right before writing (so if Worker A stalls past 120 seconds and Worker B claims token <code>2</code>, Worker A's stale token <code>1</code> is rejected).
         </p>
         <p>
           The storm breaker catches correlated multi-repository outages that cross a numeric threshold. A manual <strong>kill switch</strong> covers quality regressions that pass automated checks yet require immediate human intervention—such as a bad prompt or model release, a flawed policy check, or pull requests that code owners start rejecting. Operators flip one flag in the coordination store to pause new runs cleanly.
@@ -1251,13 +1251,13 @@
         <div class="qh"><div class="n">8</div><h3>What happens when a worker dies halfway?</h3></div>
         <div class="q3">
           <div class="a"><span class="lab">Skip it and…</span><ul><li><code>ack</code> on receipt: in-flight work vanishes when a worker crashes.</li><li>Permanent lock without expiry: the case stays stuck in <code>IN_PROGRESS</code> forever.</li></ul></div>
-          <div class="b"><span class="lab">Decide</span><ul><li><code>ack</code> only after a terminal state is recorded.</li><li>Claim the row with an expiring <strong>lease</strong> renewed on a heartbeat, and verify the lease generation (<strong>fencing</strong>) right before any external write.</li></ul></div>
-          <div class="c"><span class="lab">In the self-healing repo</span><ul><li>120-second lease renewed every 30 seconds; after an unacknowledged crash the queue redelivers the event.</li><li>Lease generation checked right before opening the draft PR.</li></ul></div>
+          <div class="b"><span class="lab">Decide</span><ul><li>Send <code>ack</code> only at a terminal exit after state is recorded.</li><li>Claim the row with an expiring <strong>lease</strong> renewed on a heartbeat, and verify its monotonic <strong>fencing token</strong> right before any external write.</li></ul></div>
+          <div class="c"><span class="lab">In the self-healing repo</span><ul><li>120-second lease renewed every 30 seconds; after an unacknowledged failure the queue redelivers the event.</li><li>Fencing token checked right before opening the draft PR.</li></ul></div>
         </div>
       </div>
       <div class="post-prose" style="margin-top:18px;">
         <p>
-          Questions 5 to 8 add the two green-glowing coordination blocks on the left of <a href="#fig-s3"><em>Figure 4</em></a>. Every pulled message enters the plain-code <strong>Guard</strong> before any model call: it checks the operator kill switch, queries the 5-minute distinct-repo storm count, and atomically claims a 120-second lease in the <strong>Coordination store</strong>, while a second dashed check verifies the kill switch, lease fencing epoch, and idempotency key right before writing to the repository.
+          Questions 5 to 8 add the two green-glowing coordination blocks on the left of <a href="#fig-s3"><em>Figure 4</em></a>. Every pulled message enters the plain-code <strong>Guard</strong> before any model call: it checks the operator kill switch, queries the 5-minute distinct-repo storm count, and atomically claims a 120-second lease in the <strong>Coordination store</strong>, while a second dashed check verifies the kill switch, fencing token, and idempotency key right before writing to the repository.
         </p>
       </div>
       <div class="diagram-frame" id="fig-s3">
@@ -1275,7 +1275,7 @@
             <text class="t-s" x="32" y="111" style="font-size:14px">events, alerts, users</text>
             <text class="t-s" x="32" y="130" style="font-size:13.4px">pointer to raw data</text>
             <rect class="b-ext" x="760" y="66" width="420" height="92" rx="7"/>
-            <text class="t-b" x="774" y="90" style="font-size:15.4px">Existing SRE / CD infra (outside agent design)</text>
+            <text class="t-b" x="774" y="90" style="font-size:15.4px">Existing deployment infra (outside agent design)</text>
             <text class="t-s" x="774" y="112" style="font-size:13.8px">SLO burn rate &gt; threshold → controller rollback</text>
             <text class="t-s" x="774" y="134" style="font-size:13.2px">fires in parallel; passes rollback_status in event</text>
             <path class="flow-d" d="M105 66 V32 H970 V62" marker-end="url(#ps3-mut)"/>
@@ -1409,7 +1409,7 @@
             <text class="t-s" x="32" y="111" style="font-size:14px">events, alerts, users</text>
             <text class="t-s" x="32" y="130" style="font-size:13.4px">pointer to raw data</text>
             <rect class="b-ext" x="760" y="66" width="420" height="92" rx="7"/>
-            <text class="t-b" x="774" y="90" style="font-size:15.4px">Existing SRE / CD infra (outside agent design)</text>
+            <text class="t-b" x="774" y="90" style="font-size:15.4px">Existing deployment infra (outside agent design)</text>
             <text class="t-s" x="774" y="112" style="font-size:13.8px">SLO burn rate &gt; threshold → controller rollback</text>
             <text class="t-s" x="774" y="134" style="font-size:13.2px">fires in parallel; passes rollback_status in event</text>
             <path class="flow-d" d="M105 66 V32 H970 V62" marker-end="url(#ps4-mut)"/>
@@ -1594,13 +1594,13 @@
           <footer><strong>Raw logs stop here.</strong> Agent 2 never sees log text or Agent 1's prompt.</footer>
         </div>
         <div class="link">
-          <header><span>AGENT 2 → VERIFIER → AGENT 3</span>ProposedPatch</header>
+          <header><span>AGENT 2 → VERIFIER</span>ProposedPatch</header>
 <pre>{
   <span class="hl-k">"target_files"</span>: [<span class="hl-s">"payments/tax.py"</span>],
   <span class="hl-k">"unified_diff"</span>: <span class="hl-s">"--- a/… +++ b/…"</span>,
   <span class="hl-k">"explanation"</span>: <span class="hl-s">"Default missing vat_rate"</span>
 }</pre>
-          <footer>Agent 3 receives it only after the verifier's own test run passes.</footer>
+          <footer>Checked in fresh Sandbox 2; on PASS, the Verifier emits VerifiedPatch to Agent 3.</footer>
         </div>
       </div>
 
@@ -1617,7 +1617,7 @@
             <thead><tr><th>State</th><th>Where it lives</th><th>Who writes it</th><th>Why</th></tr></thead>
             <tbody>
               <tr><td><b>Kill switch &amp; 5-minute storm count</b></td><td>Transactional coordination database</td><td>Workflow code / operators</td><td>Trips the circuit breaker when 5+ distinct repos fail in 5 minutes, or pauses all workers when an operator flips the kill switch.</td></tr>
-              <tr><td><b>Incident lock, expiring lease &amp; fencing</b></td><td>Coordination DB row per <code>(repo, failure_<wbr>fingerprint)</code></td><td>Workflow code only</td><td><strong>Lock:</strong> one active owner. <strong>Lease:</strong> expires after 120s unless renewed every 30s so crashed work recovers. <strong>Fencing:</strong> lease generation checked right before PR creation so a stalled worker's late write is rejected.</td></tr>
+              <tr><td><b>Incident lock, expiring lease &amp; fencing</b></td><td>Coordination DB row per <code>(repo, failure_<wbr>fingerprint)</code></td><td>Workflow code only</td><td><strong>Lock:</strong> one active owner. <strong>Lease:</strong> expires after 120s unless renewed every 30s so crashed work recovers. <strong>Fencing:</strong> monotonic fencing token checked right before PR creation so a stalled worker's late write is rejected.</td></tr>
               <tr><td><b>Per-run workflow state &amp; raw blobs</b></td><td>Session store and object storage</td><td>Workflow runner and workflow code</td><td>Carries typed outputs and <code>fix_attempts</code> across <code>RETRY</code> while keeping raw logs and diffs out of prompts by pointer.</td></tr>
               <tr><td><b>Sandbox working scratchpad</b></td><td>Ephemeral container filesystem (<code>Sandbox 1</code>)</td><td>Privileged LLM tools (ephemeral)</td><td>Holds the checked-out commit, trial edits, and local test output for one attempt; destroyed when the attempt ends.</td></tr>
               <tr><td><b>Long-term memory of approved fixes</b></td><td>Managed memory store</td><td>Post-merge code only (read-only to Agent 2)</td><td>Lets Agent 2 look up lessons from fixes a human engineer already reviewed and merged. It is written only after a merge.</td></tr>
@@ -1646,7 +1646,7 @@
             <text class="t-s" x="32" y="111" style="font-size:14px">events, alerts, users</text>
             <text class="t-s" x="32" y="130" style="font-size:13.4px">pointer to raw data</text>
             <rect class="b-ext" x="760" y="66" width="420" height="92" rx="7"/>
-            <text class="t-b" x="774" y="90" style="font-size:15.4px">Existing SRE / CD infra (outside agent design)</text>
+            <text class="t-b" x="774" y="90" style="font-size:15.4px">Existing deployment infra (outside agent design)</text>
             <text class="t-s" x="774" y="112" style="font-size:13.8px">SLO burn rate &gt; threshold → controller rollback</text>
             <text class="t-s" x="774" y="134" style="font-size:13.2px">fires in parallel; passes rollback_status in event</text>
             <path class="flow-d" d="M105 66 V32 H970 V62" marker-end="url(#ps5-mut)"/>
@@ -1818,13 +1818,13 @@
             <tbody>
               <tr><td><b>Triggers</b></td><td>External</td><td>Signals arrive from separate systems in incompatible formats.</td><td>Emits raw webhook, alert, or user events whenever an upstream condition fires.</td><td>CI failure, canary rollout alert, or monitoring alarm across 20–30 repositories.</td></tr>
               <tr><td><b>Ingress / Receiver</b></td><td>Plain code</td><td>Senders time out on slow runs, and open endpoints accept spoofed noise.</td><td>Authenticates sender, drops noise, hashes duplicate key, enqueues pointer event, replies <code>200</code>.</td><td>Webhook receiver verifies HMAC/OIDC, hashes <code>failure_<wbr>fingerprint</code>, publishes <code>FailureEvent</code>.</td></tr>
-              <tr><td><b>Existing SRE / CD infra</b></td><td>Pre-existing external</td><td>Live impact cannot wait minutes for an agent to reason and test.</td><td>Pre-existing deterministic controls fire on metric thresholds in parallel outside the agent design and attach status to the event.</td><td>Canary SLO burn rate exceeds threshold → deployment controller rolls back in seconds and sets <code>rollback_status</code>.</td></tr>
-              <tr><td><b>Queue</b></td><td>Queue</td><td>Bursts drop events, and crashes lose work if items are deleted on receipt.</td><td>Buffers items, retries with backoff + DLQ, and deletes an item only on terminal or parked <code>ack</code>.</td><td>Holds <code>FailureEvent</code> until <code>PR_OPENED</code>, <code>SKIPPED</code>, <code>ESCALATED</code>, or <code>PARKED</code>; DLQ after 5 crashes.</td></tr>
+              <tr><td><b>Existing deployment infra</b></td><td>Pre-existing external</td><td>Live impact cannot wait minutes for an agent to reason and test.</td><td>Pre-existing deterministic controls fire on metric thresholds in parallel outside the agent design and attach status to the event.</td><td>Canary SLO burn rate exceeds threshold → deployment controller rolls back in seconds and sets <code>rollback_status</code>.</td></tr>
+              <tr><td><b>Queue</b></td><td>Queue</td><td>Bursts drop events, and crashes lose work if items are deleted on receipt.</td><td>Buffers items, retries with backoff + DLQ, and deletes an item only on terminal or parked <code>ack</code>.</td><td>Holds <code>FailureEvent</code> until terminal exit (<code>PR_OPENED</code>, <code>SKIPPED</code>, <code>ESCALATED</code>, or <code>PARKED</code>); DLQ after 5 failed deliveries.</td></tr>
               <tr><td><b>Guard</b></td><td>Plain code</td><td>Duplicate events spawn duplicate runs; shared outages flood every target.</td><td>Checks kill switch and short-window storm count, then atomically claims a case lease.</td><td>Pauses if 5+ repos fail in 5 min; marks duplicates <code>SKIPPED</code>; claims a 120s lease in the coordination database.</td></tr>
               <tr><td><b>Quarantined LLM</b></td><td>LLM (1 call, 0 tools)</td><td>Untrusted external text can carry prompt injections aimed at tools.</td><td>Single toolless call (<code>include_contents="none"</code>) emitting a strict schema; raw text stops here.</td><td><strong>Agent 1 · Detect:</strong> ≤100 screened log lines → <code>IncidentReport</code> (or <code>flaky</code> / <code>unknown</code> → escalate).</td></tr>
               <tr><td><b>Privileged LLM + Sandbox 1</b></td><td>LLM loop + sandbox</td><td>Open-ended repair requires iterative exploration, yet untrusted code risks credential theft.</td><td>Step/time-capped loop whose tools run in a container with zero network and zero credentials.</td><td><strong>Agent 2 · Suggest fix:</strong> search, read, patch, and local test in Sandbox 1 → <code>ProposedPatch</code>.</td></tr>
               <tr><td><b>Verifier + Sandbox 2</b></td><td>Plain code + sandbox</td><td>Models misgrade their own work and can game checks by deleting tests.</td><td>Re-verifies candidate output in a fresh sandbox against domain &amp; policy rules; caps total attempts.</td><td>Fresh Sandbox 2 confirms pre-patch failure, re-runs full pytest, blocks protected paths/deleted tests, caps total attempts at <code>3</code> (up to 2 retries).</td></tr>
-              <tr><td><b>Act gate</b></td><td>Plain code</td><td>Models must not hold write keys, and stalled workers can write late.</td><td>Runs lease fencing check, performs narrowest idempotent write, and sends terminal <code>ack</code>.</td><td><strong>Agent 3 · Open PR:</strong> checks the lease epoch, opens a draft PR on <code>autofix/*</code>, then sends the queue <code>ack</code>.</td></tr>
+              <tr><td><b>Act gate</b></td><td>Plain code</td><td>Models must not hold write keys, and stalled workers can write late.</td><td>Verifies the fencing token, performs narrowest idempotent write, and sends terminal <code>ack</code>.</td><td><strong>Agent 3 · Open PR:</strong> checks the fencing token, opens a draft PR on <code>autofix/*</code>, then sends the queue <code>ack</code>.</td></tr>
               <tr><td><b>Human + record</b></td><td>Human</td><td>Irreversible changes need human accountability and live quality telemetry.</td><td>Reviewer approves, edits, or rejects; live acceptance rate gates rollout autonomy.</td><td>Code owner reviews draft PR; merge-without-edit rate governs staged promotion/demotion.</td></tr>
               <tr><td><b>Coordination store</b></td><td>Transactional DB</td><td>Workers race on duplicates, crash mid-run, or stall past lease expiry.</td><td>Holds kill switch, storm query, and case row with atomic <strong>lock</strong>, expiring <strong>lease</strong>, and <strong>fencing</strong>.</td><td>One database: a control row and an <code>incidents</code> table with a 120s lease and 30s heartbeat.</td></tr>
               <tr><td><b>Session, blobs &amp; memory</b></td><td>Session, blob &amp; memory</td><td>Large blobs bloat prompts; unverified model writes poison cross-run memory.</td><td>Per-run state in session, raw blobs by pointer, read-only memory written post-approval by code.</td><td><code>fix_attempts</code> in the session store, logs and diffs in object storage, human-merged fixes in the memory store.</td></tr>
@@ -1854,7 +1854,7 @@
             <text class="t-s" x="32" y="111" style="font-size:14px">events, alerts, users</text>
             <text class="t-s" x="32" y="130" style="font-size:13.4px">pointer to raw data</text>
             <rect class="b-ext" x="760" y="66" width="420" height="92" rx="7"/>
-            <text class="t-b" x="774" y="90" style="font-size:15.4px">Existing SRE / CD infra (outside agent design)</text>
+            <text class="t-b" x="774" y="90" style="font-size:15.4px">Existing deployment infra (outside agent design)</text>
             <text class="t-s" x="774" y="112" style="font-size:13.8px">SLO burn rate &gt; threshold → controller rollback</text>
             <text class="t-s" x="774" y="134" style="font-size:13.2px">fires in parallel; passes rollback_status in event</text>
             <path class="flow-d" d="M105 66 V32 H970 V62" marker-end="url(#ps6-mut)"/>
@@ -2005,9 +2005,9 @@
           <table>
             <thead><tr><th></th><th>Self-healing repo</th><th>Invoice exception → propose resolution</th><th>Risk review of 100,000 bank clients</th></tr></thead>
             <tbody>
-              <tr><td><b>Wakes it up</b></td><td>CI, CD controller, monitoring</td><td>Invoice that fails matching, supplier email, ERP alert</td><td>Nightly feed of clients whose data changed</td></tr>
+              <tr><td><b>Wakes it up</b></td><td>CI, deployment controller, monitoring</td><td>Invoice that fails matching, supplier email, ERP alert</td><td>Nightly feed of clients whose data changed</td></tr>
               <tr><td><b>Real size</b></td><td>100 failures a day</td><td>Only the invoices that fail the three-way match</td><td>Only the clients whose data changed</td></tr>
-              <tr><td><b>Existing parallel infra</b></td><td>SLO burn rate → CD canary rollback</td><td>ERP rule places a payment hold on the invoice</td><td>None needed; batch workload</td></tr>
+              <tr><td><b>Existing parallel infra</b></td><td>SLO burn rate → deployment controller rollback</td><td>ERP rule places a payment hold on the invoice</td><td>None needed; batch workload</td></tr>
               <tr><td><b>Duplicate key</b></td><td><code>(repo, failure_fingerprint)</code></td><td><code>(supplier_id, invoice_number)</code></td><td><code>(client_id, review_period)</code></td></tr>
               <tr><td><b>Everything on fire?</b></td><td>5 repos fail in 5 minutes</td><td>A price-list or tax-table update mismatches hundreds of invoices at once</td><td>Broken data feed flags thousands at once</td></tr>
               <tr><td><b>Quarantined / Privileged LLM</b></td><td>Classify logs; iteratively patch &amp; test</td><td>Read invoice and supplier emails; investigate order, receipt, and contract</td><td>Extract filing facts; draft risk narrative</td></tr>
@@ -2032,7 +2032,7 @@
     <div class="sheet-b">
       <div class="post-prose">
         <p>
-          <a href="#fig-gcp"><em>Figure 8</em></a> maps every box of <a href="#fig-skeleton"><em>Figure 7</em></a> onto Google Cloud and the <strong>Gemini Enterprise Agent Platform</strong> (shortened to <strong>Agent Platform</strong> below; LLM calls remain model-family neutral). At ~100 failures a day, one <strong>Spanner</strong> database covers the kill switch, the 5-minute distinct-repo storm query, and the per-incident lock, expiring lease, and fencing generation check—an extra in-memory cache like Memorystore is unnecessary unless event rates reach thousands per second. Alongside Spanner, Agent Platform provides managed per-run <strong>Session</strong> storage, <strong>Memory Bank</strong> for read-only lookup of past human-merged fixes, ephemeral gVisor sandboxes via <strong>Agent Platform Code Execution</strong>, keyless <strong>Agent Identity</strong>, <strong>Agent Gateway</strong> with <strong>Model Armor</strong>, and <strong>ADK Eval</strong>.
+          <a href="#fig-gcp"><em>Figure 8</em></a> maps every box of <a href="#fig-skeleton"><em>Figure 7</em></a> onto Google Cloud and the <strong>Gemini Enterprise Agent Platform</strong> (shortened to <strong>Agent Platform</strong> below; LLM calls remain model-family neutral). At ~100 failures a day, one <strong>Spanner</strong> database covers the kill switch, the 5-minute distinct-repo storm query, and the per-incident lock, expiring lease, and fencing token—an extra in-memory cache like Memorystore is unnecessary unless event rates reach thousands per second. Alongside Spanner, Agent Platform provides managed per-run <strong>Session</strong> storage, <strong>Memory Bank</strong> for read-only lookup of past human-merged fixes, ephemeral gVisor sandboxes via <strong>Agent Platform Code Execution</strong>, keyless <strong>Agent Identity</strong>, <strong>Agent Gateway</strong> with <strong>Model Armor</strong>, and <strong>ADK Eval</strong>.
         </p>
       </div>
       <div class="diagram-frame" id="fig-gcp">
@@ -2067,12 +2067,12 @@
 
           <rect class="b-store" x="466" y="66" width="174" height="92" rx="7"/>
           <text class="t-b" x="478" y="90" style="font-size:15.8px">Cloud Pub/Sub</text>
-          <text class="t-s" x="478" y="110" style="font-size:13.4px">ack at completion,</text>
+          <text class="t-s" x="478" y="110" style="font-size:13.4px">ack at terminal exit,</text>
           <text class="t-s" x="478" y="127" style="font-size:13.4px">backoff + DLQ topic</text>
           <text class="t-s" x="478" y="144" style="font-size:13px">durable queue</text>
 
           <rect class="b-ext" x="760" y="66" width="420" height="92" rx="7"/>
-          <text class="t-b" x="774" y="90" style="font-size:15.4px">Existing SRE / CD infra (outside agent design)</text>
+          <text class="t-b" x="774" y="90" style="font-size:15.4px">Existing deployment infra (outside agent design)</text>
           <text class="t-s" x="774" y="112" style="font-size:13.8px">SLO burn-rate alert → Cloud Deploy rollback</text>
           <text class="t-s" x="774" y="134" style="font-size:13.2px">fires in parallel; passes rollback_status in event</text>
 
@@ -2189,7 +2189,7 @@
             <tbody>
               <tr><td><b>Ingress / Receiver</b></td><td>Cloud Run service</td><td>Verifies HMAC/OIDC, hashes the fingerprint, publishes <code>FailureEvent</code>.</td></tr>
               <tr><td><b>Queue</b></td><td>Pub/Sub with a dead-letter topic</td><td>Holds the event until the terminal <code>ack</code>; dead-letters after 5 failed deliveries.</td></tr>
-              <tr><td><b>Existing SRE / CD infra (outside agent design)</b></td><td>Cloud Monitoring SLO alert + Cloud Deploy rollback</td><td>Rolls back the failing canary in parallel when SLO burn rate exceeds threshold.</td></tr>
+              <tr><td><b>Existing deployment infra (outside agent design)</b></td><td>Cloud Monitoring SLO alert + Cloud Deploy rollback</td><td>Rolls back the failing canary in parallel when SLO burn rate exceeds threshold.</td></tr>
               <tr><td><b>Worker and harness</b></td><td>Cloud Run or Agent Runtime, running an ADK 2.x <code>Workflow</code></td><td>All workflow nodes run in-process; one message drives one run.</td></tr>
               <tr><td><b>Coordination store and kill switch</b></td><td>One Spanner database</td><td>A control row for the kill switch, the 5-minute storm query, and an <code>incidents</code> table with lock, 120s lease and fencing. An in-memory cache such as Memorystore becomes useful at thousands of events per second.</td></tr>
               <tr><td><b>Quarantined LLM input</b></td><td>Cloud Logging and Model Armor</td><td>At most 100 log lines, screened before the single model call.</td></tr>
@@ -2242,12 +2242,12 @@
             <tbody>
               <tr><td><b><a href="#q1">Q1</a></b></td><td>What wakes it up &amp; what is in the message?</td><td>Missed triggers or 50 MB log payloads on the bus.</td><td>Normalize every trigger into one small event carrying a data <strong>pointer</strong>.</td><td>CI, canary, alerts → <code>FailureEvent</code></td><td><a href="#stage-1">Stage 1</a></td></tr>
               <tr><td><b><a href="#q2">Q2</a></b></td><td>How big is it really?</td><td>Over-built infra for filtered noise, or runaway model bills.</td><td>Multiply volume × filter rate; enforce step and budget caps per case.</td><td><code>10,000 × 1% = 100</code>/day</td><td><a href="#stage-1">Stage 1</a></td></tr>
-              <tr><td><b><a href="#q3">Q3</a></b></td><td>What must happen in seconds, and who owns it?</td><td>Users suffer broken releases during slow LLM runs, or models hold deploy keys.</td><td>Keep urgent containment on <strong>pre-existing parallel infra</strong> outside the agent design.</td><td>SLO burn → CD rollback + <code>rollback_status</code></td><td><a href="#stage-1">Stage 1</a></td></tr>
-              <tr><td><b><a href="#q4">Q4</a></b></td><td>How does work reach a worker safely?</td><td>Webhook timeouts, dropped bursts, or lost crashes.</td><td>Stateless <strong>Receiver</strong> + durable <strong>Queue</strong> + terminal <code>ack</code> + DLQ.</td><td>Cloud Run → Pub/Sub → terminal <code>ack</code></td><td><a href="#stage-2">Stage 2</a></td></tr>
+              <tr><td><b><a href="#q3">Q3</a></b></td><td>What must happen in seconds, and who owns it?</td><td>Users suffer broken releases during slow LLM runs, or models hold deploy keys.</td><td>Keep urgent containment on <strong>pre-existing parallel infra</strong> outside the agent design.</td><td>SLO burn → Cloud Deploy rollback + <code>rollback_status</code></td><td><a href="#stage-1">Stage 1</a></td></tr>
+              <tr><td><b><a href="#q4">Q4</a></b></td><td>How does work reach a worker safely?</td><td>Sender HTTP timeouts, dropped bursts, or lost runs.</td><td>Stateless <strong>Receiver</strong> + durable <strong>Queue</strong> + terminal <code>ack</code> + DLQ (5 tries).</td><td>Cloud Run → Pub/Sub → terminal <code>ack</code></td><td><a href="#stage-2">Stage 2</a></td></tr>
               <tr><td><b><a href="#q5">Q5</a></b></td><td>How do I avoid doing work twice?</td><td>Duplicate PRs, tickets, or double mutations.</td><td>Code-computed duplicate key + atomic <strong>lock</strong> row + idempotent write.</td><td><code>(repo, failure_<wbr>fingerprint)</code> in Spanner</td><td><a href="#stage-3">Stage 3</a></td></tr>
               <tr><td><b><a href="#q6">Q6</a></b></td><td>One bug vs. everything on fire?</td><td>Shared infra outage makes bots "fix" healthy targets.</td><td>Count distinct targets in a short window; trip a <strong>storm breaker</strong>.</td><td>5+ repos in 5 min → pause &amp; page</td><td><a href="#stage-3">Stage 3</a></td></tr>
               <tr><td><b><a href="#q7">Q7</a></b></td><td>How does a person stop it, right now?</td><td>A bad prompt or model release keeps acting until a fix ships.</td><td>Manual <strong>kill switch</strong>: one flag, read at run start and before every write; events are parked.</td><td>Flag per repo or for all repos</td><td><a href="#stage-3">Stage 3</a></td></tr>
-              <tr><td><b><a href="#q8">Q8</a></b></td><td>What if a worker dies halfway?</td><td>Lost work (early <code>ack</code>) or permanently stuck locks.</td><td>Expiring <strong>lease</strong> + heartbeat renewal + pre-write <strong>fencing</strong> check.</td><td>120s lease, 30s heartbeat, epoch fence</td><td><a href="#stage-3">Stage 3</a></td></tr>
+              <tr><td><b><a href="#q8">Q8</a></b></td><td>What if a worker dies halfway?</td><td>Lost work (early <code>ack</code>) or permanently stuck locks.</td><td>Expiring <strong>lease</strong> + heartbeat renewal + monotonic <strong>fencing token</strong>.</td><td>120s lease, 30s heartbeat, fencing token</td><td><a href="#stage-3">Stage 3</a></td></tr>
               <tr><td><b><a href="#q9">Q9</a></b></td><td>Model or code, and what is the harness?</td><td>Models chatting unboundedly, self-grading, or holding write keys.</td><td>Dual-LLM split (<strong>Quarantined</strong> vs. <strong>Privileged LLM</strong>) + code <strong>Verifier</strong> &amp; <strong>Act gate</strong>.</td><td>ADK <code>Workflow</code> graph (<a href="#appendix-adk"><em>Appendix</em></a>)</td><td><a href="#stage-4">Stage 4</a></td></tr>
               <tr><td><b><a href="#q10">Q10</a></b></td><td>What passes between steps &amp; who routes?</td><td>Prose drift, prompt-injection history bleed, infinite loops.</td><td>Six typed handoffs, <code>include_contents="none"</code>, capped <code>RETRY (attempt &lt; 3)</code>, <code>ESCALATE</code>.</td><td><code>IncidentReport</code> → <code>ProposedPatch</code>, 3 tries max</td><td><a href="#stage-5">Stage 5</a></td></tr>
               <tr><td><b><a href="#q11">Q11</a></b></td><td>Where does data live &amp; who writes state?</td><td>Stale indexes, context bloat, poisoned long-term memory.</td><td>Pointer reads at exact version; code-owned state; post-approval memory only.</td><td>Exact <code>commit_sha</code>; post-merge Memory Bank</td><td><a href="#stage-5">Stage 5</a></td></tr>
@@ -2373,7 +2373,7 @@
               <tr><td><b>Quarantined LLM &amp; Typed Handoffs</b></td><td>Toolless schema extraction, <code>include_contents="none"</code>, bounded input lines.</td><td><strong>L2 · Context Screening &amp; Tokenization</strong> &amp; <strong>L3 · Bounded Reasoning &amp; Quarantine</strong></td><td>Inline Model Armor prompt-injection screening and Cloud SDP PII tokenization paired with a toolless Quarantine LLM inside a deterministic workflow harness.</td></tr>
               <tr><td><b>Privileged LLM Tool Calls</b></td><td>Bounded tool loop, narrow pointer-based tools, no raw query authoring when rules suffice.</td><td><strong>L4 · Parameterized SQL Tool Server</strong> &amp; <strong>L5 · OOB State &amp; OBO</strong></td><td>MCP Toolbox exposing fixed pre-compiled SQL templates (zero raw SQL authoring), out-of-band claim binding, and RFC 8693 OBO token exchange.</td></tr>
               <tr><td><b>Coordination &amp; Data Stores</b></td><td>Read data in place; enforce invariants in deterministic infrastructure.</td><td><strong>L6 · Private Network &amp; Egress Guard</strong> &amp; <strong>L7 · Engine RLS, CLS &amp; Perimeter</strong></td><td>Private Service Connect and egress controls paired with engine-enforced PostgreSQL <code>FORCE RLS</code> and column masking inside a VPC Service Controls perimeter.</td></tr>
-              <tr><td><b>Act Gate, Human + Audit Store</b></td><td>Fencing check, narrow idempotent write, human review, per-case trace &amp; kill switch.</td><td><strong>L8 · HITL Approval &amp; Safe Stored Procs</strong> &amp; <strong>L9 · Distributed Trace &amp; Kill Switch</strong></td><td>Human confirmation and idempotent stored procedures before mutations, W3C principal-to-SQL audit join in BigQuery, and an emergency kill switch.</td></tr>
+              <tr><td><b>Act Gate, Human + Audit Store</b></td><td>Fencing token check, narrow idempotent write, human review, per-case trace &amp; kill switch.</td><td><strong>L8 · HITL Approval &amp; Safe Stored Procs</strong> &amp; <strong>L9 · Distributed Trace &amp; Kill Switch</strong></td><td>Human confirmation and idempotent stored procedures before mutations, W3C principal-to-SQL audit join in BigQuery, and gateway/credential revocation backing the workflow kill-switch flag.</td></tr>
             </tbody>
           </table>
         </div>
@@ -2400,7 +2400,7 @@
         </p>
         <ul>
           <li><strong>Respect existing first-responder boundaries and harden intake (Stages 1–3):</strong> leave sub-second incident rollback on pre-existing SRE and deployment infrastructure firing in parallel outside the agent design, decouple callers behind a stateless receiver and a durable queue with terminal acknowledgement, and coordinate concurrent runs through one transactional store holding duplicate locks, a storm breaker, a manual kill switch, and expiring leases with pre-write fencing.</li>
-          <li><strong>Scope autonomy inside one harness (Stages 4–5):</strong> reserve language models for interpreting messy, untrusted text (a toolless Quarantined LLM) and exploring open-ended fixes (a bounded Privileged LLM), pass small code-validated contracts between steps with shared chat history disabled, verify every candidate independently in plain code, and restrict long-term memory writes to post-approval code.</li>
+          <li><strong>Scope autonomy inside one harness (Stages 4–5):</strong> reserve language models for interpreting messy, untrusted text (a toolless Quarantined LLM) and exploring open-ended fixes (a bounded Privileged LLM), pass six code-validated handoff contracts between steps with shared chat history disabled, verify every candidate independently in plain code, and restrict long-term memory writes to post-approval code.</li>
           <li><strong>Isolate execution and prove quality (Stage 6):</strong> run untrusted tools and clean-room test suites inside networkless, credential-free sandboxes, keep external write tokens narrow on a plain-code gate, and promote changes through offline golden replays and live acceptance metrics.</li>
         </ul>
         <p>
@@ -2455,7 +2455,7 @@
 
           <!-- Pre-existing Infra: Physically OUTSIDE the Engineered Agent System -->
           <rect class="b-ext" x="538" y="18" width="642" height="56" rx="10"/>
-          <text class="t-b" x="558" y="42" style="font-size:15px">Existing SRE / CD Infrastructure (Outside Our Agent Design)</text>
+          <text class="t-b" x="558" y="42" style="font-size:15px">Existing Deployment Infrastructure (Outside Our Agent Design)</text>
           <text class="t-s" x="558" y="62" style="font-size:13px">SLO burn rate &gt; threshold → parallel canary rollback in seconds; attaches rollback_status to event</text>
 
           <!-- Right Panel: Engineered Hybrid Architecture -->
@@ -2564,7 +2564,7 @@ privileged_llm = Agent(              <span class="hl-c"># Agent 2 · Suggest fix
     include_contents=<span class="hl-s">"none"</span>,
     timeout=<span class="hl-n">90.0</span>,                    <span class="hl-c"># wall-clock cap on multi-step tool loop</span>
     before_tool_callback=enforce_step_budget,  <span class="hl-c"># hard cap on tool iterations</span>
-    tools=[ripgrep_search, read_file_lines, apply_patch, run_sandbox_tests],
+    tools=[ripgrep_search, read_file_lines, apply_patch, run_sandbox1_tests],
     output_schema=ProposedPatch,
     instruction=<span class="hl-s">"Reproduce the failure, apply the smallest patch, run the tests."</span>,
 )
@@ -2572,22 +2572,27 @@ privileged_llm = Agent(              <span class="hl-c"># Agent 2 · Suggest fix
 <span class="hl-k">def</span> <span class="hl-b">verify_patch_in_sandbox</span>(ctx: Context, node_input: ProposedPatch) -&gt; Event:
     <span class="hl-k">if</span> touches_protected_path(node_input.target_files):
         <span class="hl-k">return</span> Event(route=<span class="hl-s">"ESCALATE"</span>, output={<span class="hl-s">"reason"</span>: <span class="hl-s">"protected_path"</span>})
-    result = run_sandbox_tests(node_input.unified_diff)  <span class="hl-c"># --network=none, 0 creds</span>
-    <span class="hl-k">if</span> result[<span class="hl-s">"passed"</span>]:
-        <span class="hl-k">return</span> Event(  <span class="hl-c"># VerifiedPatch handoff</span>
+    incident = ctx.state[<span class="hl-s">"incident"</span>]
+    <span class="hl-k">with</span> fresh_sandbox2(ctx.state[<span class="hl-s">"commit_sha"</span>]) <span class="hl-k">as</span> sbx2:  <span class="hl-c"># --network=none, 0 creds</span>
+        pre = sbx2.run_pytest(incident.failing_test)       <span class="hl-c"># must fail pre-patch</span>
+        <span class="hl-k">if</span> pre[<span class="hl-s">"passed"</span>]:
+            <span class="hl-k">return</span> Event(route=<span class="hl-s">"ESCALATE"</span>, output={<span class="hl-s">"reason"</span>: <span class="hl-s">"unreproduced_pre_patch"</span>})
+        post = sbx2.apply_and_run_full_suite(node_input.unified_diff)
+    <span class="hl-k">if</span> post[<span class="hl-s">"passed"</span>]:
+        <span class="hl-k">return</span> Event(
             route=<span class="hl-s">"PASS"</span>,
-            output={<span class="hl-s">"patch"</span>: node_input, <span class="hl-s">"stdout"</span>: result[<span class="hl-s">"stdout"</span>]},
+            output=VerifiedPatch(patch=node_input, pre_out=pre[<span class="hl-s">"stdout"</span>], post_out=post[<span class="hl-s">"stdout"</span>]),
         )
     attempts = ctx.state.get(<span class="hl-s">"fix_attempts"</span>, <span class="hl-n">0</span>) + <span class="hl-n">1</span>
     ctx.state[<span class="hl-s">"fix_attempts"</span>] = attempts
     <span class="hl-k">if</span> attempts &lt; <span class="hl-n">3</span>:  <span class="hl-c"># up to 3 total attempts (initial try + 2 retries)</span>
-        <span class="hl-k">return</span> Event(  <span class="hl-c"># RetryFeedback handoff</span>
+        <span class="hl-k">return</span> Event(
             route=<span class="hl-s">"RETRY"</span>,
-            output={
-                <span class="hl-s">"incident"</span>: ctx.state[<span class="hl-s">"incident"</span>],
-                <span class="hl-s">"attempt"</span>: attempts,
-                <span class="hl-s">"stderr"</span>: result[<span class="hl-s">"stderr"</span>][-<span class="hl-n">2000</span>:],  <span class="hl-c"># tail keeps traceback</span>
-            },
+            output=RetryFeedback(
+                incident=incident,
+                attempt=attempts,
+                stderr_tail=post[<span class="hl-s">"stderr"</span>][-<span class="hl-n">2000</span>:],  <span class="hl-c"># tail keeps traceback</span>
+            ),
         )
     <span class="hl-k">return</span> Event(route=<span class="hl-s">"ESCALATE"</span>, output={<span class="hl-s">"reason"</span>: <span class="hl-s">"max_attempts_exhausted"</span>})
 
