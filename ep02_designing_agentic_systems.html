@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="author" content="Eva Khmelinskaya">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="A mental model for designing systems built from AI agents: one reusable drawing and thirteen questions, practiced on a self-healing code repository with three agents.">
+<meta name="description" content="A mental model for designing systems built from AI agents: one reusable drawing and eleven questions, practiced on a self-healing code repository with three agents.">
 <meta property="og:title" content="A Mental Model for Designing Agentic Systems">
 <meta property="og:description" content="Growing a simple sequence of AI agents into a reliable architecture for asynchronous, event-driven workflows.">
 <meta property="og:type" content="article">
@@ -913,7 +913,7 @@
           Our focus is systems that wake up asynchronously on an external event, such as a webhook, a monitoring alert, an incoming document, or a scheduled feed. Once triggered, the system has to make sense of unstructured, potentially untrusted input, gather context across external stores and tools, check its proposed result against domain rules, and prepare or apply an external state change safely under traffic bursts, duplicate deliveries, and mid-run crashes. That same problem shape comes up across domains: resolving supplier invoice mismatches, triaging production incidents, reviewing updated client filings, or repairing failing builds.
         </p>
         <p>
-          Classical software handles the predictable parts of that pipeline whenever inputs arrive in fixed schemas and rules are known up front. It breaks down at two boundaries: <strong>interpreting unstructured, noisy inputs</strong> that resist static parsers, and <strong>exploring an open-ended solution space</strong> where the next lookup or candidate change depends on what the previous step uncovered. Language models earn their place at those two points, while deterministic code owns the guarantees around them: queueing, deduplication, leases, verification, and write credentials. Production systems combine both in a <strong>hybrid architecture</strong> that embeds scoped <strong>agents</strong> inside deterministic <strong>workflows</strong> (<a href="https://www.anthropic.com/research/building-effective-agents" target="_blank" rel="noopener">Anthropic</a>, <a href="https://github.com/humanlayer/12-factor-agents" target="_blank" rel="noopener">12-Factor Agents</a>, <a href="https://docs.cloud.google.com/architecture/choose-design-pattern-agentic-ai-system" target="_blank" rel="noopener">Google Cloud</a>): <em>proposing</em> a diagnosis or candidate fix uses a model, whereas <em>verifying</em> that proposal against schemas, policies, and test suites, and committing the side effect once, stays in deterministic code.
+          Classical software handles the predictable parts of that pipeline whenever inputs arrive in fixed schemas and rules are known up front. It breaks down at two boundaries: interpreting unstructured, noisy inputs that resist static parsers, and exploring an open-ended solution space where the next lookup or candidate change depends on what the previous step uncovered. Language models earn their place at those two points, while deterministic code owns the guarantees around them: queueing, deduplication, leases, verification, and write credentials. Production systems combine both in a <strong>hybrid architecture</strong> that embeds scoped agents inside deterministic workflows (<a href="https://www.anthropic.com/research/building-effective-agents" target="_blank" rel="noopener">Anthropic</a>, <a href="https://github.com/humanlayer/12-factor-agents" target="_blank" rel="noopener">12-Factor Agents</a>, <a href="https://docs.cloud.google.com/architecture/choose-design-pattern-agentic-ai-system" target="_blank" rel="noopener">Google Cloud</a>): <em>proposing</em> a diagnosis or candidate fix uses a model, whereas <em>verifying</em> that proposal against schemas, policies, and test suites, and committing the side effect once, stays in deterministic code.
         </p>
         <p>
           We will walk through one example of such a system, starting from the simplest whiteboard sketch.
@@ -968,7 +968,7 @@
 
         <h3 id="four-blocks">The 60-Second Mental Model: 4 Blocks to Remember</h3>
         <p>
-          Whenever you design or review an agentic system, <em>Figure 2</em> gives the whole architecture in four blocks.
+          To structure that architecture, I suggest framing an agentic system around four components, shown in <em>Figure 2</em>.
         </p>
       </div>
       <div class="diagram-frame" id="fig-four-blocks">
@@ -1052,23 +1052,11 @@
       <div>
         <span class="sec-badge">Boundary &amp; Intake</span>
         <h2>1 · Boundary: Triggers, Volume, and Reliable Intake</h2>
-        <p>Define what wakes the system up, size the real load, scope to asynchronous repair, and buffer events reliably behind a stateless receiver and durable queue.</p>
+        <p>Define what wakes the system up, size the real load, scope to asynchronous execution, and buffer events reliably behind a stateless receiver and durable queue.</p>
       </div>
     </div>
     <div class="sheet-b">
-      <div class="beat">Where we are</div>
-      <div class="post-prose">
-        <p>
-          <a href="#fig-first-design"><em>Figure 1</em></a> starts with a single box labeled "Failed deploy." Questions 1 to 4 define what happens at the outer boundary:
-        </p>
-        <ul>
-          <li><strong>Trigger sources and payload size (Q1):</strong> failure signals arrive from separate systems (CI, canary controllers, error-rate alarms), backed by tens of megabytes of logs.</li>
-          <li><strong>Filtered volume and per-run cost (Q2):</strong> only the <code>1%</code> of deployments that fail (<code>100</code>/day out of <code>10,000</code>) trigger a run, while bounded step caps control token spend.</li>
-          <li><strong>Workflow scope (Q3):</strong> agents diagnose and repair asynchronously on a branch while live production mitigations stay outside.</li>
-          <li><strong>Reliable intake (Q4):</strong> a stateless receiver authenticates webhooks, drops noise, replies <code>200</code> at once, and buffers work in a durable queue.</li>
-        </ul>
-      </div>
-      <div class="qb" id="q1" style="margin-top:20px;">
+      <div class="qb" id="q1" style="margin-top:4px;">
         <div class="qh"><div class="n">1</div><h3>What wakes the system up, and what is in the wake-up message?</h3></div>
         <div class="q3">
           <div class="a"><span class="lab">Skip it and…</span><ul><li>Two of the three failure sources never trigger the workflow.</li><li>50 MB of raw logs get stuffed onto the event bus.</li></ul></div>
@@ -1085,17 +1073,8 @@
           <div class="c"><span class="lab">In the self-healing repo</span><ul><li><code>10,000 × 1% = 100</code> failures/day (~one every 14 minutes)—a correctness problem at low volume.</li><li>Hard step cap and model budget per incident.</li></ul></div>
         </div>
       </div>
-
-      <div class="qb" id="q3">
-        <div class="qh"><div class="n">3</div><h3>What belongs in the agent workflow, and what stays outside?</h3></div>
-        <div class="q3">
-          <div class="a"><span class="lab">Skip it and…</span><ul><li>Users wait ten minutes while a model deliberates on a live outage.</li><li>Or an unreviewed model receives production deploy permissions to push hotfixes.</li></ul></div>
-          <div class="b"><span class="lab">Decide</span><ul><li>Scope the agent workflow strictly to asynchronous <strong>diagnosis and repair</strong>.</li><li>Keep immediate production mitigations (such as rollbacks or traffic drains) outside the agent system.</li></ul></div>
-          <div class="c"><span class="lab">In the self-healing repo</span><ul><li>Agents work asynchronously on a branch to prepare a draft PR; production rollout and rollback remain outside the workflow.</li></ul></div>
-        </div>
-      </div>
-      <div class="qb" id="q4" style="margin-top:20px;">
-        <div class="qh"><div class="n">4</div><h3>How does work get from the event to a worker without being lost?</h3></div>
+      <div class="qb" id="q3" style="margin-top:20px;">
+        <div class="qh"><div class="n">3</div><h3>How does work get from the event to a worker without being lost?</h3></div>
         <div class="q3">
           <div class="a"><span class="lab">Skip it and…</span><ul><li>The sender's 5–10s HTTP timeout expires waiting on a slow run, while an early <code>200</code> that holds work only in memory loses it on restart.</li><li>A burst drops events, or an unverified endpoint accepts spoofed webhooks.</li></ul></div>
           <div class="b"><span class="lab">Decide</span><ul><li>Place a stateless <strong>Receiver</strong> in front: verify sender signature/token, drop passing-build events, reply <code>200</code> at once.</li><li>Buffer in a durable <strong>Queue</strong>; send <code>ack</code> only at a terminal exit or on <code>PARKED</code>, with exponential backoff and a dead-letter queue after repeated failed deliveries.</li></ul></div>
@@ -1104,7 +1083,7 @@
       </div>
       <div class="post-prose" style="margin-top:18px;">
         <p>
-          Putting Questions 1 to 4 onto the diagram produces <a href="#fig-s2"><em>Figure 3</em></a>. A stateless <strong>Receiver</strong> verifies the sender signature, filters incoming webhooks down to failure events, hashes a failure fingerprint from structured fields already in the webhook payload, enqueues the pointer event, and returns <code>200</code> in under 100 milliseconds. Behind it, a durable <strong>Queue</strong> buffers bursts and holds each message until the worker records a terminal outcome and sends <code>ack</code> along the dashed return arrow, routing repeated crash-loops to a dead-letter queue.
+          Putting Questions 1 to 3 onto the diagram produces <a href="#fig-s2"><em>Figure 3</em></a>. A stateless <strong>Receiver</strong> verifies the sender signature, filters incoming webhooks down to failure events, hashes a failure fingerprint from structured fields already in the webhook payload, enqueues the pointer event, and returns <code>200</code> in under 100 milliseconds. Behind it, a durable <strong>Queue</strong> buffers bursts and holds each message until the worker records a terminal outcome and sends <code>ack</code> along the dashed return arrow, routing repeated crash-loops to a dead-letter queue.
         </p>
       </div>
       <div class="diagram-frame" id="fig-s2">
@@ -1159,7 +1138,7 @@
             <text class="t-s" x="1097" y="316" text-anchor="middle" style="font-size:13.4px">pull request</text>
           </g>
           <g class="stg-prev">
-            <text class="t-s" x="1180" y="186" text-anchor="end" style="font-size:13.4px">agent path: repair, minutes, asynchronous</text>
+            <text class="t-s" x="1180" y="186" text-anchor="end" style="font-size:13.4px">agent path: background, minutes, async</text>
             <text class="t-s" x="1180" y="204" text-anchor="end" style="font-size:13.4px">real load = volume × filter rate</text>
             <text class="t-s" x="1180" y="222" text-anchor="end" style="font-size:13.4px">step and cost cap per case</text>
           </g>
@@ -1189,8 +1168,8 @@
           Because queues deliver at least once and CI retries webhooks, two workers can pull the same case at once or an upstream outage can flood every target; <a href="#fig-s3"><em>Figure 4</em></a> adds a deterministic <strong>Guard</strong> backed by a transactional store holding a dedupe lock, storm breaker, manual kill switch, expiring 120-second lease, and monotonic <strong>fencing token</strong> (if Worker A stalls past 120 seconds and Worker B claims token <code>2</code>, Worker A's stale token <code>1</code> is rejected before any write).
         </p>
       </div>
-      <div class="qb" id="q5" style="margin-top:20px;">
-        <div class="qh"><div class="n">5</div><h3>How do I avoid doing the same thing twice?</h3></div>
+      <div class="qb" id="q4" style="margin-top:20px;">
+        <div class="qh"><div class="n">4</div><h3>How do I avoid doing the same thing twice?</h3></div>
         <div class="q3">
           <div class="a"><span class="lab">Skip it and…</span><ul><li>Fifteen identical pull requests, tickets, or refunds open for one bug.</li><li>A retry repeats an external write that already succeeded.</li></ul></div>
           <div class="b"><span class="lab">Decide</span><ul><li>Compute a deterministic duplicate key in plain code from stable fields.</li><li>Keep one durable row per key—<code>IN_PROGRESS</code> while leased, <code>PARKED</code> when paused, and terminal states <code>COMPLETED</code>, <code>SKIPPED</code>, or <code>ESCALATED</code>—and pass an idempotency key on external writes.</li></ul></div>
@@ -1198,17 +1177,8 @@
         </div>
       </div>
 
-      <div class="qb" id="q6">
-        <div class="qh"><div class="n">6</div><h3>How do I tell one problem from everything being on fire?</h3></div>
-        <div class="q3">
-          <div class="a"><span class="lab">Skip it and…</span><ul><li>A shared upstream outage makes workers attempt fixes across dozens of healthy targets at once.</li><li>Token budget burns rapidly and teams get flooded with noisy automated actions.</li></ul></div>
-          <div class="b"><span class="lab">Decide</span><ul><li>Count <em>distinct</em> targets failing over a short sliding window.</li><li>Above a threshold, trip a storm breaker, pause automated runs, and page a human once.</li></ul></div>
-          <div class="c"><span class="lab">In the self-healing repo</span><ul><li>5-minute query of distinct failing repos in the coordination database; a shared registry or compiler outage trips it.</li><li>5 or more repos failing → pause PR creation for 15 minutes and page on-call.</li></ul></div>
-        </div>
-      </div>
-
-      <div class="qb" id="q7">
-        <div class="qh"><div class="n">7</div><h3>How does a person stop it, right now?</h3></div>
+      <div class="qb" id="q5">
+        <div class="qh"><div class="n">5</div><h3>How does a person stop it, right now?</h3></div>
         <div class="q3">
           <div class="a"><span class="lab">Skip it and…</span><ul><li>A bad prompt or model release keeps producing wrong output until a fix is deployed.</li><li>Stopping means killing workers by hand, and work in flight is lost.</li></ul></div>
           <div class="b"><span class="lab">Decide</span><ul><li>Add a manual <strong>kill switch</strong>: an operational toggle acting as a manually managed circuit breaker (<a href="https://martinfowler.com/articles/feature-toggles.html" target="_blank" rel="noopener">Hodgson</a>)—one flag in the coordination store that an operator sets for one target or for all of them.</li><li>Read it at the start of every run and again right before every external write, closing the pause gap between tool selection and execution (<a href="https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-06-launch-pause-resume.md" target="_blank" rel="noopener">12-Factor Agents, Factor 6</a>) so it takes effect within one step through configuration alone.</li><li>Record incoming cases as <code>PARKED</code> in the coordination store and <code>ack</code> the queue (or pause subscription pull) so parked work avoids dead-letter retries; a sweeper re-enqueues <code>PARKED</code> rows when the flag clears.</li></ul></div>
@@ -1216,8 +1186,8 @@
         </div>
       </div>
 
-      <div class="qb" id="q8">
-        <div class="qh"><div class="n">8</div><h3>What happens when a worker dies halfway?</h3></div>
+      <div class="qb" id="q6">
+        <div class="qh"><div class="n">6</div><h3>What happens when a worker dies halfway?</h3></div>
         <div class="q3">
           <div class="a"><span class="lab">Skip it and…</span><ul><li><code>ack</code> on receipt: in-flight work vanishes when a worker crashes.</li><li>Permanent lock without expiry: the case stays stuck in <code>IN_PROGRESS</code> forever.</li></ul></div>
           <div class="b"><span class="lab">Decide</span><ul><li>Send <code>ack</code> only at a terminal exit after state is recorded.</li><li>Claim the row with an expiring <strong>lease</strong> renewed on a heartbeat, and verify its monotonic <strong>fencing token</strong> right before any external write.</li></ul></div>
@@ -1226,7 +1196,7 @@
       </div>
       <div class="post-prose" style="margin-top:18px;">
         <p>
-          Questions 5 to 8 add the two green-glowing coordination blocks on the left of <a href="#fig-s3"><em>Figure 4</em></a>. Every pulled message enters the plain-code <strong>Guard</strong> before any model call: it checks the operator kill switch, queries the 5-minute distinct-repo storm count, and atomically claims a 120-second lease in the <strong>Coordination store</strong>, while a second dashed check verifies the kill switch, fencing token, and idempotency key right before writing to the repository.
+          Questions 4 to 8 add the two green-glowing coordination blocks on the left of <a href="#fig-s3"><em>Figure 4</em></a>. Every pulled message enters the plain-code <strong>Guard</strong> before any model call: it checks the operator kill switch, queries the 5-minute distinct-repo storm count, and atomically claims a 120-second lease in the <strong>Coordination store</strong>, while a second dashed check verifies the kill switch, fencing token, and idempotency key right before writing to the repository.
         </p>
       </div>
       <div class="diagram-frame" id="fig-s3">
@@ -1298,7 +1268,7 @@
             <text class="t-s" x="1097" y="316" text-anchor="middle" style="font-size:13.4px">pull request</text>
           </g>
           <g class="stg-prev">
-            <text class="t-s" x="1180" y="186" text-anchor="end" style="font-size:13.4px">agent path: repair, minutes, asynchronous</text>
+            <text class="t-s" x="1180" y="186" text-anchor="end" style="font-size:13.4px">agent path: background, minutes, async</text>
             <text class="t-s" x="1180" y="204" text-anchor="end" style="font-size:13.4px">real load = volume × filter rate</text>
             <text class="t-s" x="1180" y="222" text-anchor="end" style="font-size:13.4px">step and cost cap per case</text>
           </g>
@@ -1325,11 +1295,11 @@
       <div class="beat">Where we are</div>
       <div class="post-prose">
         <p>
-          Up to <a href="#fig-s3"><em>Figure 4</em></a>, all three scenario agents were drawn as identical purple boxes. Question 9 breaks that illusion in <a href="#fig-s4"><em>Figure 5</em></a>. Inside the deterministic worker (<strong>the harness</strong>—the plain-code controller around the models), the two genuine model steps follow the <strong>Dual-LLM pattern</strong> (<a href="https://simonwillison.net/2023/Apr/25/dual-llm-pattern/" target="_blank" rel="noopener">Willison</a>; formalized with capability enforcement in <a href="https://arxiv.org/abs/2503.18813" target="_blank" rel="noopener">CaMeL</a>, and examined for ADK session-history isolation in <a href="ep01_securing_agent_to_database.html#dual-llm-history-bleed">Episode 01</a>): Agent 1 becomes a toolless <strong>Quarantined LLM</strong> that turns untrusted log text into a fixed schema, while Agent 2 becomes the <strong>Privileged LLM</strong> permitted to invoke workspace tools in a bounded loop. Between Agent 2 and Agent 3 we insert a deterministic <strong>Verifier</strong> so the model never grades its own work, and Agent 3 turns green as a plain-code <strong>Act gate</strong>—because opening a pull request follows a fixed rule and needs no language model at all.
+          Up to <a href="#fig-s3"><em>Figure 4</em></a>, all three scenario agents were drawn as identical purple boxes. Question 7 breaks that illusion in <a href="#fig-s4"><em>Figure 5</em></a>. Inside the deterministic worker (<strong>the harness</strong>—the plain-code controller around the models), the two genuine model steps follow the <strong>Dual-LLM pattern</strong> (<a href="https://simonwillison.net/2023/Apr/25/dual-llm-pattern/" target="_blank" rel="noopener">Willison</a>; formalized with capability enforcement in <a href="https://arxiv.org/abs/2503.18813" target="_blank" rel="noopener">CaMeL</a>, and examined for ADK session-history isolation in <a href="ep01_securing_agent_to_database.html#dual-llm-history-bleed">Episode 01</a>): Agent 1 becomes a toolless <strong>Quarantined LLM</strong> that turns untrusted log text into a fixed schema, while Agent 2 becomes the <strong>Privileged LLM</strong> permitted to invoke workspace tools in a bounded loop. Between Agent 2 and Agent 3 we insert a deterministic <strong>Verifier</strong> so the model never grades its own work, and Agent 3 turns green as a plain-code <strong>Act gate</strong>—because opening a pull request follows a fixed rule and needs no language model at all.
         </p>
       </div>
-      <div class="qb" id="q9" style="margin-top:20px;">
-        <div class="qh"><div class="n">9</div><h3>Which steps need a model, which are code, and what is the harness?</h3></div>
+      <div class="qb" id="q7" style="margin-top:20px;">
+        <div class="qh"><div class="n">7</div><h3>Which steps need a model, which are code, and what is the harness?</h3></div>
         <div class="q3">
           <div class="a"><span class="lab">Skip it and…</span><ul><li>"Three models chatting": unpredictable routing, unbounded loops, impossible to audit.</li><li>A model grades its own patch and agrees with its own mistakes.</li><li>A model holds repository write tokens just to call a deterministic REST endpoint.</li></ul></div>
           <div class="b"><span class="lab">Decide</span><ul><li>Apply the four-row autonomy test (<a href="#tbl-1"><em>Table 2</em></a>) to minimize model hops.</li><li>Split untrusted reading (<strong>Quarantined LLM</strong>, zero tools) from tool calling (<strong>Privileged LLM</strong>, bounded loop).</li><li>Wrap both in a deterministic <strong>harness</strong> that owns routing, retry counters, verification, and credentials.</li><li>Make the Verifier independent and thorough, since weak verification is a major source of multi-agent failures (<a href="https://arxiv.org/abs/2503.13657" target="_blank" rel="noopener">Cemri et al.</a>).</li></ul></div>
@@ -1448,7 +1418,7 @@
             <text class="zl" x="208" y="257">ONE WORKER SERVICE · DETERMINISTIC HARNESS AROUND THE MODELS</text>
           </g>
           <g class="stg-prev">
-            <text class="t-s" x="1180" y="186" text-anchor="end" style="font-size:13.4px">agent path: repair, minutes, asynchronous</text>
+            <text class="t-s" x="1180" y="186" text-anchor="end" style="font-size:13.4px">agent path: background, minutes, async</text>
             <text class="t-s" x="1180" y="204" text-anchor="end" style="font-size:13.4px">real load = volume × filter rate</text>
             <text class="t-s" x="1180" y="222" text-anchor="end" style="font-size:13.4px">step and cost cap per case</text>
           </g>
@@ -1460,11 +1430,11 @@
       <h3 style="margin:26px 0 8px;">Handoffs, Retries, and State Ownership</h3>
       <div class="post-prose">
         <p>
-          Separating the Quarantined LLM from the Privileged LLM fails if the runtime silently forwards shared conversation history—including raw untrusted logs—into Agent 2 (<a href="ep01_securing_agent_to_database.html#dual-llm-history-bleed">Episode 01</a>), or if a failed patch loops forever. Questions 10 and 11 define the typed handoffs, retry bounds, and state boundaries.
+          Separating the Quarantined LLM from the Privileged LLM fails if the runtime silently forwards shared conversation history—including raw untrusted logs—into Agent 2 (<a href="ep01_securing_agent_to_database.html#dual-llm-history-bleed">Episode 01</a>), or if a failed patch loops forever. Questions 8 and 11 define the typed handoffs, retry bounds, and state boundaries.
         </p>
       </div>
-      <div class="qb" id="q10" style="margin-top:20px;">
-        <div class="qh"><div class="n">10</div><h3>What passes between the agents, and who decides what is next?</h3></div>
+      <div class="qb" id="q8" style="margin-top:20px;">
+        <div class="qh"><div class="n">8</div><h3>What passes between the agents, and who decides what is next?</h3></div>
         <div class="q3">
           <div class="a"><span class="lab">Skip it and…</span><ul><li>Each step reinterprets the previous model's prose; errors compound.</li><li>Shared session history leaks raw untrusted text past the Quarantined LLM into the Privileged LLM.</li><li>A retry loop has no exit.</li></ul></div>
           <div class="b"><span class="lab">Decide</span><ul><li>The harness builds every handoff (<a href="#tbl-2"><em>Table 3</em></a>): parse output against a schema, keep <code>include_contents="none"</code>, attach code-set IDs from workflow state, restrict model fields to fixed enums and checkable paths, and pass large blobs as pointers.</li><li>Cutting shared history prevents untrusted bleed while risking conflicting decisions (<a href="https://cognition.com/blog/dont-build-multi-agents" target="_blank" rel="noopener">Cognition</a>), so keep one linear path and put every needed decision into the contract.</li><li>Route transient endpoint errors (<code>429</code>, <code>5xx</code>) back to the queue with backoff; retry schema/policy errors once before escalating, and keep routing (<code>PASS</code>, <code>RETRY</code>, <code>ESCALATE</code>) and retry caps in code (<a href="https://docs.cloud.google.com/architecture/choose-design-pattern-agentic-ai-system" target="_blank" rel="noopener">Google Cloud</a>).</li><li>Give Agent 1 an explicit abstain exit (<code>flaky</code> / <code>unknown</code> → escalate).</li></ul></div>
@@ -1472,8 +1442,8 @@
         </div>
       </div>
 
-      <div class="qb" id="q11">
-        <div class="qh"><div class="n">11</div><h3>Where does the data live, and who may write it?</h3></div>
+      <div class="qb" id="q9">
+        <div class="qh"><div class="n">9</div><h3>Where does the data live, and who may write it?</h3></div>
         <div class="q3">
           <div class="a"><span class="lab">Skip it and…</span><ul><li>A pre-built search index lags behind the failing commit or drops permissions.</li><li>Whole files and 50 MB stack traces flood the model's context window.</li><li>Unverified model guesses get saved into shared long-term memory and poison future runs.</li></ul></div>
           <div class="b"><span class="lab">Decide</span><ul><li>Read data in place by pointer with strict bounds (exact version, time window, line range).</li><li>Separate stores by writer (<a href="#tbl-3"><em>Table 4</em></a>): coordination DB for locks/leases/storm flags, session store + object storage for per-run state and blobs, and <strong>read-only</strong> cross-run memory updated by code only after human approval so bad runs never poison future ones.</li></ul></div>
@@ -1672,7 +1642,7 @@
             <text class="zl" x="208" y="257">ONE WORKER SERVICE · DETERMINISTIC HARNESS AROUND THE MODELS</text>
           </g>
           <g class="stg-prev">
-            <text class="t-s" x="1180" y="186" text-anchor="end" style="font-size:13.4px">agent path: repair, minutes, asynchronous</text>
+            <text class="t-s" x="1180" y="186" text-anchor="end" style="font-size:13.4px">agent path: background, minutes, async</text>
             <text class="t-s" x="1180" y="204" text-anchor="end" style="font-size:13.4px">real load = volume × filter rate</text>
             <text class="t-s" x="1180" y="222" text-anchor="end" style="font-size:13.4px">step and cost cap per case</text>
           </g>
@@ -1703,11 +1673,11 @@
       <div class="beat">Where we are</div>
       <div class="post-prose">
         <p>
-          Even with typed contracts and a plain-code verifier in <a href="#fig-s5"><em>Figure 6</em></a>, two production risks remain open. First, Agent 2's tools and the Verifier's test runner execute repository code and candidate diffs—running them inside the worker container would expose cloud workload credentials and GitHub write tokens to malicious test suites or prompt-injected patches. Second, switching an autonomous bot on without offline replay benchmarks and staged promotion leaves engineers blind to silent regressions until noisy pull requests erode trust. Questions 12 and 13 close execution isolation and launch governance.
+          Even with typed contracts and a plain-code verifier in <a href="#fig-s5"><em>Figure 6</em></a>, two production risks remain open. First, Agent 2's tools and the Verifier's test runner execute repository code and candidate diffs—running them inside the worker container would expose cloud workload credentials and GitHub write tokens to malicious test suites or prompt-injected patches. Second, switching an autonomous bot on without offline replay benchmarks and staged promotion leaves engineers blind to silent regressions until noisy pull requests erode trust. Questions 10 and 13 close execution isolation and launch governance.
         </p>
       </div>
-      <div class="qb" id="q12" style="margin-top:20px;">
-        <div class="qh"><div class="n">12</div><h3>What would an attacker do with it?</h3></div>
+      <div class="qb" id="q10" style="margin-top:20px;">
+        <div class="qh"><div class="n">10</div><h3>What would an attacker do with it?</h3></div>
         <div class="q3">
           <div class="a"><span class="lab">Skip it and…</span><ul><li>Injected log text steers a tool-calling model.</li><li>Malicious test code or a crafted diff steals cloud IAM or GitHub tokens from the worker host.</li><li>Over-broad write scopes allow pushes to <code>main</code> or edits to CI workflows.</li></ul></div>
           <div class="b"><span class="lab">Decide</span><ul><li>Keep the <strong>Quarantined LLM</strong> toolless and sever shared history (<a href="https://simonwillison.net/2023/Apr/25/dual-llm-pattern/" target="_blank" rel="noopener">Dual-LLM</a>). That stops injected text from choosing which tools run. The values the model reports can still be manipulated (<a href="https://arxiv.org/abs/2503.18813" target="_blank" rel="noopener">CaMeL</a>), so validate every field in code.</li><li>Execute the <strong>Privileged LLM</strong>'s tools and the <strong>Verifier</strong>'s test suite inside ephemeral sandboxes with zero network and zero credentials.</li><li>Enforce protected-path rules and narrow write scopes in code; keep a human on irreversible actions.</li></ul></div>
@@ -1715,8 +1685,8 @@
         </div>
       </div>
 
-      <div class="qb" id="q13">
-        <div class="qh"><div class="n">13</div><h3>How do I switch it on, and how do I know it is working?</h3></div>
+      <div class="qb" id="q11">
+        <div class="qh"><div class="n">11</div><h3>How do I switch it on, and how do I know it is working?</h3></div>
         <div class="q3">
           <div class="a"><span class="lab">Skip it and…</span><ul><li>A noisy bot opens broken PRs and gets muted by engineers within a week.</li><li>Prompt or model upgrades silently regress accuracy with no safety net.</li></ul></div>
           <div class="b"><span class="lab">Decide</span><ul><li><strong>Offline evals:</strong> gate every prompt, tool, or model change against a golden replay set—tracking <code>pass@1</code> (resolved on the first patch attempt) and <code>pass@3</code> (resolved within the 3-attempt budget, <a href="https://arxiv.org/abs/2107.03374" target="_blank" rel="noopener">Chen et al.</a>). Start small and judge the end state: Anthropic began with about 20 cases (<a href="https://www.anthropic.com/research/multi-agent-research-system" target="_blank" rel="noopener">multi-agent research system</a>).</li><li><strong>Online rollout:</strong> progress through tiers (shadow → draft → ready-for-review) with automatic demotion on human rejection spikes.</li><li>Record one end-to-end trace per case across every call and verdict.</li></ul></div>
@@ -1741,7 +1711,7 @@
               <tr><td><b>Queue</b></td><td>Queue</td><td>Bursts drop events, and crashes lose work if items are deleted on receipt.</td><td>Buffers items, retries with backoff + DLQ, and deletes an item only on terminal or <code>PARKED</code> <code>ack</code>.</td><td>Holds <code>FailureEvent</code> until a terminal exit (<code>COMPLETED</code>, <code>SKIPPED</code>, <code>ESCALATED</code>) or <code>PARKED</code>; DLQ after 5 failed deliveries.</td></tr>
               <tr><td><b>Guard</b></td><td>Plain code</td><td>Duplicate events spawn duplicate runs; shared outages flood every target.</td><td>Checks kill switch and short-window storm count, then atomically claims a case lease.</td><td>Pauses if 5+ repos fail in 5 min; if a case is already leased, a duplicate is acked and dropped without altering the live row (duplicates of finished cases are acked as <code>SKIPPED</code>; the row is unchanged); claims a 120-second lease in the coordination database.</td></tr>
               <tr><td><b>Quarantined LLM</b></td><td>LLM (1 call, 0 tools)</td><td>Untrusted external text can carry prompt injections aimed at tools.</td><td>Single toolless call (<code>include_contents="none"</code>) emitting a strict schema; raw text stops here.</td><td><strong>Agent 1 · Detect:</strong> ≤100 screened log lines → <code>IncidentReport</code> (or <code>flaky</code> / <code>unknown</code> → escalate).</td></tr>
-              <tr><td><b>Privileged LLM + Sandbox 1</b></td><td>LLM loop + sandbox</td><td>Open-ended repair requires iterative exploration, yet untrusted code risks credential theft.</td><td>Step/time-capped loop whose tools run in a container with zero network and zero credentials.</td><td><strong>Agent 2 · Suggest fix:</strong> search, read, patch, and local test in Sandbox 1 → <code>ProposedPatch</code>.</td></tr>
+              <tr><td><b>Privileged LLM + Sandbox 1</b></td><td>LLM loop + sandbox</td><td>Open-ended investigation requires iterative exploration, yet untrusted code risks credential theft.</td><td>Step/time-capped loop whose tools run in a container with zero network and zero credentials.</td><td><strong>Agent 2 · Suggest fix:</strong> search, read, patch, and local test in Sandbox 1 → <code>ProposedPatch</code>.</td></tr>
               <tr><td><b>Verifier + Sandbox 2</b></td><td>Plain code + sandbox</td><td>Models misgrade their own work and can game checks by deleting tests.</td><td>Re-verifies candidate output in a fresh sandbox against domain &amp; policy rules; caps total attempts.</td><td>Fresh Sandbox 2 confirms pre-patch failure, re-runs full pytest, blocks protected paths/deleted tests, caps total attempts at <code>3</code> (up to 2 retries).</td></tr>
               <tr><td><b>Act gate</b></td><td>Plain code</td><td>Models must not hold write keys, and stalled workers can write late.</td><td>Verifies the fencing token, performs narrowest idempotent write, and sends terminal <code>ack</code>.</td><td><strong>Agent 3 · Open PR:</strong> checks the fencing token, opens a draft PR on <code>autofix/*</code>, then sends the queue <code>ack</code>.</td></tr>
               <tr><td><b>Human + record</b></td><td>Human</td><td>Irreversible changes need human accountability and live quality telemetry.</td><td>Reviewer approves, edits, or rejects; live acceptance rate gates rollout autonomy.</td><td>Code owner reviews draft PR; merge-without-edit rate governs tiered promotion/demotion.</td></tr>
@@ -1892,7 +1862,7 @@
             <text class="zl" x="208" y="257">ONE WORKER SERVICE · DETERMINISTIC HARNESS AROUND THE MODELS</text>
           </g>
           <g class="stg-prev">
-            <text class="t-s" x="1180" y="186" text-anchor="end" style="font-size:13.4px">agent path: repair, minutes, asynchronous</text>
+            <text class="t-s" x="1180" y="186" text-anchor="end" style="font-size:13.4px">agent path: background, minutes, async</text>
             <text class="t-s" x="1180" y="204" text-anchor="end" style="font-size:13.4px">real load = volume × filter rate</text>
             <text class="t-s" x="1180" y="222" text-anchor="end" style="font-size:13.4px">step and cost cap per case</text>
           </g>
@@ -1976,7 +1946,7 @@
           <text class="t-b" x="248" y="90" style="font-size:15.8px">Cloud Run Receiver</text>
           <text class="t-s" x="248" y="110" style="font-size:13.4px">HMAC / OIDC check,</text>
           <text class="t-s" x="248" y="127" style="font-size:13.4px">fingerprint, 200 &lt;100ms</text>
-          <text class="t-s" x="248" y="144" style="font-size:13px">standalone service #1</text>
+          <text class="t-s" x="248" y="144" style="font-size:13px">SERVICE #1 · INGRESS</text>
 
           <rect class="b-store" x="466" y="66" width="174" height="92" rx="7"/>
           <text class="t-b" x="478" y="90" style="font-size:15.8px">Cloud Pub/Sub</text>
@@ -2077,7 +2047,7 @@
           <text class="t-s" x="684" y="556" style="font-size:13.4px">BigQuery + ADK Eval replay &amp; metrics</text>
 
           <rect class="zone-ours" x="14" y="240" width="984" height="338" rx="10"/>
-          <text class="zl" x="128" y="257">WORKER SERVICE #2 (CLOUD RUN OR AGENT RUNTIME) · AGENT IDENTITY · ADK WORKFLOW</text>
+          <text class="zl" x="124" y="257">SINGLE DEPLOYED SERVICE #2 (CLOUD RUN / AGENT RUNTIME) · ALL NODES IN-PROCESS</text>
           </g>
         </svg>
         <div class="fig-caption"><span>Figure 8 — The assembled architecture from <em>Figure 7</em> mapped 1-to-1 onto Google Cloud and Agent Platform.</span>
@@ -2130,7 +2100,7 @@
     <div class="sheet-h">
       <div>
         <span class="sec-badge">Summary · Master Cheat Sheet</span>
-        <h2>Thirteen-Question Design Cheat Sheet</h2>
+        <h2>Eleven-Question Design Cheat Sheet</h2>
         <p>Every question in execution order, what breaks if you skip it, and what it adds to the diagram.</p>
       </div>
     </div>
@@ -2143,24 +2113,22 @@
         <p><strong>Four-Block Shortcut:</strong> <strong>Boundary</strong> (triggers, real rate, async scope, receiver, queue) → <strong>Control Plane</strong> (Guard, lock, storm, kill switch, lease, fencing) → <strong>Workflow</strong> (Quarantined → Privileged → Verifier → Act gate, typed contracts) → <strong>Safeguards</strong> (zero-net sandboxes, narrow keys, replay evals).</p>
       </div>
       <div class="nine-q-wrap" id="tbl-7" style="margin:14px 0 16px;">
-        <div class="nine-q-head">Table 8 · Master Cheat Sheet — All Thirteen Questions Mapped to the Four Blocks</div>
+        <div class="nine-q-head">Table 8 · Master Cheat Sheet — All Eleven Questions Mapped to the Four Blocks</div>
         <div class="tbl-wrap" style="margin:0;">
           <table>
             <thead><tr><th style="width:6%">Q#</th><th style="width:21%">Design question</th><th style="width:22%">What breaks without it</th><th style="width:25%">Architectural rule / box added</th><th style="width:17.5%">Self-healing repo</th><th style="width:11%">Block</th></tr></thead>
             <tbody>
               <tr><td><b><a href="#q1">Q1</a></b></td><td>What wakes it up &amp; what is in the message?</td><td>Missed triggers or 50 MB log payloads on the bus.</td><td>Normalize every trigger into one small event carrying a data <strong>pointer</strong>.</td><td>CI, canary, alerts → <code>FailureEvent</code></td><td><a href="#stage-1">Boundary</a></td></tr>
               <tr><td><b><a href="#q2">Q2</a></b></td><td>How big is it really?</td><td>Over-built infra for filtered noise, or runaway model bills.</td><td>Multiply volume × filter rate; enforce step and budget caps per case.</td><td><code>10,000 × 1% = 100</code>/day</td><td><a href="#stage-1">Boundary</a></td></tr>
-              <tr><td><b><a href="#q3">Q3</a></b></td><td>What belongs in the workflow vs. outside?</td><td>Models wait on live outages or hold production deploy keys.</td><td>Scope workflow strictly to asynchronous <strong>diagnosis and repair</strong>.</td><td>Branch + draft PR; deploy stays outside</td><td><a href="#stage-1">Boundary</a></td></tr>
-              <tr><td><b><a href="#q4">Q4</a></b></td><td>How does work reach a worker safely?</td><td>Sender HTTP timeouts, dropped bursts, or lost runs.</td><td>Stateless <strong>Receiver</strong> + durable <strong>Queue</strong> + terminal <code>ack</code> + DLQ (5 tries).</td><td>Cloud Run → Pub/Sub → terminal <code>ack</code></td><td><a href="#stage-1">Boundary</a></td></tr>
-              <tr><td><b><a href="#q5">Q5</a></b></td><td>How do I avoid doing work twice?</td><td>Duplicate PRs, tickets, or double mutations.</td><td>Code-computed duplicate key + atomic <strong>lock</strong> row + idempotent write.</td><td><code>(repo, failure_<wbr>fingerprint)</code> in Cloud SQL</td><td><a href="#stage-2">Control Plane</a></td></tr>
-              <tr><td><b><a href="#q6">Q6</a></b></td><td>One bug vs. everything on fire?</td><td>Shared infra outage makes bots "fix" healthy targets.</td><td>Count distinct targets in a short window; trip a <strong>storm breaker</strong>.</td><td>5+ repos in 5 min → pause &amp; page</td><td><a href="#stage-2">Control Plane</a></td></tr>
-              <tr><td><b><a href="#q7">Q7</a></b></td><td>How does a person stop it, right now?</td><td>A bad prompt or model release keeps acting until a fix ships.</td><td>Manual <strong>kill switch</strong>: one flag, read at run start and before every write; events are parked.</td><td>Flag per repo or for all repos</td><td><a href="#stage-2">Control Plane</a></td></tr>
-              <tr><td><b><a href="#q8">Q8</a></b></td><td>What if a worker dies halfway?</td><td>Lost work (early <code>ack</code>) or permanently stuck locks.</td><td>Expiring <strong>lease</strong> + heartbeat renewal + monotonic <strong>fencing token</strong>.</td><td>120-second lease, 30-second heartbeat, fencing token</td><td><a href="#stage-2">Control Plane</a></td></tr>
-              <tr><td><b><a href="#q9">Q9</a></b></td><td>Model or code, and what is the harness?</td><td>Models chatting unboundedly, self-grading, or holding write keys.</td><td>Dual-LLM split (<strong>Quarantined</strong> vs. <strong>Privileged LLM</strong>) + code <strong>Verifier</strong> &amp; <strong>Act gate</strong>.</td><td>ADK <code>Workflow</code> graph (<a href="#appendix-adk"><em>Appendix</em></a>)</td><td><a href="#stage-3">Workflow</a></td></tr>
-              <tr><td><b><a href="#q10">Q10</a></b></td><td>What passes between steps &amp; who routes?</td><td>Prose drift, prompt-injection history bleed, infinite loops.</td><td>Typed handoff contracts, <code>include_contents="none"</code>, capped <code>RETRY (≤ 3 attempts)</code>, <code>ESCALATE</code>.</td><td><code>IncidentReport</code> → <code>ProposedPatch</code>, 3 tries max</td><td><a href="#stage-3">Workflow</a></td></tr>
-              <tr><td><b><a href="#q11">Q11</a></b></td><td>Where does data live &amp; who writes state?</td><td>Stale indexes, context bloat, poisoned long-term memory.</td><td>Pointer reads at exact version; code-owned state; post-approval memory only.</td><td>Exact <code>commit_sha</code>; post-merge Memory Bank</td><td><a href="#stage-3">Workflow</a></td></tr>
-              <tr><td><b><a href="#q12">Q12</a></b></td><td>What would an attacker do with it?</td><td>Prompt injection → RCE or stolen cloud/repo tokens.</td><td>Toolless <strong>Quarantined LLM</strong>, no-net/no-cred <strong>Sandboxes 1 &amp; 2</strong>, narrow write scope + human.</td><td>Code Exec gVisor, <code>autofix/*</code> draft PR</td><td><a href="#stage-4">Safeguards</a></td></tr>
-              <tr><td><b><a href="#q13">Q13</a></b></td><td>How do I launch &amp; prove it works?</td><td>Noisy bot muted in week one; silent prompt regressions.</td><td><strong>Audit &amp; eval store</strong>: offline golden replay + staged rollout + auto-demotion.</td><td>Shadow → draft PR; merge-without-edit rate</td><td><a href="#stage-4">Safeguards</a></td></tr>
+              <tr><td><b><a href="#q3">Q3</a></b></td><td>How does work reach a worker safely?</td><td>Sender HTTP timeouts, dropped bursts, or lost runs.</td><td>Stateless <strong>Receiver</strong> + durable <strong>Queue</strong> + terminal <code>ack</code> + DLQ (5 tries).</td><td>Cloud Run → Pub/Sub → terminal <code>ack</code></td><td><a href="#stage-1">Boundary</a></td></tr>
+              <tr><td><b><a href="#q4">Q4</a></b></td><td>How do I avoid doing work twice?</td><td>Duplicate PRs, tickets, or double mutations.</td><td>Code-computed duplicate key + atomic <strong>lock</strong> row + idempotent write.</td><td><code>(repo, failure_<wbr>fingerprint)</code> in Cloud SQL</td><td><a href="#stage-2">Control Plane</a></td></tr>
+              <tr><td><b><a href="#q5">Q5</a></b></td><td>How does a person stop it, right now?</td><td>A bad prompt or model release keeps acting until a fix ships.</td><td>Manual <strong>kill switch</strong>: one flag, read at run start and before every write; events are parked.</td><td>Flag per repo or for all repos</td><td><a href="#stage-2">Control Plane</a></td></tr>
+              <tr><td><b><a href="#q6">Q6</a></b></td><td>What if a worker dies halfway?</td><td>Lost work (early <code>ack</code>) or permanently stuck locks.</td><td>Expiring <strong>lease</strong> + heartbeat renewal + monotonic <strong>fencing token</strong>.</td><td>120-second lease, 30-second heartbeat, fencing token</td><td><a href="#stage-2">Control Plane</a></td></tr>
+              <tr><td><b><a href="#q7">Q7</a></b></td><td>Model or code, and what is the harness?</td><td>Models chatting unboundedly, self-grading, or holding write keys.</td><td>Dual-LLM split (<strong>Quarantined</strong> vs. <strong>Privileged LLM</strong>) + code <strong>Verifier</strong> &amp; <strong>Act gate</strong>.</td><td>ADK <code>Workflow</code> graph (<a href="#appendix-adk"><em>Appendix</em></a>)</td><td><a href="#stage-3">Workflow</a></td></tr>
+              <tr><td><b><a href="#q8">Q8</a></b></td><td>What passes between steps &amp; who routes?</td><td>Prose drift, prompt-injection history bleed, infinite loops.</td><td>Typed handoff contracts, <code>include_contents="none"</code>, capped <code>RETRY (≤ 3 attempts)</code>, <code>ESCALATE</code>.</td><td><code>IncidentReport</code> → <code>ProposedPatch</code>, 3 tries max</td><td><a href="#stage-3">Workflow</a></td></tr>
+              <tr><td><b><a href="#q9">Q9</a></b></td><td>Where does data live &amp; who writes state?</td><td>Stale indexes, context bloat, poisoned long-term memory.</td><td>Pointer reads at exact version; code-owned state; post-approval memory only.</td><td>Exact <code>commit_sha</code>; post-merge Memory Bank</td><td><a href="#stage-3">Workflow</a></td></tr>
+              <tr><td><b><a href="#q10">Q10</a></b></td><td>What would an attacker do with it?</td><td>Prompt injection → RCE or stolen cloud/repo tokens.</td><td>Toolless <strong>Quarantined LLM</strong>, no-net/no-cred <strong>Sandboxes 1 &amp; 2</strong>, narrow write scope + human.</td><td>Code Exec gVisor, <code>autofix/*</code> draft PR</td><td><a href="#stage-4">Safeguards</a></td></tr>
+              <tr><td><b><a href="#q11">Q11</a></b></td><td>How do I launch &amp; prove it works?</td><td>Noisy bot muted in week one; silent prompt regressions.</td><td><strong>Audit &amp; eval store</strong>: offline golden replay + staged rollout + auto-demotion.</td><td>Shadow → draft PR; merge-without-edit rate</td><td><a href="#stage-4">Safeguards</a></td></tr>
             </tbody>
           </table>
         </div>
@@ -2307,13 +2275,13 @@
           Walking through the four blocks turns that habit into repeatable muscle memory:
         </p>
         <ul>
-          <li><strong>Fix the boundary and intake (Boundary):</strong> normalize triggers into pointer events, size real filtered volume, scope workflows to asynchronous diagnosis and repair, and decouple senders behind a stateless receiver and durable queue with terminal acknowledgement.</li>
+          <li><strong>Fix the boundary and intake (Boundary):</strong> normalize triggers into pointer events, size real filtered volume, scope workflows to asynchronous execution, and decouple senders behind a stateless receiver and durable queue with terminal acknowledgement.</li>
           <li><strong>Coordinate and recover in one control plane (Control Plane):</strong> coordinate concurrent runs through one transactional store holding dedupe locks, a storm breaker, a manual kill switch, and expiring leases with pre-write fencing.</li>
           <li><strong>Scope autonomy inside one harness (Workflow):</strong> reserve language models for interpreting messy, untrusted text (a toolless Quarantined LLM) and exploring open-ended fixes (a bounded Privileged LLM), pass code-validated typed handoff contracts between steps with shared chat history disabled, verify every candidate independently in plain code, and restrict long-term memory writes to post-approval code.</li>
           <li><strong>Isolate execution and prove quality (Safeguards):</strong> run untrusted tools and clean-room test suites inside networkless, credential-free sandboxes, keep external write tokens narrow on a plain-code gate, and promote changes through offline golden replays and live acceptance metrics.</li>
         </ul>
         <p>
-          Whether the trigger is a failing deployment, a disputed supplier invoice, a production alert, or an updated client filing, the domain nouns change while the architecture and its thirteen questions stay the same.
+          Whether the trigger is a failing deployment, a disputed supplier invoice, a production alert, or an updated client filing, the domain nouns change while the architecture and its eleven questions stay the same.
         </p>
         <p>
           <strong>Figures to take away:</strong> <a href="#fig-four-blocks"><em>Figure 2</em></a> (the 4-block mental model), <a href="#fig-skeleton"><em>Figure 7</em></a> (the complete generic architecture), and <a href="#fig-gcp"><em>Figure 8</em></a> (the Google Cloud mapping).
@@ -2353,7 +2321,7 @@
           <!-- Center Bridge -->
           <rect x="382" y="206" width="122" height="58" rx="10" style="fill:var(--cyan-soft);stroke:var(--cyan);stroke-width:1.6"/>
           <text class="t-m-c" x="443" y="230" text-anchor="middle" style="font-size:13px">4 BLOCKS</text>
-          <text class="t-m-c" x="443" y="250" text-anchor="middle" style="font-size:13px;fill:var(--ink)">13 QUESTIONS</text>
+          <text class="t-m-c" x="443" y="250" text-anchor="middle" style="font-size:13px;fill:var(--ink)">11 QUESTIONS</text>
           <line x1="388" y1="282" x2="498" y2="282" style="stroke:var(--cyan);stroke-width:3.2" marker-end="url(#hbr-big)"/>
 
           <!-- Right Panel: 4-Block Hybrid Architecture -->
