@@ -998,7 +998,7 @@
 </defs>
 <g>
 <rect class="b-ext" height="92" rx="7" width="170" x="20" y="66"></rect>
-<text class="t-b" style="font-size:15.8px" x="32" y="90">Triggers</text>
+<text class="t-b" style="font-size:15.8px" x="32" y="90">External Event</text>
 <text class="t-s" style="font-size:14px" x="32" y="111">events, alerts, users</text>
 <text class="t-s" style="font-size:13.4px" x="32" y="130">pointer to raw data</text>
 
@@ -1067,7 +1067,7 @@
 </g>
 <g>
 <rect class="b-ext" height="108" rx="8" width="168" x="1014" y="266"></rect>
-<text class="t-b" style="font-size:15.8px" text-anchor="middle" x="1098" y="290">Human + record</text>
+<text class="t-b" style="font-size:14.2px" text-anchor="middle" x="1098" y="290">External Sys + Human</text>
 <text class="t-s" style="font-size:13.4px" text-anchor="middle" x="1098" y="313">reviews draft PR,</text>
 <text class="t-s" style="font-size:13.4px" text-anchor="middle" x="1098" y="331">live approval signal</text>
 <text class="t-s" style="font-size:13px" text-anchor="middle" x="1098" y="349">governs rollout stage</text>
@@ -1176,7 +1176,7 @@
           </div>
           <div class="step-why"><b>Problem solved:</b> Outage bursts overwhelm synchronous workers, and a worker crashing mid-run loses any event acknowledged on receipt.</div>
           <p class="step-how">
-            Buffers <code>FailureEvent</code> messages durably and delivers one item at a time to available workers. A message remains unacknowledged while the run executes and is deleted only when the worker records a terminal or paused state (<code>PR_OPENED</code>, <code>SKIPPED</code>, <code>ESCALATED</code>, or <code>PARKED</code>) and sends <code>ack</code>. Repeated crashes back off exponentially and route to a dead-letter queue after 5 failed deliveries.
+            Buffers <code>FailureEvent</code> messages durably and delivers one item at a time to available workers. A message remains unacknowledged while the run executes and is deleted only when the worker records a terminal or paused state (<code>COMPLETED</code>, <code>SKIPPED</code>, <code>ESCALATED</code>, or <code>PARKED</code>) and sends <code>ack</code>. Repeated crashes back off exponentially and route to a dead-letter queue after 5 failed deliveries.
           </p>
         </div>
 
@@ -1281,7 +1281,7 @@
           </div>
           <div class="step-why"><b>Problem solved:</b> Opening a pull request follows a fixed API contract that needs zero model reasoning, and a worker stalled past its 120-second lease could wake up late and double-write after another worker took over.</div>
           <p class="step-how">
-            Implemented strictly as plain deterministic code holding a repository credential restricted to <code>autofix/*</code> branches. Right before calling the repository API, it performs a second transactional check on the <strong>Coordination store</strong>—verifying that the manual <strong>kill switch</strong> remains clear and that its <strong>fencing token</strong> still owns the row—then pushes the branch idempotently, opens a <strong>draft pull request</strong>, marks the row <code>PR_OPENED</code>, and sends terminal <code>ack</code> to the queue.
+            Implemented strictly as plain deterministic code holding a repository credential restricted to <code>autofix/*</code> branches. Right before calling the repository API, it performs a second transactional check on the <strong>Coordination store</strong>—verifying that the manual <strong>kill switch</strong> remains clear and that its <strong>fencing token</strong> still owns the row—then pushes the branch idempotently, opens a <strong>draft pull request</strong>, marks the row <code>COMPLETED</code>, and sends terminal <code>ack</code> to the queue.
           </p>
         </div>
 
@@ -1347,7 +1347,7 @@
 <text class="zl" x="176" y="36">· GEMINI ENTERPRISE AGENT PLATFORM</text>
 <g transform="translate(0, 44)">
 <rect class="b-ext" height="92" rx="7" width="170" x="20" y="66"></rect>
-<text class="t-b" style="font-size:15.8px" x="32" y="90">Event Sources</text>
+<text class="t-b" style="font-size:15.8px" x="32" y="90">External Event</text>
 <text class="t-s" style="font-size:13.4px" x="32" y="110">Webhooks, Scheduler,</text>
 <text class="t-s" style="font-size:13.4px" x="32" y="128">Cloud Monitoring / Logs</text>
 <rect class="b-code" height="92" rx="7" width="184" x="236" y="66"></rect>
@@ -1405,7 +1405,7 @@
 <text class="t-m-g" text-anchor="middle" x="907" y="360">→ External Write</text>
 <path class="flow" d="M988 320 H1010" marker-end="url(#pgcp-ink)"></path>
 <rect class="b-ext" height="108" rx="8" width="168" x="1014" y="266"></rect>
-<text class="t-b" style="font-size:15.8px" text-anchor="middle" x="1098" y="290">Target + Human</text>
+<text class="t-b" style="font-size:14.2px" text-anchor="middle" x="1098" y="290">External Sys + Human</text>
 <text class="t-s" style="font-size:13.4px" text-anchor="middle" x="1098" y="313">narrowly scoped write,</text>
 <text class="t-s" style="font-size:13.4px" text-anchor="middle" x="1098" y="331">human approves change</text>
 <text class="t-s" style="font-size:13px" text-anchor="middle" x="1098" y="349">post-approval → Memory</text>

@@ -872,10 +872,10 @@
     <a id="home-link" class="home-link" href="index.html">← Home</a>
     <a href="#problem">Scenario</a>
     <a href="#four-blocks">4 Blocks</a>
-    <a href="#stage-1">Stage 1 · Boundary</a>
-    <a href="#stage-2">Stage 2 · Control Plane</a>
-    <a href="#stage-3">Stage 3 · Workflow</a>
-    <a href="#stage-4">Stage 4 · Safeguards</a>
+    <a href="#stage-1">Boundary</a>
+    <a href="#stage-2">Control Plane</a>
+    <a href="#stage-3">Workflow</a>
+    <a href="#stage-4">Safeguards</a>
     <a href="ref/ep02-full-architecture.html">Full Architecture</a>
     <a href="#gcp">Google Cloud</a>
     <a href="#cheatsheet">Cheat Sheet</a>
@@ -901,6 +901,10 @@
       </div>
     </div>
     <div class="sheet-b">
+      <div class="diagram-frame" id="fig-hero-banner" style="margin-bottom:20px;">
+        <img src="ref/ep02-hero-banner.png" alt="From a black-box agent sequence to the 4-block hybrid architecture" style="width:100%;height:auto;display:block;border-radius:8px;">
+        <div class="fig-caption"><span>Overview — Moving from an initial black-box agent sequence to the 4-block hybrid architecture.</span></div>
+      </div>
       <div class="post-prose">
         <p>
           As frontier language models get better in everyday interactive work, handing them a high-level goal and letting them work out the steps becomes routine. Carrying that habit into system design makes it easy to sketch an architecture as a sequence of autonomous black boxes, naming what each agent should accomplish while leaving control flow, state, failure recovery, and security unspecified. At the same time, new frameworks, SDKs, and agent protocols arrive constantly, while the architectural questions underneath that churn change far more slowly. My goal with this episode is to build muscle memory for the new set of questions we need to ask and answer when working with agent-based systems, and to turn them into a generic approach that applies across domains and problem types.
@@ -922,11 +926,11 @@
         </p>
       </div>
       <div class="diagram-frame" id="fig-first-design">
-        <svg viewBox="0 0 880 180" role="img" aria-label="Figure 1: the scenario as given, three agents in a row">
+        <svg viewBox="0 0 912 180" role="img" aria-label="Figure 1: the scenario as given, three agents in a row">
           <defs>
             <marker id="f1-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--ink)"/></marker>
           </defs>
-          <rect class="zone-box" x="12" y="12" width="856" height="156" rx="10"/>
+          <rect class="zone-box" x="12" y="12" width="888" height="156" rx="10"/>
           <text class="t-zone" x="30" y="36">INITIAL SEQUENCE · THE SCENARIO AS GIVEN</text>
           <rect class="node-card" x="22" y="58" width="128" height="92" rx="8"/>
           <text class="t-title" x="34" y="86">Failed deploy</text>
@@ -944,10 +948,10 @@
           <text class="t-title" x="590" y="86">Agent 3 · Open PR</text>
           <text class="t-sub" x="590" y="108">Opens a pull request</text>
           <text class="t-sub" x="590" y="126">with the fix</text>
-          <rect class="node-card" x="778" y="58" width="80" height="92" rx="8"/>
-          <text class="t-title" x="790" y="86">Repo</text>
-          <text class="t-sub" x="790" y="108">pull</text>
-          <text class="t-sub" x="790" y="126">request</text>
+          <rect class="node-card" x="778" y="58" width="112" height="92" rx="8"/>
+          <text class="t-title" x="790" y="84">External</text>
+          <text class="t-title" x="790" y="103">System</text>
+          <text class="t-sub" x="790" y="128">pull request</text>
           <path d="M150 104 H172" style="stroke:var(--ink);stroke-width:2;fill:none" marker-end="url(#f1-ink)"/>
           <path d="M350 104 H372" style="stroke:var(--ink);stroke-width:2;fill:none" marker-end="url(#f1-ink)"/>
           <path d="M552 104 H574" style="stroke:var(--ink);stroke-width:2;fill:none" marker-end="url(#f1-ink)"/>
@@ -1017,11 +1021,11 @@
       </div>
       <div class="post-prose">
         <p>
-          <em>Table 1</em> maps those four blocks one-to-one onto the four stages below:
+          <em>Table 1</em> summarizes what each block owns:
         </p>
       </div>
       <div class="nine-q-wrap" id="tbl-blocks" style="margin:12px 0 18px;">
-        <div class="nine-q-head">Table 1 · Four Blocks Mapped to Four Stages</div>
+        <div class="nine-q-head">Table 1 · What Each Block Owns</div>
         <div class="tbl-wrap" style="margin:0;">
           <table>
             <thead><tr><th style="width:18%">Block</th><th>What happens</th></tr></thead>
@@ -1047,7 +1051,7 @@
     <div class="sheet-h">
       <div>
         <span class="sec-badge">Boundary &amp; Intake</span>
-        <h2>Stage 1 · Boundary: Triggers, Volume, and Reliable Intake</h2>
+        <h2>1 · Boundary: Triggers, Volume, and Reliable Intake</h2>
         <p>Define what wakes the system up, size the real load, scope to asynchronous repair, and buffer events reliably behind a stateless receiver and durable queue.</p>
       </div>
     </div>
@@ -1078,7 +1082,7 @@
         <div class="q3">
           <div class="a"><span class="lab">Skip it and…</span><ul><li>You over-engineer sharded caches for <code>10,000</code>/day when only <code>100</code>/day run.</li><li>Or an uncapped agent loop burns excessive token budget.</li></ul></div>
           <div class="b"><span class="lab">Decide</span><ul><li>Multiply total volume by the filter rate before choosing infrastructure.</li><li>Ask whether you face a throughput problem or a correctness/coordination problem, and cap cost per case. One agent uses about 4× more tokens than a chat exchange, and a multi-agent system about 15× more (<a href="https://www.anthropic.com/research/multi-agent-research-system" target="_blank" rel="noopener">Anthropic</a>).</li></ul></div>
-          <div class="c"><span class="lab">In the self-healing repo</span><ul><li><code>10,000 × 1% = 100</code> failures/day (~one every 14 minutes)—a correctness problem at low volume.</li><li>At ~6–10 model calls and ~50k tokens per case, rough cost is ~$0.05–$0.15/incident (~$5–$15/day, Flash-class pricing; illustrative); enforce a hard step and budget cap per run.</li></ul></div>
+          <div class="c"><span class="lab">In the self-healing repo</span><ul><li><code>10,000 × 1% = 100</code> failures/day (~one every 14 minutes)—a correctness problem at low volume.</li><li>Hard step cap and model budget per incident.</li></ul></div>
         </div>
       </div>
 
@@ -1095,7 +1099,7 @@
         <div class="q3">
           <div class="a"><span class="lab">Skip it and…</span><ul><li>The sender's 5–10s HTTP timeout expires waiting on a slow run, while an early <code>200</code> that holds work only in memory loses it on restart.</li><li>A burst drops events, or an unverified endpoint accepts spoofed webhooks.</li></ul></div>
           <div class="b"><span class="lab">Decide</span><ul><li>Place a stateless <strong>Receiver</strong> in front: verify sender signature/token, drop passing-build events, reply <code>200</code> at once.</li><li>Buffer in a durable <strong>Queue</strong>; send <code>ack</code> only at a terminal exit or on <code>PARKED</code>, with exponential backoff and a dead-letter queue after repeated failed deliveries.</li></ul></div>
-          <div class="c"><span class="lab">In the self-healing repo</span><ul><li>Webhook receiver → durable queue → worker.</li><li>HMAC/OIDC check, reply <code>200</code> immediately; <code>ack</code> at a terminal exit (<code>PR_OPENED</code>, <code>SKIPPED</code>, <code>ESCALATED</code>) or on <code>PARKED</code>; DLQ after 5 failed deliveries.</li></ul></div>
+          <div class="c"><span class="lab">In the self-healing repo</span><ul><li>Webhook receiver → durable queue → worker.</li><li>HMAC/OIDC check, reply <code>200</code> immediately; <code>ack</code> at a terminal exit (<code>COMPLETED</code>, <code>SKIPPED</code>, <code>ESCALATED</code>) or on <code>PARKED</code>; DLQ after 5 failed deliveries.</li></ul></div>
         </div>
       </div>
       <div class="post-prose" style="margin-top:18px;">
@@ -1104,7 +1108,7 @@
         </p>
       </div>
       <div class="diagram-frame" id="fig-s2">
-        <svg viewBox="0 0 1200 390" role="img" aria-label="Figure 3 — Stage 1 · Boundary and Reliable Intake: Normalized triggers, stateless receiver, durable queue, and terminal ack.">
+        <svg viewBox="0 0 1200 390" role="img" aria-label="Figure 3 — Boundary: Normalized triggers, stateless receiver, durable queue, and terminal ack.">
           <defs>
             <marker id="ps2-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--ink)"/></marker>
             <marker id="ps2-mut" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--muted)"/></marker>
@@ -1114,7 +1118,7 @@
           </defs>
           <g class="stg-new">
             <rect class="b-ext" x="20" y="66" width="170" height="92" rx="7"/>
-            <text class="t-b" x="32" y="90" style="font-size:15.8px">Triggers</text>
+            <text class="t-b" x="32" y="90" style="font-size:15.8px">External Event</text>
             <text class="t-s" x="32" y="111" style="font-size:14px">events, alerts, users</text>
             <text class="t-s" x="32" y="130" style="font-size:13.4px">pointer to raw data</text>
             <rect class="b-code" x="236" y="66" width="184" height="92" rx="7"/>
@@ -1151,7 +1155,7 @@
             <text class="t-s" x="862" y="335" text-anchor="middle" style="font-size:13.4px">with the fix</text>
             <path class="flow" d="M964 318 H1010" marker-end="url(#ps2-ink)"/>
             <rect class="b-ext" x="1014" y="266" width="166" height="104" rx="8"/>
-            <text class="t-b" x="1097" y="294" text-anchor="middle" style="font-size:15.8px">Repo</text>
+            <text class="t-b" x="1097" y="294" text-anchor="middle" style="font-size:15.2px">External System</text>
             <text class="t-s" x="1097" y="316" text-anchor="middle" style="font-size:13.4px">pull request</text>
           </g>
           <g class="stg-prev">
@@ -1160,12 +1164,12 @@
             <text class="t-s" x="1180" y="222" text-anchor="end" style="font-size:13.4px">step and cost cap per case</text>
           </g>
         </svg>
-        <div class="fig-caption"><span>Figure 3 — Stage 1 · Boundary and Reliable Intake: Normalized triggers, stateless receiver, durable queue, and terminal ack.</span>
-          <div class="legend-items"><span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good);border-width:2.2px;box-shadow:0 0 5px var(--good)"></i> <b>Bold glow = Added in this stage</b></span><span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good)"></i> Plain code</span><span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> Unexamined black-box agent</span><span><i class="swatch-dot" style="background:var(--amber-soft);border-color:var(--amber)"></i> Queue / store</span></div>
+        <div class="fig-caption"><span>Figure 3 — Boundary: Normalized triggers, stateless receiver, durable queue, and terminal ack.</span>
+          <div class="legend-items"><span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good);border-width:2.2px;box-shadow:0 0 5px var(--good)"></i> <b>Bold glow = Added in this block</b></span><span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good)"></i> Plain code</span><span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> Unexamined black-box agent</span><span><i class="swatch-dot" style="background:var(--amber-soft);border-color:var(--amber)"></i> Queue / store</span></div>
         </div>
       </div>
-      <div class="closes"><span><b>Added in Stage 1:</b> Normalized pointer triggers, sized load, stateless Receiver + durable Queue + terminal <code>ack</code></span><span><i>Still open:</i> Duplicate deliveries · multi-repo outage storms · dead or stalled workers · black-box agents</span></div>
-      <div class="post-prose" style="margin-top:12px;"><p>At-least-once queueing guarantees no event is lost, which immediately creates the opposite hazard: the same failure delivered twice, a shared outage flooding every repo, or a worker dying mid-run. Stage 2 adds coordination.</p></div>
+      <div class="closes"><span><b>Added in Boundary:</b> Normalized pointer triggers, sized load, stateless Receiver + durable Queue + terminal <code>ack</code></span><span><i>Still open:</i> Duplicate deliveries · multi-repo outage storms · dead or stalled workers · black-box agents</span></div>
+      <div class="post-prose" style="margin-top:12px;"><p>At-least-once queueing guarantees no event is lost, which immediately creates the opposite hazard: the same failure delivered twice, a shared outage flooding every repo, or a worker dying mid-run. Control Plane adds coordination.</p></div>
     </div>
   </section>
 
@@ -1174,7 +1178,7 @@
     <div class="sheet-h">
       <div>
         <span class="sec-badge">Control Plane</span>
-        <h2>Stage 2 · Control Plane: Coordination and Recovery</h2>
+        <h2>2 · Control Plane: Coordination and Recovery</h2>
         <p>One transactional coordination store gives the worker a lock, an expiring lease, a fencing check, a storm breaker, and a kill switch.</p>
       </div>
     </div>
@@ -1189,7 +1193,7 @@
         <div class="qh"><div class="n">5</div><h3>How do I avoid doing the same thing twice?</h3></div>
         <div class="q3">
           <div class="a"><span class="lab">Skip it and…</span><ul><li>Fifteen identical pull requests, tickets, or refunds open for one bug.</li><li>A retry repeats an external write that already succeeded.</li></ul></div>
-          <div class="b"><span class="lab">Decide</span><ul><li>Compute a deterministic duplicate key in plain code from stable fields.</li><li>Keep one durable row per key—<code>IN_PROGRESS</code> while leased, <code>PARKED</code> when paused, and terminal states <code>PR_OPENED</code>, <code>SKIPPED</code>, or <code>ESCALATED</code>—and pass an idempotency key on external writes.</li></ul></div>
+          <div class="b"><span class="lab">Decide</span><ul><li>Compute a deterministic duplicate key in plain code from stable fields.</li><li>Keep one durable row per key—<code>IN_PROGRESS</code> while leased, <code>PARKED</code> when paused, and terminal states <code>COMPLETED</code>, <code>SKIPPED</code>, or <code>ESCALATED</code>—and pass an idempotency key on external writes.</li></ul></div>
           <div class="c"><span class="lab">In the self-healing repo</span><ul><li><code>failure_fingerprint</code>: hash of structured error type, target, and normalized summary already in the webhook payload (no log download needed).</li><li>One row per <code>(repo, failure_fingerprint)</code>; finished rows immediately <code>ack</code> and skip.</li></ul></div>
         </div>
       </div>
@@ -1226,7 +1230,7 @@
         </p>
       </div>
       <div class="diagram-frame" id="fig-s3">
-        <svg viewBox="0 0 1200 538" role="img" aria-label="Figure 4 — Stage 2 · Control Plane (Coordination and Recovery): Guard, storm breaker, kill switch, and expiring case lease added.">
+        <svg viewBox="0 0 1200 538" role="img" aria-label="Figure 4 — Control Plane: Guard, storm breaker, kill switch, and expiring case lease added.">
           <defs>
             <marker id="ps3-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--ink)"/></marker>
             <marker id="ps3-mut" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--muted)"/></marker>
@@ -1236,7 +1240,7 @@
           </defs>
           <g class="stg-prev">
             <rect class="b-ext" x="20" y="66" width="170" height="92" rx="7"/>
-            <text class="t-b" x="32" y="90" style="font-size:15.8px">Triggers</text>
+            <text class="t-b" x="32" y="90" style="font-size:15.8px">External Event</text>
             <text class="t-s" x="32" y="111" style="font-size:14px">events, alerts, users</text>
             <text class="t-s" x="32" y="130" style="font-size:13.4px">pointer to raw data</text>
           </g>
@@ -1290,7 +1294,7 @@
             <text class="t-s" x="876" y="335" text-anchor="middle" style="font-size:13.4px">black-box agent</text>
             <path class="flow" d="M978 320 H1010" marker-end="url(#ps3-ink)"/>
             <rect class="b-ext" x="1014" y="266" width="166" height="108" rx="8"/>
-            <text class="t-b" x="1097" y="294" text-anchor="middle" style="font-size:15.8px">Repo</text>
+            <text class="t-b" x="1097" y="294" text-anchor="middle" style="font-size:15.2px">External System</text>
             <text class="t-s" x="1097" y="316" text-anchor="middle" style="font-size:13.4px">pull request</text>
           </g>
           <g class="stg-prev">
@@ -1299,12 +1303,12 @@
             <text class="t-s" x="1180" y="222" text-anchor="end" style="font-size:13.4px">step and cost cap per case</text>
           </g>
         </svg>
-        <div class="fig-caption"><span>Figure 4 — Stage 2 · Control Plane (Coordination and Recovery): Guard, storm breaker, kill switch, and expiring case lease added.</span>
-          <div class="legend-items"><span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good);border-width:2.2px;box-shadow:0 0 5px var(--good)"></i> <b>Bold glow = Added in this stage</b></span><span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good)"></i> Plain code</span><span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> Unexamined black-box agent</span><span><i class="swatch-dot" style="background:var(--amber-soft);border-color:var(--amber)"></i> Queue / store</span></div>
+        <div class="fig-caption"><span>Figure 4 — Control Plane: Guard, storm breaker, kill switch, and expiring case lease added.</span>
+          <div class="legend-items"><span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good);border-width:2.2px;box-shadow:0 0 5px var(--good)"></i> <b>Bold glow = Added in this block</b></span><span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good)"></i> Plain code</span><span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> Unexamined black-box agent</span><span><i class="swatch-dot" style="background:var(--amber-soft);border-color:var(--amber)"></i> Queue / store</span></div>
         </div>
       </div>
-      <div class="closes"><span><b>Added in Stage 2:</b> Guard + Coordination store (lock, expiring lease, fencing, storm breaker, kill switch)</span><span><i>Still open:</i> The three agents are still unexamined purple black boxes</span></div>
-      <div class="post-prose" style="margin-top:12px;"><p>The plumbing around the worker now handles duplicates, storms, and crashes. Stage 3 opens up the three purple boxes themselves and asks which ones should be models at all.</p></div>
+      <div class="closes"><span><b>Added in Control Plane:</b> Guard + Coordination store (lock, expiring lease, fencing, storm breaker, kill switch)</span><span><i>Still open:</i> The three agents are still unexamined purple black boxes</span></div>
+      <div class="post-prose" style="margin-top:12px;"><p>The plumbing around the worker now handles duplicates, storms, and crashes. Workflow opens up the three purple boxes themselves and asks which ones should be models at all.</p></div>
     </div>
   </section>
 
@@ -1313,7 +1317,7 @@
     <div class="sheet-h">
       <div>
         <span class="sec-badge">Inside the Worker</span>
-        <h2>Stage 3 · Workflow: Agents, Handoffs, and State</h2>
+        <h2>3 · Workflow: Agents, Handoffs, and State</h2>
         <p>Give every step the lowest autonomy that works, pass small validated schemas between steps, cap retries, and keep state and memory writes in code.</p>
       </div>
     </div>
@@ -1328,7 +1332,7 @@
         <div class="qh"><div class="n">9</div><h3>Which steps need a model, which are code, and what is the harness?</h3></div>
         <div class="q3">
           <div class="a"><span class="lab">Skip it and…</span><ul><li>"Three models chatting": unpredictable routing, unbounded loops, impossible to audit.</li><li>A model grades its own patch and agrees with its own mistakes.</li><li>A model holds repository write tokens just to call a deterministic REST endpoint.</li></ul></div>
-          <div class="b"><span class="lab">Decide</span><ul><li>Apply the four-row autonomy test (<a href="#tbl-1"><em>Table 2</em></a>) to minimize model hops: chaining ten 95%-reliable model steps drops end-to-end reliability to ~60% (<code>0.95¹⁰</code>), whereas keeping two model steps inside deterministic code preserves ~90% before verification and retry.</li><li>Split untrusted reading (<strong>Quarantined LLM</strong>, zero tools) from tool calling (<strong>Privileged LLM</strong>, bounded loop).</li><li>Wrap both in a deterministic <strong>harness</strong> that owns routing, retry counters, verification, and credentials.</li><li>Make the Verifier independent and thorough—confirming the target test fails before the patch and passes after—since weak verification is a major source of multi-agent failures (<a href="https://arxiv.org/abs/2503.13657" target="_blank" rel="noopener">Cemri et al.</a>).</li></ul></div>
+          <div class="b"><span class="lab">Decide</span><ul><li>Apply the four-row autonomy test (<a href="#tbl-1"><em>Table 2</em></a>) to minimize model hops.</li><li>Split untrusted reading (<strong>Quarantined LLM</strong>, zero tools) from tool calling (<strong>Privileged LLM</strong>, bounded loop).</li><li>Wrap both in a deterministic <strong>harness</strong> that owns routing, retry counters, verification, and credentials.</li><li>Make the Verifier independent and thorough, since weak verification is a major source of multi-agent failures (<a href="https://arxiv.org/abs/2503.13657" target="_blank" rel="noopener">Cemri et al.</a>).</li></ul></div>
           <div class="c"><span class="lab">In the self-healing repo</span><ul><li><strong>Agent 1 (Quarantined LLM):</strong> 1 schema-bound call over ≤100 screened lines, no tools.</li><li><strong>Agent 2 (Privileged LLM):</strong> bounded tool loop with step and time caps.</li><li><strong>Verifier &amp; Agent 3 (Act gate):</strong> plain deterministic code, zero LLM calls.</li></ul></div>
         </div>
       </div>
@@ -1354,7 +1358,7 @@
         </p>
       </div>
       <div class="diagram-frame" id="fig-s4">
-        <svg viewBox="0 0 1200 546" role="img" aria-label="Figure 5 — Stage 3 · Workflow (Agents): Black boxes split into Quarantined LLM, Privileged LLM, plain-code Verifier, and Act gate.">
+        <svg viewBox="0 0 1200 546" role="img" aria-label="Figure 5 — Workflow (Agents): Black boxes split into Quarantined LLM, Privileged LLM, plain-code Verifier, and Act gate.">
           <defs>
             <marker id="ps4-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--ink)"/></marker>
             <marker id="ps4-mut" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--muted)"/></marker>
@@ -1364,7 +1368,7 @@
           </defs>
           <g class="stg-prev">
             <rect class="b-ext" x="20" y="66" width="170" height="92" rx="7"/>
-            <text class="t-b" x="32" y="90" style="font-size:15.8px">Triggers</text>
+            <text class="t-b" x="32" y="90" style="font-size:15.8px">External Event</text>
             <text class="t-s" x="32" y="111" style="font-size:14px">events, alerts, users</text>
             <text class="t-s" x="32" y="130" style="font-size:13.4px">pointer to raw data</text>
           </g>
@@ -1427,7 +1431,7 @@
           </g>
           <g class="stg-prev">
             <rect class="b-ext" x="1014" y="266" width="168" height="108" rx="8"/>
-            <text class="t-b" x="1098" y="294" text-anchor="middle" style="font-size:15.8px">Repo</text>
+            <text class="t-b" x="1098" y="294" text-anchor="middle" style="font-size:15.2px">External System</text>
             <text class="t-s" x="1098" y="316" text-anchor="middle" style="font-size:13.4px">pull request</text>
           </g>
           <g class="stg-prev">
@@ -1449,8 +1453,8 @@
             <text class="t-s" x="1180" y="222" text-anchor="end" style="font-size:13.4px">step and cost cap per case</text>
           </g>
         </svg>
-        <div class="fig-caption"><span>Figure 5 — Stage 3 · Workflow (Agents): Black boxes split into Quarantined LLM, Privileged LLM, plain-code Verifier, and Act gate.</span>
-          <div class="legend-items"><span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good);border-width:2.2px;box-shadow:0 0 5px var(--good)"></i> <b>Bold glow = Added in this stage</b></span><span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good)"></i> Plain code</span><span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> LLM step</span><span><i class="swatch-dot" style="background:var(--amber-soft);border-color:var(--amber)"></i> Queue / store</span></div>
+        <div class="fig-caption"><span>Figure 5 — Workflow (Agents): Black boxes split into Quarantined LLM, Privileged LLM, plain-code Verifier, and Act gate.</span>
+          <div class="legend-items"><span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good);border-width:2.2px;box-shadow:0 0 5px var(--good)"></i> <b>Bold glow = Added in this block</b></span><span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good)"></i> Plain code</span><span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> LLM step</span><span><i class="swatch-dot" style="background:var(--amber-soft);border-color:var(--amber)"></i> Queue / store</span></div>
         </div>
       </div>
       <h3 style="margin:26px 0 8px;">Handoffs, Retries, and State Ownership</h3>
@@ -1554,7 +1558,7 @@
         </p>
       </div>
       <div class="diagram-frame" id="fig-s5">
-        <svg viewBox="0 0 1200 596" role="img" aria-label="Figure 6 — Stage 3 · Workflow (Handoffs and State): Six typed handoff contracts, bounded retry (≤ 3 attempts), human escalation, and session/memory stores.">
+        <svg viewBox="0 0 1200 596" role="img" aria-label="Figure 6 — Workflow (Handoffs and State): Six typed handoff contracts, bounded retry (≤ 3 attempts), human escalation, and session/memory stores.">
           <defs>
             <marker id="ps5-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--ink)"/></marker>
             <marker id="ps5-mut" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--muted)"/></marker>
@@ -1564,7 +1568,7 @@
           </defs>
           <g class="stg-prev">
             <rect class="b-ext" x="20" y="66" width="170" height="92" rx="7"/>
-            <text class="t-b" x="32" y="90" style="font-size:15.8px">Triggers</text>
+            <text class="t-b" x="32" y="90" style="font-size:15.8px">External Event</text>
             <text class="t-s" x="32" y="111" style="font-size:14px">events, alerts, users</text>
             <text class="t-s" x="32" y="130" style="font-size:13.4px">pointer to raw data</text>
           </g>
@@ -1638,7 +1642,7 @@
           </g>
           <g class="stg-prev">
             <rect class="b-ext" x="1014" y="266" width="168" height="108" rx="8"/>
-            <text class="t-b" x="1098" y="294" text-anchor="middle" style="font-size:15.8px">Repo</text>
+            <text class="t-b" x="1098" y="294" text-anchor="middle" style="font-size:15.2px">External System</text>
             <text class="t-s" x="1098" y="316" text-anchor="middle" style="font-size:13.4px">pull request</text>
           </g>
           <g class="stg-prev">
@@ -1677,12 +1681,12 @@
             <text class="t-s" x="346" y="438" text-anchor="end" style="font-size:13.4px">bounded reads by pointer</text>
           </g>
         </svg>
-        <div class="fig-caption"><span>Figure 6 — Stage 3 · Workflow (Handoffs and State): Six typed handoff contracts, bounded retry (≤ 3 attempts), human escalation, and session/memory stores.</span>
-          <div class="legend-items"><span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good);border-width:2.2px;box-shadow:0 0 5px var(--good)"></i> <b>Bold glow = Added in this stage</b></span><span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good)"></i> Plain code</span><span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> LLM step</span><span><i class="swatch-dot" style="background:var(--amber-soft);border-color:var(--amber)"></i> Queue / store</span></div>
+        <div class="fig-caption"><span>Figure 6 — Workflow (Handoffs and State): Six typed handoff contracts, bounded retry (≤ 3 attempts), human escalation, and session/memory stores.</span>
+          <div class="legend-items"><span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good);border-width:2.2px;box-shadow:0 0 5px var(--good)"></i> <b>Bold glow = Added in this block</b></span><span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good)"></i> Plain code</span><span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> LLM step</span><span><i class="swatch-dot" style="background:var(--amber-soft);border-color:var(--amber)"></i> Queue / store</span></div>
         </div>
       </div>
-      <div class="closes"><span><b>Added in Stage 3:</b> Dual-LLM split + plain-code Verifier &amp; Act gate, typed handoff contracts, <code>include_contents="none"</code>, bounded <code>RETRY (≤ 3 attempts)</code>, <code>ESCALATE</code>, and separated state/memory ownership</span><span><i>Still open:</i> Untrusted code execution isolation, narrow write permissions, human sign-off, and staged rollout</span></div>
-      <div class="post-prose" style="margin-top:12px;"><p>One danger remains: Agent 2 and the Verifier execute repository code and candidate patches, and the system still needs a safe way to ship and measure quality. Stage 4 completes the generic architecture.</p></div>
+      <div class="closes"><span><b>Added in Workflow:</b> Dual-LLM split + plain-code Verifier &amp; Act gate, typed handoff contracts, <code>include_contents="none"</code>, bounded <code>RETRY (≤ 3 attempts)</code>, <code>ESCALATE</code>, and separated state/memory ownership</span><span><i>Still open:</i> Untrusted code execution isolation, narrow write permissions, human sign-off, and staged rollout</span></div>
+      <div class="post-prose" style="margin-top:12px;"><p>One danger remains: Agent 2 and the Verifier execute repository code and candidate patches, and the system still needs a safe way to ship and measure quality. Safeguards completes the generic architecture.</p></div>
     </div>
   </section>
 
@@ -1691,7 +1695,7 @@
     <div class="sheet-h">
       <div>
         <span class="sec-badge">Safeguards &amp; Complete Generic Architecture</span>
-        <h2>Stage 4 · Safeguards: Isolation and Rollout</h2>
+        <h2>4 · Safeguards: Isolation and Rollout</h2>
         <p>Put untrusted execution in credential-free sandboxes, keep a human on irreversible writes, and gate every change with offline and online evals.</p>
       </div>
     </div>
@@ -1715,7 +1719,7 @@
         <div class="qh"><div class="n">13</div><h3>How do I switch it on, and how do I know it is working?</h3></div>
         <div class="q3">
           <div class="a"><span class="lab">Skip it and…</span><ul><li>A noisy bot opens broken PRs and gets muted by engineers within a week.</li><li>Prompt or model upgrades silently regress accuracy with no safety net.</li></ul></div>
-          <div class="b"><span class="lab">Decide</span><ul><li><strong>Offline evals:</strong> gate every prompt, tool, or model change against a golden replay set—tracking <code>pass@1</code> (resolved on the first patch attempt) and <code>pass@3</code> (resolved within the 3-attempt budget, <a href="https://arxiv.org/abs/2107.03374" target="_blank" rel="noopener">Chen et al.</a>). Start small and judge the end state: Anthropic began with about 20 cases (<a href="https://www.anthropic.com/research/multi-agent-research-system" target="_blank" rel="noopener">multi-agent research system</a>).</li><li><strong>Online rollout:</strong> progress through stages (shadow → draft → ready-for-review) with automatic demotion on human rejection spikes.</li><li>Record one end-to-end trace per case across every call and verdict.</li></ul></div>
+          <div class="b"><span class="lab">Decide</span><ul><li><strong>Offline evals:</strong> gate every prompt, tool, or model change against a golden replay set—tracking <code>pass@1</code> (resolved on the first patch attempt) and <code>pass@3</code> (resolved within the 3-attempt budget, <a href="https://arxiv.org/abs/2107.03374" target="_blank" rel="noopener">Chen et al.</a>). Start small and judge the end state: Anthropic began with about 20 cases (<a href="https://www.anthropic.com/research/multi-agent-research-system" target="_blank" rel="noopener">multi-agent research system</a>).</li><li><strong>Online rollout:</strong> progress through tiers (shadow → draft → ready-for-review) with automatic demotion on human rejection spikes.</li><li>Record one end-to-end trace per case across every call and verdict.</li></ul></div>
           <div class="c"><span class="lab">In the self-healing repo</span><ul><li>Replay 20+ historical bugs before every release.</li><li>Illustrative rollout gates: promote draft → ready-for-review after 50 cases at ≥ 70% merge-without-edit rate; auto-demote on 3 rejections in a day.</li></ul></div>
         </div>
       </div>
@@ -1734,13 +1738,13 @@
             <tbody>
               <tr><td><b>Triggers</b></td><td>External</td><td>Signals arrive from separate systems in incompatible formats.</td><td>Emits raw webhook, alert, or user events whenever an upstream condition fires.</td><td>CI failure, canary rollout alert, or monitoring alarm across 20–30 repositories.</td></tr>
               <tr><td><b>Receiver</b></td><td>Plain code</td><td>Senders time out on slow runs, and open endpoints accept spoofed noise.</td><td>Authenticates sender, drops noise, hashes duplicate key, enqueues pointer event, replies <code>200</code>.</td><td>Webhook receiver verifies HMAC/OIDC, hashes <code>failure_<wbr>fingerprint</code>, publishes <code>FailureEvent</code>.</td></tr>
-              <tr><td><b>Queue</b></td><td>Queue</td><td>Bursts drop events, and crashes lose work if items are deleted on receipt.</td><td>Buffers items, retries with backoff + DLQ, and deletes an item only on terminal or <code>PARKED</code> <code>ack</code>.</td><td>Holds <code>FailureEvent</code> until a terminal exit (<code>PR_OPENED</code>, <code>SKIPPED</code>, <code>ESCALATED</code>) or <code>PARKED</code>; DLQ after 5 failed deliveries.</td></tr>
+              <tr><td><b>Queue</b></td><td>Queue</td><td>Bursts drop events, and crashes lose work if items are deleted on receipt.</td><td>Buffers items, retries with backoff + DLQ, and deletes an item only on terminal or <code>PARKED</code> <code>ack</code>.</td><td>Holds <code>FailureEvent</code> until a terminal exit (<code>COMPLETED</code>, <code>SKIPPED</code>, <code>ESCALATED</code>) or <code>PARKED</code>; DLQ after 5 failed deliveries.</td></tr>
               <tr><td><b>Guard</b></td><td>Plain code</td><td>Duplicate events spawn duplicate runs; shared outages flood every target.</td><td>Checks kill switch and short-window storm count, then atomically claims a case lease.</td><td>Pauses if 5+ repos fail in 5 min; if a case is already leased, a duplicate is acked and dropped without altering the live row (duplicates of finished cases are acked as <code>SKIPPED</code>; the row is unchanged); claims a 120-second lease in the coordination database.</td></tr>
               <tr><td><b>Quarantined LLM</b></td><td>LLM (1 call, 0 tools)</td><td>Untrusted external text can carry prompt injections aimed at tools.</td><td>Single toolless call (<code>include_contents="none"</code>) emitting a strict schema; raw text stops here.</td><td><strong>Agent 1 · Detect:</strong> ≤100 screened log lines → <code>IncidentReport</code> (or <code>flaky</code> / <code>unknown</code> → escalate).</td></tr>
               <tr><td><b>Privileged LLM + Sandbox 1</b></td><td>LLM loop + sandbox</td><td>Open-ended repair requires iterative exploration, yet untrusted code risks credential theft.</td><td>Step/time-capped loop whose tools run in a container with zero network and zero credentials.</td><td><strong>Agent 2 · Suggest fix:</strong> search, read, patch, and local test in Sandbox 1 → <code>ProposedPatch</code>.</td></tr>
               <tr><td><b>Verifier + Sandbox 2</b></td><td>Plain code + sandbox</td><td>Models misgrade their own work and can game checks by deleting tests.</td><td>Re-verifies candidate output in a fresh sandbox against domain &amp; policy rules; caps total attempts.</td><td>Fresh Sandbox 2 confirms pre-patch failure, re-runs full pytest, blocks protected paths/deleted tests, caps total attempts at <code>3</code> (up to 2 retries).</td></tr>
               <tr><td><b>Act gate</b></td><td>Plain code</td><td>Models must not hold write keys, and stalled workers can write late.</td><td>Verifies the fencing token, performs narrowest idempotent write, and sends terminal <code>ack</code>.</td><td><strong>Agent 3 · Open PR:</strong> checks the fencing token, opens a draft PR on <code>autofix/*</code>, then sends the queue <code>ack</code>.</td></tr>
-              <tr><td><b>Human + record</b></td><td>Human</td><td>Irreversible changes need human accountability and live quality telemetry.</td><td>Reviewer approves, edits, or rejects; live acceptance rate gates rollout autonomy.</td><td>Code owner reviews draft PR; merge-without-edit rate governs staged promotion/demotion.</td></tr>
+              <tr><td><b>Human + record</b></td><td>Human</td><td>Irreversible changes need human accountability and live quality telemetry.</td><td>Reviewer approves, edits, or rejects; live acceptance rate gates rollout autonomy.</td><td>Code owner reviews draft PR; merge-without-edit rate governs tiered promotion/demotion.</td></tr>
               <tr><td><b>Coordination store</b></td><td>Transactional DB</td><td>Workers race on duplicates, crash mid-run, or stall past lease expiry.</td><td>Holds kill switch, storm query, and case row with atomic <strong>lock</strong>, expiring <strong>lease</strong>, and <strong>fencing</strong>.</td><td>One database: a control row and an <code>incidents</code> table with a 120-second lease and 30-second heartbeat.</td></tr>
               <tr><td><b>Session, blobs &amp; memory</b></td><td>Session, blob &amp; memory</td><td>Large blobs bloat prompts; unverified model writes poison cross-run memory.</td><td>Per-run state in session, raw blobs by pointer, read-only memory written post-approval by code.</td><td><code>fix_attempts</code> in the session store, logs and diffs in object storage, human-merged fixes in the memory store.</td></tr>
               <tr><td><b>Audit and eval store</b></td><td>Trace &amp; analytics</td><td>Without per-case traces, regressions cannot be audited or replayed offline.</td><td>Logs every model call, tool run, latency, and verdict for offline replay and online metrics.</td><td>Per-case traces and a golden replay set of historical bugs.</td></tr>
@@ -1755,7 +1759,7 @@
         </p>
       </div>
       <div class="diagram-frame" id="fig-skeleton">
-        <svg viewBox="0 0 1200 608" role="img" aria-label="Figure 7 — Stage 4 · Safeguards (Isolation and Rollout): Isolated sandboxes, human gate, and audit/eval store complete the generic architecture.">
+        <svg viewBox="0 0 1200 608" role="img" aria-label="Figure 7 — Safeguards: Isolated sandboxes, human gate, and audit/eval store complete the generic architecture.">
           <defs>
             <marker id="ps6-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--ink)"/></marker>
             <marker id="ps6-mut" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--muted)"/></marker>
@@ -1765,7 +1769,7 @@
           </defs>
           <g class="stg-prev">
             <rect class="b-ext" x="20" y="66" width="170" height="92" rx="7"/>
-            <text class="t-b" x="32" y="90" style="font-size:15.8px">Triggers</text>
+            <text class="t-b" x="32" y="90" style="font-size:15.8px">External Event</text>
             <text class="t-s" x="32" y="111" style="font-size:14px">events, alerts, users</text>
             <text class="t-s" x="32" y="130" style="font-size:13.4px">pointer to raw data</text>
           </g>
@@ -1839,10 +1843,10 @@
           </g>
           <g class="stg-new">
             <rect class="b-ext" x="1014" y="266" width="168" height="108" rx="8"/>
-            <text class="t-b" x="1098" y="290" text-anchor="middle" style="font-size:15.8px">Human + record</text>
+            <text class="t-b" x="1098" y="290" text-anchor="middle" style="font-size:14.2px">External Sys + Human</text>
             <text class="t-s" x="1098" y="313" text-anchor="middle" style="font-size:13.4px">reviews draft PR,</text>
             <text class="t-s" x="1098" y="331" text-anchor="middle" style="font-size:13.4px">live approval signal</text>
-            <text class="t-s" x="1098" y="349" text-anchor="middle" style="font-size:13px">governs rollout stage</text>
+            <text class="t-s" x="1098" y="349" text-anchor="middle" style="font-size:13px">governs rollout tier</text>
           </g>
           <g class="stg-prev">
             <path class="flow-d" d="M102 374 V494" marker-end="url(#ps6-mut)"/>
@@ -1897,11 +1901,11 @@
             <text class="t-s" x="346" y="438" text-anchor="end" style="font-size:13.4px">bounded reads by pointer</text>
           </g>
         </svg>
-        <div class="fig-caption"><span>Figure 7 — Stage 4 · Safeguards (Isolation and Rollout): Isolated sandboxes, human gate, and audit/eval store complete the generic architecture.</span>
-          <div class="legend-items"><span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good);border-width:2.2px;box-shadow:0 0 5px var(--good)"></i> <b>Bold glow = Added in this stage</b></span><span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good)"></i> Plain code</span><span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> LLM step</span><span><i class="swatch-dot" style="background:var(--amber-soft);border-color:var(--amber)"></i> Queue / store</span><span><i class="swatch-dot" style="background:var(--panel-2);border-color:var(--cyan)"></i> Sandbox</span></div>
+        <div class="fig-caption"><span>Figure 7 — Safeguards: Isolated sandboxes, human gate, and audit/eval store complete the generic architecture.</span>
+          <div class="legend-items"><span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good);border-width:2.2px;box-shadow:0 0 5px var(--good)"></i> <b>Bold glow = Added in this block</b></span><span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good)"></i> Plain code</span><span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> LLM step</span><span><i class="swatch-dot" style="background:var(--amber-soft);border-color:var(--amber)"></i> Queue / store</span><span><i class="swatch-dot" style="background:var(--panel-2);border-color:var(--cyan)"></i> Sandbox</span></div>
         </div>
       </div>
-      <div class="closes"><span><b>Added in Stage 4:</b> Ephemeral Sandboxes 1 &amp; 2 + Human rollout gate + Audit &amp; eval store</span><span><b>Generic architecture complete</b> — ready to map onto cloud services</span></div>
+      <div class="closes"><span><b>Added in Safeguards:</b> Ephemeral Sandboxes 1 &amp; 2 + Human rollout gate + Audit &amp; eval store</span><span><b>Generic architecture complete</b> — ready to map onto cloud services</span></div>
       <div class="post-prose" style="margin-top:22px;">
         <h3>The Same Skeleton in Other Domains</h3>
         <p>
@@ -1964,7 +1968,7 @@
           <text class="zl" x="176" y="36">· GEMINI ENTERPRISE AGENT PLATFORM</text>
           <g transform="translate(0, 44)">
           <rect class="b-ext" x="20" y="66" width="170" height="92" rx="7"/>
-          <text class="t-b" x="32" y="90" style="font-size:15.8px">Event Sources</text>
+          <text class="t-b" x="32" y="90" style="font-size:15.8px">External Event</text>
           <text class="t-s" x="32" y="110" style="font-size:13.4px">Webhooks, Scheduler,</text>
           <text class="t-s" x="32" y="128" style="font-size:13.4px">Cloud Monitoring / Logs</text>
 
@@ -2030,7 +2034,7 @@
           <path class="flow" d="M988 320 H1010" marker-end="url(#pgcp-ink)"/>
 
           <rect class="b-ext" x="1014" y="266" width="168" height="108" rx="8"/>
-          <text class="t-b" x="1098" y="290" text-anchor="middle" style="font-size:15.8px">Target + Human</text>
+          <text class="t-b" x="1098" y="290" text-anchor="middle" style="font-size:14.2px">External Sys + Human</text>
           <text class="t-s" x="1098" y="313" text-anchor="middle" style="font-size:13.4px">narrowly scoped write,</text>
           <text class="t-s" x="1098" y="331" text-anchor="middle" style="font-size:13.4px">human approves change</text>
           <text class="t-s" x="1098" y="349" text-anchor="middle" style="font-size:13px">post-approval → Memory</text>
@@ -2139,24 +2143,24 @@
         <p><strong>Four-Block Shortcut:</strong> <strong>Boundary</strong> (triggers, real rate, async scope, receiver, queue) → <strong>Control Plane</strong> (Guard, lock, storm, kill switch, lease, fencing) → <strong>Workflow</strong> (Quarantined → Privileged → Verifier → Act gate, typed contracts) → <strong>Safeguards</strong> (zero-net sandboxes, narrow keys, replay evals).</p>
       </div>
       <div class="nine-q-wrap" id="tbl-7" style="margin:14px 0 16px;">
-        <div class="nine-q-head">Table 8 · Master Cheat Sheet — All Thirteen Questions Mapped to Progressive Stages</div>
+        <div class="nine-q-head">Table 8 · Master Cheat Sheet — All Thirteen Questions Mapped to the Four Blocks</div>
         <div class="tbl-wrap" style="margin:0;">
           <table>
-            <thead><tr><th style="width:6%">Q#</th><th style="width:21%">Design question</th><th style="width:22%">What breaks without it</th><th style="width:25%">Architectural rule / box added</th><th style="width:17.5%">Self-healing repo</th><th style="width:8.5%">Stage</th></tr></thead>
+            <thead><tr><th style="width:6%">Q#</th><th style="width:21%">Design question</th><th style="width:22%">What breaks without it</th><th style="width:25%">Architectural rule / box added</th><th style="width:17.5%">Self-healing repo</th><th style="width:11%">Block</th></tr></thead>
             <tbody>
-              <tr><td><b><a href="#q1">Q1</a></b></td><td>What wakes it up &amp; what is in the message?</td><td>Missed triggers or 50 MB log payloads on the bus.</td><td>Normalize every trigger into one small event carrying a data <strong>pointer</strong>.</td><td>CI, canary, alerts → <code>FailureEvent</code></td><td><a href="#stage-1">Stage 1</a></td></tr>
-              <tr><td><b><a href="#q2">Q2</a></b></td><td>How big is it really?</td><td>Over-built infra for filtered noise, or runaway model bills.</td><td>Multiply volume × filter rate; enforce step and budget caps per case.</td><td><code>10,000 × 1% = 100</code>/day</td><td><a href="#stage-1">Stage 1</a></td></tr>
-              <tr><td><b><a href="#q3">Q3</a></b></td><td>What belongs in the workflow vs. outside?</td><td>Models wait on live outages or hold production deploy keys.</td><td>Scope workflow strictly to asynchronous <strong>diagnosis and repair</strong>.</td><td>Branch + draft PR; deploy stays outside</td><td><a href="#stage-1">Stage 1</a></td></tr>
-              <tr><td><b><a href="#q4">Q4</a></b></td><td>How does work reach a worker safely?</td><td>Sender HTTP timeouts, dropped bursts, or lost runs.</td><td>Stateless <strong>Receiver</strong> + durable <strong>Queue</strong> + terminal <code>ack</code> + DLQ (5 tries).</td><td>Cloud Run → Pub/Sub → terminal <code>ack</code></td><td><a href="#stage-1">Stage 1</a></td></tr>
-              <tr><td><b><a href="#q5">Q5</a></b></td><td>How do I avoid doing work twice?</td><td>Duplicate PRs, tickets, or double mutations.</td><td>Code-computed duplicate key + atomic <strong>lock</strong> row + idempotent write.</td><td><code>(repo, failure_<wbr>fingerprint)</code> in Cloud SQL</td><td><a href="#stage-2">Stage 2</a></td></tr>
-              <tr><td><b><a href="#q6">Q6</a></b></td><td>One bug vs. everything on fire?</td><td>Shared infra outage makes bots "fix" healthy targets.</td><td>Count distinct targets in a short window; trip a <strong>storm breaker</strong>.</td><td>5+ repos in 5 min → pause &amp; page</td><td><a href="#stage-2">Stage 2</a></td></tr>
-              <tr><td><b><a href="#q7">Q7</a></b></td><td>How does a person stop it, right now?</td><td>A bad prompt or model release keeps acting until a fix ships.</td><td>Manual <strong>kill switch</strong>: one flag, read at run start and before every write; events are parked.</td><td>Flag per repo or for all repos</td><td><a href="#stage-2">Stage 2</a></td></tr>
-              <tr><td><b><a href="#q8">Q8</a></b></td><td>What if a worker dies halfway?</td><td>Lost work (early <code>ack</code>) or permanently stuck locks.</td><td>Expiring <strong>lease</strong> + heartbeat renewal + monotonic <strong>fencing token</strong>.</td><td>120-second lease, 30-second heartbeat, fencing token</td><td><a href="#stage-2">Stage 2</a></td></tr>
-              <tr><td><b><a href="#q9">Q9</a></b></td><td>Model or code, and what is the harness?</td><td>Models chatting unboundedly, self-grading, or holding write keys.</td><td>Dual-LLM split (<strong>Quarantined</strong> vs. <strong>Privileged LLM</strong>) + code <strong>Verifier</strong> &amp; <strong>Act gate</strong>.</td><td>ADK <code>Workflow</code> graph (<a href="#appendix-adk"><em>Appendix</em></a>)</td><td><a href="#stage-3">Stage 3</a></td></tr>
-              <tr><td><b><a href="#q10">Q10</a></b></td><td>What passes between steps &amp; who routes?</td><td>Prose drift, prompt-injection history bleed, infinite loops.</td><td>Typed handoff contracts, <code>include_contents="none"</code>, capped <code>RETRY (≤ 3 attempts)</code>, <code>ESCALATE</code>.</td><td><code>IncidentReport</code> → <code>ProposedPatch</code>, 3 tries max</td><td><a href="#stage-3">Stage 3</a></td></tr>
-              <tr><td><b><a href="#q11">Q11</a></b></td><td>Where does data live &amp; who writes state?</td><td>Stale indexes, context bloat, poisoned long-term memory.</td><td>Pointer reads at exact version; code-owned state; post-approval memory only.</td><td>Exact <code>commit_sha</code>; post-merge Memory Bank</td><td><a href="#stage-3">Stage 3</a></td></tr>
-              <tr><td><b><a href="#q12">Q12</a></b></td><td>What would an attacker do with it?</td><td>Prompt injection → RCE or stolen cloud/repo tokens.</td><td>Toolless <strong>Quarantined LLM</strong>, no-net/no-cred <strong>Sandboxes 1 &amp; 2</strong>, narrow write scope + human.</td><td>Code Exec gVisor, <code>autofix/*</code> draft PR</td><td><a href="#stage-4">Stage 4</a></td></tr>
-              <tr><td><b><a href="#q13">Q13</a></b></td><td>How do I launch &amp; prove it works?</td><td>Noisy bot muted in week one; silent prompt regressions.</td><td><strong>Audit &amp; eval store</strong>: offline golden replay + staged rollout + auto-demotion.</td><td>Shadow → draft PR; merge-without-edit rate</td><td><a href="#stage-4">Stage 4</a></td></tr>
+              <tr><td><b><a href="#q1">Q1</a></b></td><td>What wakes it up &amp; what is in the message?</td><td>Missed triggers or 50 MB log payloads on the bus.</td><td>Normalize every trigger into one small event carrying a data <strong>pointer</strong>.</td><td>CI, canary, alerts → <code>FailureEvent</code></td><td><a href="#stage-1">Boundary</a></td></tr>
+              <tr><td><b><a href="#q2">Q2</a></b></td><td>How big is it really?</td><td>Over-built infra for filtered noise, or runaway model bills.</td><td>Multiply volume × filter rate; enforce step and budget caps per case.</td><td><code>10,000 × 1% = 100</code>/day</td><td><a href="#stage-1">Boundary</a></td></tr>
+              <tr><td><b><a href="#q3">Q3</a></b></td><td>What belongs in the workflow vs. outside?</td><td>Models wait on live outages or hold production deploy keys.</td><td>Scope workflow strictly to asynchronous <strong>diagnosis and repair</strong>.</td><td>Branch + draft PR; deploy stays outside</td><td><a href="#stage-1">Boundary</a></td></tr>
+              <tr><td><b><a href="#q4">Q4</a></b></td><td>How does work reach a worker safely?</td><td>Sender HTTP timeouts, dropped bursts, or lost runs.</td><td>Stateless <strong>Receiver</strong> + durable <strong>Queue</strong> + terminal <code>ack</code> + DLQ (5 tries).</td><td>Cloud Run → Pub/Sub → terminal <code>ack</code></td><td><a href="#stage-1">Boundary</a></td></tr>
+              <tr><td><b><a href="#q5">Q5</a></b></td><td>How do I avoid doing work twice?</td><td>Duplicate PRs, tickets, or double mutations.</td><td>Code-computed duplicate key + atomic <strong>lock</strong> row + idempotent write.</td><td><code>(repo, failure_<wbr>fingerprint)</code> in Cloud SQL</td><td><a href="#stage-2">Control Plane</a></td></tr>
+              <tr><td><b><a href="#q6">Q6</a></b></td><td>One bug vs. everything on fire?</td><td>Shared infra outage makes bots "fix" healthy targets.</td><td>Count distinct targets in a short window; trip a <strong>storm breaker</strong>.</td><td>5+ repos in 5 min → pause &amp; page</td><td><a href="#stage-2">Control Plane</a></td></tr>
+              <tr><td><b><a href="#q7">Q7</a></b></td><td>How does a person stop it, right now?</td><td>A bad prompt or model release keeps acting until a fix ships.</td><td>Manual <strong>kill switch</strong>: one flag, read at run start and before every write; events are parked.</td><td>Flag per repo or for all repos</td><td><a href="#stage-2">Control Plane</a></td></tr>
+              <tr><td><b><a href="#q8">Q8</a></b></td><td>What if a worker dies halfway?</td><td>Lost work (early <code>ack</code>) or permanently stuck locks.</td><td>Expiring <strong>lease</strong> + heartbeat renewal + monotonic <strong>fencing token</strong>.</td><td>120-second lease, 30-second heartbeat, fencing token</td><td><a href="#stage-2">Control Plane</a></td></tr>
+              <tr><td><b><a href="#q9">Q9</a></b></td><td>Model or code, and what is the harness?</td><td>Models chatting unboundedly, self-grading, or holding write keys.</td><td>Dual-LLM split (<strong>Quarantined</strong> vs. <strong>Privileged LLM</strong>) + code <strong>Verifier</strong> &amp; <strong>Act gate</strong>.</td><td>ADK <code>Workflow</code> graph (<a href="#appendix-adk"><em>Appendix</em></a>)</td><td><a href="#stage-3">Workflow</a></td></tr>
+              <tr><td><b><a href="#q10">Q10</a></b></td><td>What passes between steps &amp; who routes?</td><td>Prose drift, prompt-injection history bleed, infinite loops.</td><td>Typed handoff contracts, <code>include_contents="none"</code>, capped <code>RETRY (≤ 3 attempts)</code>, <code>ESCALATE</code>.</td><td><code>IncidentReport</code> → <code>ProposedPatch</code>, 3 tries max</td><td><a href="#stage-3">Workflow</a></td></tr>
+              <tr><td><b><a href="#q11">Q11</a></b></td><td>Where does data live &amp; who writes state?</td><td>Stale indexes, context bloat, poisoned long-term memory.</td><td>Pointer reads at exact version; code-owned state; post-approval memory only.</td><td>Exact <code>commit_sha</code>; post-merge Memory Bank</td><td><a href="#stage-3">Workflow</a></td></tr>
+              <tr><td><b><a href="#q12">Q12</a></b></td><td>What would an attacker do with it?</td><td>Prompt injection → RCE or stolen cloud/repo tokens.</td><td>Toolless <strong>Quarantined LLM</strong>, no-net/no-cred <strong>Sandboxes 1 &amp; 2</strong>, narrow write scope + human.</td><td>Code Exec gVisor, <code>autofix/*</code> draft PR</td><td><a href="#stage-4">Safeguards</a></td></tr>
+              <tr><td><b><a href="#q13">Q13</a></b></td><td>How do I launch &amp; prove it works?</td><td>Noisy bot muted in week one; silent prompt regressions.</td><td><strong>Audit &amp; eval store</strong>: offline golden replay + staged rollout + auto-demotion.</td><td>Shadow → draft PR; merge-without-edit rate</td><td><a href="#stage-4">Safeguards</a></td></tr>
             </tbody>
           </table>
         </div>
@@ -2300,13 +2304,13 @@
           Frameworks, model versions, and agent protocols will keep changing every few months, while the structural questions underneath an event-driven system remain stable. Whenever we start from a simple whiteboard sequence of agents, reliable design comes from building from the deterministic shell inward and giving every step only the autonomy its task requires.
         </p>
         <p>
-          Walking through the four stages—matching the four blocks one-to-one—turns that habit into repeatable muscle memory:
+          Walking through the four blocks turns that habit into repeatable muscle memory:
         </p>
         <ul>
-          <li><strong>Fix the boundary and intake (Boundary — Stage 1):</strong> normalize triggers into pointer events, size real filtered volume, scope workflows to asynchronous diagnosis and repair, and decouple senders behind a stateless receiver and durable queue with terminal acknowledgement.</li>
-          <li><strong>Coordinate and recover in one control plane (Control Plane — Stage 2):</strong> coordinate concurrent runs through one transactional store holding dedupe locks, a storm breaker, a manual kill switch, and expiring leases with pre-write fencing.</li>
-          <li><strong>Scope autonomy inside one harness (Workflow — Stage 3):</strong> reserve language models for interpreting messy, untrusted text (a toolless Quarantined LLM) and exploring open-ended fixes (a bounded Privileged LLM), pass code-validated typed handoff contracts between steps with shared chat history disabled, verify every candidate independently in plain code, and restrict long-term memory writes to post-approval code.</li>
-          <li><strong>Isolate execution and prove quality (Safeguards — Stage 4):</strong> run untrusted tools and clean-room test suites inside networkless, credential-free sandboxes, keep external write tokens narrow on a plain-code gate, and promote changes through offline golden replays and live acceptance metrics.</li>
+          <li><strong>Fix the boundary and intake (Boundary):</strong> normalize triggers into pointer events, size real filtered volume, scope workflows to asynchronous diagnosis and repair, and decouple senders behind a stateless receiver and durable queue with terminal acknowledgement.</li>
+          <li><strong>Coordinate and recover in one control plane (Control Plane):</strong> coordinate concurrent runs through one transactional store holding dedupe locks, a storm breaker, a manual kill switch, and expiring leases with pre-write fencing.</li>
+          <li><strong>Scope autonomy inside one harness (Workflow):</strong> reserve language models for interpreting messy, untrusted text (a toolless Quarantined LLM) and exploring open-ended fixes (a bounded Privileged LLM), pass code-validated typed handoff contracts between steps with shared chat history disabled, verify every candidate independently in plain code, and restrict long-term memory writes to post-approval code.</li>
+          <li><strong>Isolate execution and prove quality (Safeguards):</strong> run untrusted tools and clean-room test suites inside networkless, credential-free sandboxes, keep external write tokens narrow on a plain-code gate, and promote changes through offline golden replays and live acceptance metrics.</li>
         </ul>
         <p>
           Whether the trigger is a failing deployment, a disputed supplier invoice, a production alert, or an updated client filing, the domain nouns change while the architecture and its thirteen questions stay the same.
@@ -2316,118 +2320,92 @@
         </p>
       </div>
       <div class="diagram-frame" id="fig-conclusion-recap" style="margin-top:18px;">
-        <svg viewBox="0 0 1200 572" role="img" aria-label="Figure 10: Visual recap from an initial black-box sequence of agents to the engineered hybrid architecture">
+        <svg viewBox="0 0 1200 500" role="img" aria-label="Figure 10: Visual recap from an initial black-box sequence of agents to the 4-block hybrid architecture">
           <defs>
             <marker id="hbr-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--ink)"/></marker>
             <marker id="hbr-good" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--good)"/></marker>
-            <marker id="hbr-cyan" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--cyan)"/></marker>
             <marker id="hbr-big" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 1 L11 6 L0 11 z" style="fill:var(--cyan)"/></marker>
           </defs>
           <!-- Left Panel: Initial Sketch -->
-          <rect x="20" y="18" width="368" height="534" rx="14" style="fill:var(--panel-2);stroke:var(--line);stroke-width:1.8"/>
-          <text class="zl" x="44" y="48">1 · INITIAL WHITEBOARD SKETCH</text>
-          <text class="t-b" x="44" y="76" style="font-size:19px">Black-Box Agent Sequence</text>
+          <rect x="20" y="18" width="346" height="464" rx="14" style="fill:var(--panel-2);stroke:var(--line);stroke-width:1.8"/>
+          <text class="zl" x="42" y="46">WHITEBOARD SKETCH</text>
+          <text class="t-b" x="42" y="74" style="font-size:19px">Black-Box Agent Sequence</text>
 
-          <rect class="b-ext" x="64" y="96" width="280" height="54" rx="8"/>
-          <text class="t-b" x="204" y="120" text-anchor="middle" style="font-size:15.8px">External Event</text>
-          <text class="t-s" x="204" y="139" text-anchor="middle" style="font-size:13.4px">Webhook, alert, or raw log</text>
-          <line x1="204" y1="150" x2="204" y2="168" style="stroke:var(--ink);stroke-width:2" marker-end="url(#hbr-ink)"/>
+          <rect class="b-ext" x="58" y="102" width="270" height="52" rx="8"/>
+          <text class="t-b" x="193" y="134" text-anchor="middle" style="font-size:16px">External Event</text>
+          <line x1="193" y1="154" x2="193" y2="174" style="stroke:var(--ink);stroke-width:2" marker-end="url(#hbr-ink)"/>
 
-          <rect class="b-model" x="64" y="172" width="280" height="62" rx="8"/>
-          <text class="t-b" x="204" y="198" text-anchor="middle" style="font-size:15.8px">Agent 1 · Detect</text>
-          <text class="t-s" x="204" y="218" text-anchor="middle" style="font-size:13.4px">Unexamined autonomous black box</text>
-          <line x1="204" y1="234" x2="204" y2="252" style="stroke:var(--ink);stroke-width:2" marker-end="url(#hbr-ink)"/>
+          <rect class="b-model" x="58" y="178" width="270" height="56" rx="8"/>
+          <text class="t-b" x="193" y="212" text-anchor="middle" style="font-size:16px">Agent 1 · Detect</text>
+          <line x1="193" y1="234" x2="193" y2="254" style="stroke:var(--ink);stroke-width:2" marker-end="url(#hbr-ink)"/>
 
-          <rect class="b-model" x="64" y="256" width="280" height="62" rx="8"/>
-          <text class="t-b" x="204" y="282" text-anchor="middle" style="font-size:15.8px">Agent 2 · Suggest fix</text>
-          <text class="t-s" x="204" y="302" text-anchor="middle" style="font-size:13.4px">Unexamined autonomous black box</text>
-          <line x1="204" y1="318" x2="204" y2="336" style="stroke:var(--ink);stroke-width:2" marker-end="url(#hbr-ink)"/>
+          <rect class="b-model" x="58" y="258" width="270" height="56" rx="8"/>
+          <text class="t-b" x="193" y="292" text-anchor="middle" style="font-size:16px">Agent 2 · Suggest fix</text>
+          <line x1="193" y1="314" x2="193" y2="334" style="stroke:var(--ink);stroke-width:2" marker-end="url(#hbr-ink)"/>
 
-          <rect class="b-model" x="64" y="340" width="280" height="62" rx="8"/>
-          <text class="t-b" x="204" y="366" text-anchor="middle" style="font-size:15.8px">Agent 3 · Open PR</text>
-          <text class="t-s" x="204" y="386" text-anchor="middle" style="font-size:13.4px">Unexamined autonomous black box</text>
-          <line x1="204" y1="402" x2="204" y2="420" style="stroke:var(--ink);stroke-width:2" marker-end="url(#hbr-ink)"/>
+          <rect class="b-model" x="58" y="338" width="270" height="56" rx="8"/>
+          <text class="t-b" x="193" y="372" text-anchor="middle" style="font-size:16px">Agent 3 · Open PR</text>
+          <line x1="193" y1="394" x2="193" y2="414" style="stroke:var(--ink);stroke-width:2" marker-end="url(#hbr-ink)"/>
 
-          <rect class="b-ext" x="64" y="424" width="280" height="54" rx="8"/>
-          <text class="t-b" x="204" y="448" text-anchor="middle" style="font-size:15.8px">External System</text>
-          <text class="t-s" x="204" y="467" text-anchor="middle" style="font-size:13.4px">Direct side effect</text>
-
-          <rect x="44" y="494" width="320" height="38" rx="7" style="fill:var(--stop-soft);stroke:var(--stop);stroke-width:1.3"/>
-          <text class="t-s" x="204" y="518" text-anchor="middle" style="fill:var(--stop);font-weight:700;font-size:13px">Control flow, state, retries &amp; isolation unspecified</text>
+          <rect class="b-ext" x="58" y="418" width="270" height="48" rx="8"/>
+          <text class="t-b" x="193" y="448" text-anchor="middle" style="font-size:15.5px">External System</text>
 
           <!-- Center Bridge -->
-          <rect x="404" y="238" width="118" height="58" rx="10" style="fill:var(--cyan-soft);stroke:var(--cyan);stroke-width:1.6"/>
-          <text class="t-m-c" x="463" y="262" text-anchor="middle" style="font-size:12.5px">4 STAGES</text>
-          <text class="t-m-c" x="463" y="282" text-anchor="middle" style="font-size:12.5px;fill:var(--ink)">13 QUESTIONS</text>
-          <line x1="408" y1="314" x2="520" y2="314" style="stroke:var(--cyan);stroke-width:3.2" marker-end="url(#hbr-big)"/>
+          <rect x="382" y="206" width="122" height="58" rx="10" style="fill:var(--cyan-soft);stroke:var(--cyan);stroke-width:1.6"/>
+          <text class="t-m-c" x="443" y="230" text-anchor="middle" style="font-size:13px">4 BLOCKS</text>
+          <text class="t-m-c" x="443" y="250" text-anchor="middle" style="font-size:13px;fill:var(--ink)">13 QUESTIONS</text>
+          <line x1="388" y1="282" x2="498" y2="282" style="stroke:var(--cyan);stroke-width:3.2" marker-end="url(#hbr-big)"/>
 
-          <!-- Right Panel: Engineered Hybrid Architecture -->
-          <rect x="538" y="18" width="642" height="534" rx="14" style="fill:var(--panel-2);stroke:var(--good);stroke-width:2.2"/>
-          <text class="zl" x="562" y="112" style="fill:var(--good)">2 · ENGINEERED HYBRID ARCHITECTURE</text>
-          <text class="t-b" x="562" y="136" style="font-size:18.5px">Deterministic Shell Around Scoped Models</text>
+          <!-- Right Panel: 4-Block Hybrid Architecture -->
+          <rect x="518" y="18" width="662" height="464" rx="14" style="fill:var(--panel-2);stroke:var(--good);stroke-width:2.2"/>
+          <text class="zl" x="542" y="46" style="fill:var(--good)">4-BLOCK HYBRID ARCHITECTURE</text>
+          <text class="t-b" x="542" y="74" style="font-size:19px">Deterministic Shell Around Scoped Models</text>
 
-          <rect class="b-code" x="562" y="148" width="594" height="50" rx="8"/>
-          <text class="t-b" x="578" y="178" style="font-size:15.2px">Stateless Receiver + Queue</text>
-          <text class="t-s" x="802" y="178" style="font-size:13px">Auth, pointer event &amp; terminal ack</text>
-          <text class="t-m-g" x="1140" y="178" text-anchor="end" style="font-size:11.6px">STAGE 1 · INTAKE</text>
+          <!-- Block 1: Boundary -->
+          <rect class="b-code" x="542" y="92" width="614" height="58" rx="8"/>
+          <text class="t-m-g" x="558" y="114" style="font-size:12px">1 · BOUNDARY</text>
+          <text class="t-b" x="558" y="137" style="font-size:15px">Pointer Triggers → Stateless Receiver → Durable Queue</text>
 
-          <rect class="zone-ours" x="562" y="210" width="594" height="242" rx="11" style="fill:var(--panel)"/>
-          <text class="t-m-c" x="578" y="230" style="font-size:12px">SINGLE WORKER HARNESS · TYPED HANDOFFS · NO SHARED CHAT HISTORY</text>
+          <!-- Block 2: Control Plane -->
+          <rect class="b-code" x="542" y="162" width="614" height="58" rx="8"/>
+          <text class="t-m-g" x="558" y="184" style="font-size:12px">2 · CONTROL PLANE</text>
+          <text class="t-b" x="558" y="207" style="font-size:15px">Guard: Dedupe Locks, Storm Breaker, Kill Switch, Lease &amp; Fence</text>
 
-          <rect class="b-code" x="576" y="242" width="122" height="90" rx="8"/>
-          <text class="t-b" x="637" y="266" text-anchor="middle" style="font-size:15.8px">Guard</text>
-          <text class="t-s" x="637" y="286" text-anchor="middle" style="font-size:13.2px">Lock, lease,</text>
-          <text class="t-s" x="637" y="303" text-anchor="middle" style="font-size:13.2px">storm &amp; kill</text>
-          <text class="t-m-g" x="637" y="320" text-anchor="middle">CODE</text>
+          <!-- Block 3: Workflow -->
+          <rect class="b-model" x="542" y="232" width="614" height="148" rx="10" style="fill:var(--panel)"/>
+          <text class="t-m-v" x="558" y="254" style="font-size:12px">3 · WORKFLOW · TYPED HANDOFFS · NO SHARED CHAT HISTORY</text>
 
-          <line x1="698" y1="287" x2="714" y2="287" style="stroke:var(--ink);stroke-width:2" marker-end="url(#hbr-ink)"/>
+          <rect class="b-model" x="558" y="268" width="176" height="72" rx="8"/>
+          <text class="t-b" x="646" y="295" text-anchor="middle" style="font-size:16px">Quarantined</text>
+          <text class="t-s" x="646" y="317" text-anchor="middle" style="font-size:13.5px">1 call · 0 tools</text>
+          <text class="t-m-v" x="646" y="333" text-anchor="middle" style="font-size:11.5px">LLM #1</text>
 
-          <rect class="b-model" x="718" y="242" width="136" height="90" rx="8"/>
-          <text class="t-b" x="786" y="266" text-anchor="middle" style="font-size:15.8px">Quarantined</text>
-          <text class="t-s" x="786" y="286" text-anchor="middle" style="font-size:13.2px">Reads raw text</text>
-          <text class="t-s" x="786" y="303" text-anchor="middle" style="font-size:13.2px">1 call · 0 tools</text>
-          <text class="t-m-v" x="786" y="320" text-anchor="middle">LLM #1</text>
+          <line x1="734" y1="304" x2="758" y2="304" style="stroke:var(--ink);stroke-width:2" marker-end="url(#hbr-ink)"/>
 
-          <line x1="854" y1="287" x2="870" y2="287" style="stroke:var(--ink);stroke-width:2" marker-end="url(#hbr-ink)"/>
+          <rect class="b-model" x="762" y="268" width="176" height="72" rx="8"/>
+          <text class="t-b" x="850" y="295" text-anchor="middle" style="font-size:16px">Privileged</text>
+          <text class="t-s" x="850" y="317" text-anchor="middle" style="font-size:13.5px">Bounded tool loop</text>
+          <text class="t-m-v" x="850" y="333" text-anchor="middle" style="font-size:11.5px">LLM #2</text>
 
-          <rect class="b-model" x="874" y="242" width="132" height="90" rx="8"/>
-          <text class="t-b" x="940" y="266" text-anchor="middle" style="font-size:15.8px">Privileged</text>
-          <text class="t-s" x="940" y="286" text-anchor="middle" style="font-size:13.2px">Bounded search</text>
-          <text class="t-s" x="940" y="303" text-anchor="middle" style="font-size:13.2px">&amp; tool loop</text>
-          <text class="t-m-v" x="940" y="320" text-anchor="middle">LLM #2</text>
+          <line x1="938" y1="304" x2="962" y2="304" style="stroke:var(--good);stroke-width:2.2" marker-end="url(#hbr-good)"/>
 
-          <line x1="1006" y1="287" x2="1022" y2="287" style="stroke:var(--good);stroke-width:2.2" marker-end="url(#hbr-good)"/>
+          <rect class="b-code" x="966" y="268" width="174" height="72" rx="8"/>
+          <text class="t-b" x="1053" y="295" text-anchor="middle" style="font-size:16px">Verify &amp; Act</text>
+          <text class="t-s" x="1053" y="317" text-anchor="middle" style="font-size:13.5px">Re-check &amp; fence</text>
+          <text class="t-m-g" x="1053" y="333" text-anchor="middle" style="font-size:11.5px">PLAIN CODE</text>
 
-          <rect class="b-code" x="1026" y="242" width="116" height="90" rx="8"/>
-          <text class="t-b" x="1084" y="266" text-anchor="middle" style="font-size:15.8px">Verify &amp; Act</text>
-          <text class="t-s" x="1084" y="286" text-anchor="middle" style="font-size:13.2px">Code check,</text>
-          <text class="t-s" x="1084" y="303" text-anchor="middle" style="font-size:13.2px">fence &amp; write</text>
-          <text class="t-m-g" x="1084" y="320" text-anchor="middle">CODE</text>
+          <text class="t-s" x="849" y="366" text-anchor="middle" style="font-size:13.2px">Code-owned state, bounded retries, &amp; post-approval memory</text>
 
-          <line x1="940" y1="332" x2="940" y2="354" style="stroke:var(--cyan);stroke-width:1.8;stroke-dasharray:4 3" marker-end="url(#hbr-cyan)"/>
-          <line x1="1084" y1="332" x2="1084" y2="354" style="stroke:var(--cyan);stroke-width:1.8;stroke-dasharray:4 3" marker-end="url(#hbr-cyan)"/>
+          <!-- Block 4: Safeguards -->
+          <rect class="b-sbx" x="542" y="392" width="300" height="74" rx="8"/>
+          <text class="t-m-c" x="558" y="414" style="font-size:12px">4 · SAFEGUARDS · ISOLATION</text>
+          <text class="t-b" x="558" y="436" style="font-size:15px">Zero-Net, Zero-Cred Sandboxes</text>
+          <text class="t-s" x="558" y="454" style="font-size:13.2px">Untrusted tools &amp; verification isolated</text>
 
-          <rect class="b-sbx" x="576" y="358" width="276" height="78" rx="8"/>
-          <text class="t-m-c" x="714" y="381" text-anchor="middle">TYPED HANDOFFS &amp; BOUNDED RETRY</text>
-          <text class="t-s" x="714" y="402" text-anchor="middle" style="font-size:13.2px">Typed contracts; up to 3 total tries,</text>
-          <text class="t-s" x="714" y="420" text-anchor="middle" style="font-size:13.2px">then escalates to a human</text>
-
-          <rect class="b-sbx" x="866" y="358" width="276" height="78" rx="8"/>
-          <text class="t-m-c" x="1004" y="381" text-anchor="middle">SANDBOXES 1 &amp; 2 · ZERO CREDENTIALS</text>
-          <text class="t-s" x="1004" y="402" text-anchor="middle" style="font-size:13.2px">Tools &amp; clean-room test suite run</text>
-          <text class="t-s" x="1004" y="420" text-anchor="middle" style="font-size:13.2px">isolated with no network egress</text>
-
-          <rect class="b-store" x="562" y="466" width="190" height="70" rx="8"/>
-          <text class="t-b" x="657" y="492" text-anchor="middle" style="font-size:15.5px">Coordination Store</text>
-          <text class="t-s" x="657" y="513" text-anchor="middle" style="font-size:13.2px">Locks, leases &amp; fence</text>
-
-          <rect class="b-store" x="764" y="466" width="190" height="70" rx="8"/>
-          <text class="t-b" x="859" y="492" text-anchor="middle" style="font-size:15.5px">Session &amp; Memory</text>
-          <text class="t-s" x="859" y="513" text-anchor="middle" style="font-size:13.2px">Post-approval writes</text>
-
-          <rect class="b-store" x="966" y="466" width="190" height="70" rx="8"/>
-          <text class="t-b" x="1061" y="492" text-anchor="middle" style="font-size:15.5px">Audit &amp; Eval Store</text>
-          <text class="t-s" x="1061" y="513" text-anchor="middle" style="font-size:13.2px">Traces &amp; golden replay</text>
+          <rect class="b-store" x="856" y="392" width="300" height="74" rx="8"/>
+          <text class="t-m-c" x="872" y="414" style="font-size:12px;fill:var(--amber)">4 · SAFEGUARDS · GOVERNANCE</text>
+          <text class="t-b" x="872" y="436" style="font-size:15px">Human Gate + Audit &amp; Evals</text>
+          <text class="t-s" x="872" y="454" style="font-size:13.2px">Narrow keys, traces &amp; replay rollout</text>
         </svg>
         <div class="fig-caption"><span>Figure 10 — Visual recap: growing an initial sequence of black-box agents into a deterministic-shell hybrid architecture.</span>
           <div class="legend-items"><span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good)"></i> Plain code</span><span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> Scoped LLM</span><span><i class="swatch-dot" style="background:var(--amber-soft);border-color:var(--amber)"></i> Durable store</span><span><i class="swatch-dot" style="background:var(--panel-2);border-color:var(--cyan)"></i> Sandbox</span></div>
@@ -2442,7 +2420,7 @@
       <div>
         <span class="sec-badge">Appendix · Implementation Sketch</span>
         <h2>The Workflow Graph in ADK 2.x</h2>
-        <p>The worker from Stage 3 written as an explicit graph: two model nodes, and plain functions for everything else.</p>
+        <p>The worker from Workflow written as an explicit graph: two model nodes, and plain functions for everything else.</p>
       </div>
     </div>
     <div class="sheet-b">
@@ -2515,7 +2493,7 @@ self_healing_workflow = Workflow(
         (route_incident, {<span class="hl-s">"FIX"</span>: privileged_llm, <span class="hl-s">"ESCALATE"</span>: escalate_node}),
         (privileged_llm, verify_patch_in_sandbox), <span class="hl-c"># typed ProposedPatch handoff</span>
         (verify_patch_in_sandbox, {
-            <span class="hl-s">"PASS"</span>: open_draft_pr,                    <span class="hl-c"># Act gate: fence + PR_OPENED + ack</span>
+            <span class="hl-s">"PASS"</span>: open_draft_pr,                    <span class="hl-c"># Act gate: fence + COMPLETED + ack</span>
             <span class="hl-s">"RETRY"</span>: privileged_llm,              <span class="hl-c"># code-owned RetryFeedback back-edge</span>
             <span class="hl-s">"ESCALATE"</span>: escalate_node,          <span class="hl-c"># opens owner ticket + trace link, marks ESCALATED</span>
         }),

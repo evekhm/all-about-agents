@@ -248,12 +248,12 @@
             When designing an agentic system, it is easy to start with an abstract sequence of agents, name what each one does, and treat every component as a black box that will figure out the rest. This episode takes that high-level sketch and follows it down to what it actually means as an architecture: where a language model belongs versus deterministic code, how the surrounding harness coordinates control flow and state, and how structured context moves from one step to the next. Using a self-healing code repository system as a reference example, it lays out a systematic, reusable way to approach agentic system design. It ends with that architecture mapped onto Google Cloud, a printable cheat sheet, and a bridge into the controls of Episode 01.
           </p>
 
-          <h3>What the stages add</h3>
+          <h3>What the blocks add</h3>
           <ul class="stages">
-            <li><b>Boundary (Stage 1).</b> Pointer events trigger asynchronous repair at the real filtered volume, buffered by a stateless receiver and durable queue with terminal acknowledgement.</li>
-            <li><b>Control Plane (Stage 2).</b> Transactional locks, expiring leases, fencing checks, storm breakers, and a kill switch prevent duplicate or runaway runs.</li>
-            <li><b>Workflow (Stage 3).</b> Dual-LLM separation pairs a toolless Quarantined LLM with a bounded Privileged LLM, code verification, small typed contracts without shared chat history, and code-owned state.</li>
-            <li><b>Safeguards (Stage 4).</b> Credential-free sandboxes contain untrusted execution, and replay evaluations gate staged rollout.</li>
+            <li><b>Boundary.</b> Pointer events trigger asynchronous repair at the real filtered volume, buffered by a stateless receiver and durable queue with terminal acknowledgement.</li>
+            <li><b>Control Plane.</b> Transactional locks, expiring leases, fencing checks, storm breakers, and a kill switch prevent duplicate or runaway runs.</li>
+            <li><b>Workflow.</b> Dual-LLM separation pairs a toolless Quarantined LLM with a bounded Privileged LLM, code verification, small typed contracts without shared chat history, and code-owned state.</li>
+            <li><b>Safeguards.</b> Credential-free sandboxes contain untrusted execution, and replay evaluations gate tiered rollout.</li>
             <li><b>Cloud mapping.</b> Every generic role maps onto Google Cloud and Agent Platform with clear standalone-service criteria.</li>
             <li><b>Series bridge.</b> A printable cheat sheet summarizes all questions, and the data seam plugs directly into Episode 01.</li>
           </ul>
