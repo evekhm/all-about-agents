@@ -1631,8 +1631,8 @@
           </g>
           <g class="stg-new">
 
-            <text class="t-m-g" x="295" y="360" text-anchor="middle">→ IncidentReport</text>
-            <text class="t-m-g" x="505" y="360" text-anchor="middle">→ ProposedPatch</text>
+            <text class="t-m-v" x="295" y="360" text-anchor="middle">→ IncidentReport</text>
+            <text class="t-m-v" x="505" y="360" text-anchor="middle">→ ProposedPatch</text>
             <text class="t-m-g" x="705" y="360" text-anchor="middle" style="font-size:11.8px">PASS · RETRY · ESCALATE</text>
             <text class="t-m-g" x="907" y="360" text-anchor="middle">→ Draft PR</text>
           </g>
@@ -1941,7 +1941,7 @@
     <div class="sheet-b">
       <div class="post-prose">
         <p>
-          <a href="#fig-gcp"><em>Figure 8</em></a> maps every box of <a href="#fig-skeleton"><em>Figure 7</em></a> onto Google Cloud and the <strong>Gemini Enterprise Agent Platform</strong> (<strong>Agent Platform</strong> below; LLM calls remain model-family neutral). At ~100 failures a day, one <strong>Spanner</strong> database (or <strong>Cloud SQL</strong> / <strong>Firestore</strong> if you prefer a lighter single-region store) covers the kill switch, the 5-minute distinct-repo storm query, and the per-incident lock, expiring lease, and fencing token—chosen here for strongly consistent multi-region transactions and monotonic commit timestamps, while an extra in-memory cache like Memorystore is unnecessary unless event rates reach thousands per second. Alongside Spanner, Agent Platform provides managed per-run <strong>Agent Platform Sessions</strong>, <strong>Agent Platform Memory Bank</strong> for read-only lookup of past human-merged fixes, ephemeral gVisor sandboxes via <strong>Agent Runtime Code Execution</strong>, keyless <strong>Agent Identity</strong>, <strong>Agent Gateway</strong> with <strong>Model Armor</strong>, and <strong>ADK Eval</strong>.
+          <a href="#fig-gcp"><em>Figure 8</em></a> maps every box of <a href="#fig-skeleton"><em>Figure 7</em></a> onto Google Cloud and the <strong>Gemini Enterprise Agent Platform</strong> (<strong>Agent Platform</strong> below; LLM calls remain model-family neutral). A single transactional database such as <strong>Cloud SQL</strong> (PostgreSQL) or <strong>Firestore</strong> covers the kill switch, the short-window storm query, and the per-case lock, expiring lease, and fencing token; step up to <strong>Spanner</strong> when you need multi-region strong consistency or high write concurrency, and skip an extra cache such as Memorystore unless event rates reach thousands per second. Alongside the coordination database, Agent Platform provides managed per-run <strong>Agent Platform Sessions</strong>, <strong>Agent Platform Memory Bank</strong> for read-only lookup of past human-approved cases, ephemeral gVisor sandboxes via <strong>Agent Runtime Code Execution</strong>, keyless <strong>Agent Identity</strong>, <strong>Agent Gateway</strong> with <strong>Model Armor</strong>, and <strong>ADK Eval</strong>.
         </p>
       </div>
       <div class="diagram-frame" id="fig-gcp">
@@ -1965,8 +1965,8 @@
           <g transform="translate(0, 44)">
           <rect class="b-ext" x="20" y="66" width="170" height="92" rx="7"/>
           <text class="t-b" x="32" y="90" style="font-size:15.8px">Event Sources</text>
-          <text class="t-s" x="32" y="110" style="font-size:13.4px">Cloud Build, GitHub,</text>
-          <text class="t-s" x="32" y="128" style="font-size:13.4px">Cloud Monitoring</text>
+          <text class="t-s" x="32" y="110" style="font-size:13.4px">Webhooks, Scheduler,</text>
+          <text class="t-s" x="32" y="128" style="font-size:13.4px">Cloud Monitoring / Logs</text>
 
           <rect class="b-code" x="236" y="66" width="184" height="92" rx="7"/>
           <text class="t-b" x="248" y="90" style="font-size:15.8px">Cloud Run Receiver</text>
@@ -1989,8 +1989,8 @@
 
           <rect class="b-code" x="20" y="266" width="164" height="108" rx="8"/>
           <text class="t-b" x="102" y="290" text-anchor="middle" style="font-size:15.8px">Guard</text>
-          <text class="t-m-g" x="102" y="309" text-anchor="middle" style="font-size:11.8px">SPANNER TXN</text>
-          <text class="t-s" x="102" y="327" text-anchor="middle" style="font-size:13.4px">kill switch &amp; 5-min storm,</text>
+          <text class="t-m-g" x="102" y="309" text-anchor="middle" style="font-size:11.8px">CLOUD SQL TXN</text>
+          <text class="t-s" x="102" y="327" text-anchor="middle" style="font-size:13.4px">kill switch &amp; storm check,</text>
           <text class="t-s" x="102" y="343" text-anchor="middle" style="font-size:13.4px">120s row lease</text>
           <text class="t-m-g" x="102" y="360" text-anchor="middle">→ FailureEvent</text>
           <path class="flow" d="M184 320 H204" marker-end="url(#pgcp-ink)"/>
@@ -2024,16 +2024,16 @@
           <rect class="b-code" x="826" y="266" width="162" height="108" rx="8"/>
           <text class="t-b" x="907" y="290" text-anchor="middle" style="font-size:15.8px">Act gate</text>
           <text class="t-m-g" x="907" y="309" text-anchor="middle" style="font-size:11.8px">ADK FUNCTION NODE</text>
-          <text class="t-s" x="907" y="327" text-anchor="middle" style="font-size:13.4px">Spanner fence, Secret</text>
-          <text class="t-s" x="907" y="343" text-anchor="middle" style="font-size:13px">Mgr token + ack</text>
-          <text class="t-m-g" x="907" y="360" text-anchor="middle">→ Draft PR</text>
+          <text class="t-s" x="907" y="327" text-anchor="middle" style="font-size:13.4px">DB fence, Secret Mgr</text>
+          <text class="t-s" x="907" y="343" text-anchor="middle" style="font-size:13px">narrow token + ack</text>
+          <text class="t-m-g" x="907" y="360" text-anchor="middle">→ External Write</text>
           <path class="flow" d="M988 320 H1010" marker-end="url(#pgcp-ink)"/>
 
           <rect class="b-ext" x="1014" y="266" width="168" height="108" rx="8"/>
-          <text class="t-b" x="1098" y="290" text-anchor="middle" style="font-size:15.8px">GitHub + Reviewer</text>
-          <text class="t-s" x="1098" y="313" text-anchor="middle" style="font-size:13.4px">autofix/* draft PR,</text>
-          <text class="t-s" x="1098" y="331" text-anchor="middle" style="font-size:13.4px">code owner merges</text>
-          <text class="t-s" x="1098" y="349" text-anchor="middle" style="font-size:13px">post-merge → Memory</text>
+          <text class="t-b" x="1098" y="290" text-anchor="middle" style="font-size:15.8px">Target + Human</text>
+          <text class="t-s" x="1098" y="313" text-anchor="middle" style="font-size:13.4px">narrowly scoped write,</text>
+          <text class="t-s" x="1098" y="331" text-anchor="middle" style="font-size:13.4px">human approves change</text>
+          <text class="t-s" x="1098" y="349" text-anchor="middle" style="font-size:13px">post-approval → Memory</text>
 
           <line x1="505" y1="374" x2="505" y2="392" style="stroke:var(--cyan);stroke-width:1.7;stroke-dasharray:4 3" marker-end="url(#pgcp-cyan)"/>
           <rect class="b-sbx" x="416" y="396" width="178" height="56" rx="7"/>
@@ -2043,27 +2043,27 @@
           <line x1="700" y1="374" x2="700" y2="392" style="stroke:var(--cyan);stroke-width:1.7;stroke-dasharray:4 3" marker-end="url(#pgcp-cyan)"/>
           <rect class="b-sbx" x="618" y="396" width="164" height="56" rx="7"/>
           <text class="t-m-c" x="700" y="416" text-anchor="middle">CODE EXEC · SANDBOX 2</text>
-          <text class="t-s" x="700" y="436" text-anchor="middle" style="font-size:13px;fill:var(--ink)">fresh pytest run</text>
+          <text class="t-s" x="700" y="436" text-anchor="middle" style="font-size:13px;fill:var(--ink)">fresh verification run</text>
 
           <path d="M693 452 V468 H398 V342 H412" style="fill:none;stroke:var(--stop);stroke-width:1.9;stroke-dasharray:5 4" marker-end="url(#pgcp-stop)"/>
           <text class="t-m-r" x="545" y="484" text-anchor="middle">RETRY (attempt &lt; 3) · RetryFeedback</text>
 
           <path d="M788 374 V424 H1010" style="fill:none;stroke:var(--ink);stroke-width:1.7" marker-end="url(#pgcp-ink)"/>
           <rect class="b-ext" x="1014" y="396" width="168" height="56" rx="8"/>
-          <text class="t-b" x="1098" y="418" text-anchor="middle" style="font-size:14.6px">GitHub Issue / Pager</text>
+          <text class="t-b" x="1098" y="418" text-anchor="middle" style="font-size:14.6px">Issue Tracker / Pager</text>
           <text class="t-s" x="1098" y="437" text-anchor="middle" style="font-size:12.6px">ESCALATED + Pub/Sub ack</text>
 
           <path class="flow-d" d="M102 374 V494" marker-end="url(#pgcp-mut)"/>
           <rect class="b-store" x="20" y="498" width="308" height="70" rx="7"/>
-          <text class="t-b" x="32" y="520" style="font-size:15.8px">Spanner (coordination)</text>
-          <text class="t-s" x="32" y="539" style="font-size:13.4px">Kill switch + 5-min storm query</text>
-          <text class="t-s" x="32" y="556" style="font-size:13.4px">Incident row: lock, lease &amp; fencing</text>
+          <text class="t-b" x="32" y="520" style="font-size:15.8px">Cloud SQL (or Spanner)</text>
+          <text class="t-s" x="32" y="539" style="font-size:13.4px">Kill switch + short-window storm</text>
+          <text class="t-s" x="32" y="556" style="font-size:13.4px">Case row: lock, lease &amp; fencing</text>
 
           <path class="flow-d" d="M356 374 V494" marker-end="url(#pgcp-mut)"/>
           <rect class="b-store" x="342" y="498" width="316" height="70" rx="7"/>
           <text class="t-b" x="354" y="520" style="font-size:15.8px">Session, GCS &amp; Memory Bank</text>
           <text class="t-s" x="354" y="539" style="font-size:13.4px">Agent Platform Sessions + GCS blobs</text>
-          <text class="t-s" x="354" y="556" style="font-size:13.4px">Memory Bank: past merged fixes only</text>
+          <text class="t-s" x="354" y="556" style="font-size:13.4px">Memory Bank: approved cases only</text>
 
           <path class="flow-d" d="M907 374 V494" marker-end="url(#pgcp-mut)"/>
           <path class="flow-d" d="M1098 452 V533 H990" marker-end="url(#pgcp-mut)"/>
@@ -2092,7 +2092,7 @@
               <tr><td><b>Receiver</b></td><td>Cloud Run service</td><td>Verifies HMAC/OIDC, hashes the fingerprint, publishes <code>FailureEvent</code>.</td></tr>
               <tr><td><b>Queue</b></td><td>Pub/Sub with a dead-letter topic</td><td>Holds the event until the terminal <code>ack</code>; dead-letters after 5 failed deliveries.</td></tr>
               <tr><td><b>Worker and harness</b></td><td>Cloud Run or Agent Runtime, running an ADK 2.x <code>Workflow</code></td><td>All workflow nodes run in-process; one message drives one run.</td></tr>
-              <tr><td><b>Coordination store and kill switch</b></td><td>One Spanner database</td><td>A control row for the kill switch, the 5-minute storm query, and an <code>incidents</code> table with lock, 120-second lease and fencing. An in-memory cache such as Memorystore becomes useful at thousands of events per second.</td></tr>
+              <tr><td><b>Coordination store and kill switch</b></td><td>Cloud SQL (or Spanner for multi-region scale)</td><td>A control row for the kill switch, the 5-minute storm query, and an <code>incidents</code> table with lock, 120-second lease and fencing. An in-memory cache such as Memorystore becomes useful at thousands of events per second.</td></tr>
               <tr><td><b>Quarantined LLM input</b></td><td>Cloud Logging and Model Armor</td><td>At most 100 log lines, screened before the single model call.</td></tr>
               <tr><td><b>Session and blobs</b></td><td>Agent Platform Sessions and Cloud Storage</td><td><code>fix_attempts</code> and typed outputs in the session; logs and diffs by pointer.</td></tr>
               <tr><td><b>Long-term memory</b></td><td>Agent Platform Memory Bank</td><td>Human-merged fixes, written after the merge and read-only during a run.</td></tr>

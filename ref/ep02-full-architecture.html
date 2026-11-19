@@ -1348,8 +1348,8 @@
 <g transform="translate(0, 44)">
 <rect class="b-ext" height="92" rx="7" width="170" x="20" y="66"></rect>
 <text class="t-b" style="font-size:15.8px" x="32" y="90">Event Sources</text>
-<text class="t-s" style="font-size:13.4px" x="32" y="110">Cloud Build, GitHub,</text>
-<text class="t-s" style="font-size:13.4px" x="32" y="128">Cloud Monitoring</text>
+<text class="t-s" style="font-size:13.4px" x="32" y="110">Webhooks, Scheduler,</text>
+<text class="t-s" style="font-size:13.4px" x="32" y="128">Cloud Monitoring / Logs</text>
 <rect class="b-code" height="92" rx="7" width="184" x="236" y="66"></rect>
 <text class="t-b" style="font-size:15.8px" x="248" y="90">Cloud Run Receiver</text>
 <text class="t-s" style="font-size:13.4px" x="248" y="110">HMAC / OIDC check,</text>
@@ -1370,8 +1370,8 @@
 <text class="t-s t-c" style="font-size:13.4px" x="752" y="195">Pub/Sub ack at terminal exit</text>
 <rect class="b-code" height="108" rx="8" width="164" x="20" y="266"></rect>
 <text class="t-b" style="font-size:15.8px" text-anchor="middle" x="102" y="290">Guard</text>
-<text class="t-m-g" style="font-size:11.8px" text-anchor="middle" x="102" y="309">SPANNER TXN</text>
-<text class="t-s" style="font-size:13.4px" text-anchor="middle" x="102" y="327">kill switch &amp; 5-min storm,</text>
+<text class="t-m-g" style="font-size:11.8px" text-anchor="middle" x="102" y="309">CLOUD SQL TXN</text>
+<text class="t-s" style="font-size:13.4px" text-anchor="middle" x="102" y="327">kill switch &amp; storm check,</text>
 <text class="t-s" style="font-size:13.4px" text-anchor="middle" x="102" y="343">120s row lease</text>
 <text class="t-m-g" text-anchor="middle" x="102" y="360">→ FailureEvent</text>
 <path class="flow" d="M184 320 H204" marker-end="url(#pgcp-ink)"></path>
@@ -1380,14 +1380,14 @@
 <text class="t-m-v" text-anchor="middle" x="295" y="309">MODEL ARMOR → LLM</text>
 <text class="t-s" style="font-size:13.4px" text-anchor="middle" x="295" y="327">Cloud Logging / GCS,</text>
 <text class="t-s" style="font-size:13px" text-anchor="middle" x="295" y="343">1 call, no tools</text>
-<text class="t-m-g" text-anchor="middle" x="295" y="360">→ IncidentReport</text>
+<text class="t-m-v" text-anchor="middle" x="295" y="360">→ IncidentReport</text>
 <path class="flow" d="M382 320 H412" marker-end="url(#pgcp-ink)"></path>
 <rect class="b-model" height="108" rx="8" width="178" x="416" y="266"></rect>
 <text class="t-b" style="font-size:15.8px" text-anchor="middle" x="505" y="290">Privileged LLM</text>
 <text class="t-m-v" text-anchor="middle" x="505" y="309">ADK AGENT LOOP</text>
 <text class="t-s" style="font-size:13.4px" text-anchor="middle" x="505" y="327">model call on worker,</text>
 <text class="t-s" style="font-size:13px" text-anchor="middle" x="505" y="343">tools in Code Exec</text>
-<text class="t-m-g" text-anchor="middle" x="505" y="360">→ ProposedPatch</text>
+<text class="t-m-v" text-anchor="middle" x="505" y="360">→ ProposedPatch</text>
 <path class="flow" d="M594 320 H614" marker-end="url(#pgcp-ink)"></path>
 <rect class="b-code" height="108" rx="8" width="174" x="618" y="266"></rect>
 <text class="t-b" style="font-size:15.8px" text-anchor="middle" x="705" y="290">Verifier Node</text>
@@ -1400,15 +1400,15 @@
 <rect class="b-code" height="108" rx="8" width="162" x="826" y="266"></rect>
 <text class="t-b" style="font-size:15.8px" text-anchor="middle" x="907" y="290">Act gate</text>
 <text class="t-m-g" style="font-size:11.8px" text-anchor="middle" x="907" y="309">ADK FUNCTION NODE</text>
-<text class="t-s" style="font-size:13.4px" text-anchor="middle" x="907" y="327">Spanner fence, Secret</text>
-<text class="t-s" style="font-size:13px" text-anchor="middle" x="907" y="343">Mgr token + ack</text>
-<text class="t-m-g" text-anchor="middle" x="907" y="360">→ Draft PR</text>
+<text class="t-s" style="font-size:13.4px" text-anchor="middle" x="907" y="327">DB fence, Secret Mgr</text>
+<text class="t-s" style="font-size:13px" text-anchor="middle" x="907" y="343">narrow token + ack</text>
+<text class="t-m-g" text-anchor="middle" x="907" y="360">→ External Write</text>
 <path class="flow" d="M988 320 H1010" marker-end="url(#pgcp-ink)"></path>
 <rect class="b-ext" height="108" rx="8" width="168" x="1014" y="266"></rect>
-<text class="t-b" style="font-size:15.8px" text-anchor="middle" x="1098" y="290">GitHub + Reviewer</text>
-<text class="t-s" style="font-size:13.4px" text-anchor="middle" x="1098" y="313">autofix/* draft PR,</text>
-<text class="t-s" style="font-size:13.4px" text-anchor="middle" x="1098" y="331">code owner merges</text>
-<text class="t-s" style="font-size:13px" text-anchor="middle" x="1098" y="349">post-merge → Memory</text>
+<text class="t-b" style="font-size:15.8px" text-anchor="middle" x="1098" y="290">Target + Human</text>
+<text class="t-s" style="font-size:13.4px" text-anchor="middle" x="1098" y="313">narrowly scoped write,</text>
+<text class="t-s" style="font-size:13.4px" text-anchor="middle" x="1098" y="331">human approves change</text>
+<text class="t-s" style="font-size:13px" text-anchor="middle" x="1098" y="349">post-approval → Memory</text>
 <line marker-end="url(#pgcp-cyan)" style="stroke:var(--cyan);stroke-width:1.7;stroke-dasharray:4 3" x1="505" x2="505" y1="374" y2="392"></line>
 <rect class="b-sbx" height="56" rx="7" width="178" x="416" y="396"></rect>
 <text class="t-m-c" text-anchor="middle" x="505" y="416">CODE EXEC · SANDBOX 1</text>
@@ -1416,23 +1416,23 @@
 <line marker-end="url(#pgcp-cyan)" style="stroke:var(--cyan);stroke-width:1.7;stroke-dasharray:4 3" x1="700" x2="700" y1="374" y2="392"></line>
 <rect class="b-sbx" height="56" rx="7" width="164" x="618" y="396"></rect>
 <text class="t-m-c" text-anchor="middle" x="700" y="416">CODE EXEC · SANDBOX 2</text>
-<text class="t-s" style="font-size:13px;fill:var(--ink)" text-anchor="middle" x="700" y="436">fresh pytest run</text>
+<text class="t-s" style="font-size:13px;fill:var(--ink)" text-anchor="middle" x="700" y="436">fresh verification run</text>
 <path d="M693 452 V468 H398 V342 H412" marker-end="url(#pgcp-stop)" style="fill:none;stroke:var(--stop);stroke-width:1.9;stroke-dasharray:5 4"></path>
 <text class="t-m-r" text-anchor="middle" x="545" y="484">RETRY (attempt &lt; 3) · RetryFeedback</text>
 <path d="M788 374 V424 H1010" marker-end="url(#pgcp-ink)" style="fill:none;stroke:var(--ink);stroke-width:1.7"></path>
 <rect class="b-ext" height="56" rx="8" width="168" x="1014" y="396"></rect>
-<text class="t-b" style="font-size:14.6px" text-anchor="middle" x="1098" y="418">GitHub Issue / Pager</text>
+<text class="t-b" style="font-size:14.6px" text-anchor="middle" x="1098" y="418">Issue Tracker / Pager</text>
 <text class="t-s" style="font-size:12.6px" text-anchor="middle" x="1098" y="437">ESCALATED + Pub/Sub ack</text>
 <path class="flow-d" d="M102 374 V494" marker-end="url(#pgcp-mut)"></path>
 <rect class="b-store" height="70" rx="7" width="308" x="20" y="498"></rect>
-<text class="t-b" style="font-size:15.8px" x="32" y="520">Spanner (coordination)</text>
-<text class="t-s" style="font-size:13.4px" x="32" y="539">Kill switch + 5-min storm query</text>
-<text class="t-s" style="font-size:13.4px" x="32" y="556">Incident row: lock, lease &amp; fencing</text>
+<text class="t-b" style="font-size:15.8px" x="32" y="520">Cloud SQL (or Spanner)</text>
+<text class="t-s" style="font-size:13.4px" x="32" y="539">Kill switch + short-window storm</text>
+<text class="t-s" style="font-size:13.4px" x="32" y="556">Case row: lock, lease &amp; fencing</text>
 <path class="flow-d" d="M356 374 V494" marker-end="url(#pgcp-mut)"></path>
 <rect class="b-store" height="70" rx="7" width="316" x="342" y="498"></rect>
 <text class="t-b" style="font-size:15.8px" x="354" y="520">Session, GCS &amp; Memory Bank</text>
 <text class="t-s" style="font-size:13.4px" x="354" y="539">Agent Platform Sessions + GCS blobs</text>
-<text class="t-s" style="font-size:13.4px" x="354" y="556">Memory Bank: past merged fixes only</text>
+<text class="t-s" style="font-size:13.4px" x="354" y="556">Memory Bank: approved cases only</text>
 <path class="flow-d" d="M907 374 V494" marker-end="url(#pgcp-mut)"></path>
 <path class="flow-d" d="M1098 452 V533 H990" marker-end="url(#pgcp-mut)"></path>
 <rect class="b-store" height="70" rx="7" width="316" x="672" y="498"></rect>
@@ -1467,7 +1467,7 @@
 <tr><td><b>Receiver</b></td><td>Cloud Run service</td><td>Verifies HMAC/OIDC, hashes the fingerprint, publishes <code>FailureEvent</code>.</td></tr>
 <tr><td><b>Queue</b></td><td>Pub/Sub with a dead-letter topic</td><td>Holds the event until a terminal or <code>PARKED</code> <code>ack</code>; dead-letters after 5 failed deliveries.</td></tr>
 <tr><td><b>Worker and harness</b></td><td>Cloud Run or Agent Runtime, running an ADK 2.x <code>Workflow</code></td><td>All workflow nodes run in-process; one message drives one run.</td></tr>
-<tr><td><b>Coordination store and kill switch</b></td><td>One Spanner database</td><td>A control row for the kill switch, the 5-minute storm query, and an <code>incidents</code> table with lock, 120-second lease and fencing. An in-memory cache such as Memorystore becomes useful at thousands of events per second.</td></tr>
+<tr><td><b>Coordination store and kill switch</b></td><td>Cloud SQL (or Spanner for multi-region scale)</td><td>A control row for the kill switch, the 5-minute storm query, and an <code>incidents</code> table with lock, 120-second lease and fencing. An in-memory cache such as Memorystore becomes useful at thousands of events per second.</td></tr>
 <tr><td><b>Quarantined LLM input</b></td><td>Cloud Logging and Model Armor</td><td>At most 100 log lines, screened before the single model call.</td></tr>
 <tr><td><b>Session and blobs</b></td><td>Agent Platform Sessions and Cloud Storage</td><td><code>fix_attempts</code> and typed outputs in the session; logs and diffs by pointer.</td></tr>
 <tr><td><b>Long-term memory</b></td><td>Agent Platform Memory Bank</td><td>Human-merged fixes, written after the merge and read-only during a run.</td></tr>
