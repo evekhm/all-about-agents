@@ -971,7 +971,7 @@
         </p>
 
 <div class="diagram-frame" id="fig-q1a">
-  <svg viewBox="0 0 920 580" role="img" aria-label="One forward pass per token: activations are computed through every layer and discarded once the next token is sampled, and only the written token is fed back as the next input">
+  <svg viewBox="0 0 920 580" role="img" aria-label="Diagram of four generation steps for a prior-authorization case. In each step, an input token passes up through stacked model layers, the activations, and produces one written token: &quot;needs,&quot; &quot;6 wk,&quot; &quot;PT,&quot; &quot;fail.&quot; Each written token is fed back as the next step&#x27;s input. Together the written tokens form the raw thinking trace, which a separate pass condenses into a thought summary. A note says proprietary APIs usually expose only the thought summary, while open-weight models expose raw tokens and, with forward-pass hooks and sparse autoencoders, the activations.">
     <defs>
       <marker id="arr-q1a-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
         <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:var(--ink)"/>
