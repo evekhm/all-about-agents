@@ -265,37 +265,78 @@
             <a class="btn secondary" id="ep02-medium-btn" href="https://medium.com/google-cloud/a-mental-model-for-designing-agentic-systems-aaf90dcc9f3d" target="_blank" rel="noopener">Read on Medium</a>
           </div>
         </article>
-
-        <article class="episode">
-          <p class="ep-num">Episode 03</p>
-          <h2><a id="ep03-title-link" href="ep03_ai_architecture_field_questions.html">Five Foundational Questions in AI System Design</a></h2>
-          <p class="ep-meta">November 2026 · about 45 minutes in full</p>
-
-          <p class="ep-summary">
-            This episode builds a ground-up foundation across five questions that companies ask in AI system-design interviews: making a language model trustworthy for an enterprise customer, choosing across the full model spectrum, retail demand forecasting, modern RAG and what it pairs with, and building a lean domain-specific agent.
-          </p>
-
-          <h3>What the questions cover</h3>
-          <ul class="stages">
-            <li><b>Trust and transparency.</b> Nine concerns behind the phrase “black box”, six business risks, and seven system layers around an opaque model core.</li>
-            <li><b>Model spectrum.</b> Open-weight, proprietary, and classical tiers filtered through governance constraints, serving math, and task evaluations.</li>
-            <li><b>Retail forecasting.</b> Tabular, time-series, and count models own the numbers while language models stay in backtest-gated sidecars.</li>
-            <li><b>Modern RAG.</b> Structure-aware parsing, hybrid search, and reranking paired with SQL, graphs, memory, and prefix-cached long context.</li>
-            <li><b>Domain-specific agent.</b> One agent with compiled policy retrieval, injected defined terms, and code that verifies quotes and precedence.</li>
-          </ul>
-
-          <div class="actions">
-            <a class="btn" id="ep03-read-btn" href="ep03_ai_architecture_field_questions.html">Read Episode 03</a>
-            <a class="btn secondary" id="ep03-pdf-btn" href="ep03_ai_architecture_field_questions.pdf">Download PDF</a>
-          </div>
-        </article>
       </section>
 
-      <section class="planned" aria-labelledby="planned-label">
-        <p class="section-label" id="planned-label">Up Next</p>
-        <ul>
-          <li><span>Governance</span><div><b>Dual LLM and CaMeL, in depth.</b></div></li>
-        </ul>
+      <section aria-labelledby="interview-label" style="margin-top:40px;">
+        <p class="section-label" id="interview-label">Topic · AI System Design Interviews</p>
+        <p style="margin:0 0 18px;font-size:15.5px;line-height:1.6;color:var(--muted);">
+          Five standalone deep dives covering core questions companies test in AI system-design interviews—each with its own architecture diagram, reference tables, and printable PDF, plus a <a href="ref/ai-interview-cheat-sheet.html" style="color:var(--accent);font-weight:600;text-decoration:none;">5-question Master Cheat Sheet</a>.
+        </p>
+
+        <article class="episode">
+          <p class="ep-num">Episode 03 · Interview Question 01</p>
+          <h2><a id="ep03-title-link" href="ep03_enterprise_llm_trust.html">Making an LLM Trustworthy for an Enterprise Customer</a></h2>
+          <p class="ep-meta">November 2026 · about 12 minutes</p>
+          <p class="ep-summary">
+            Opens with how far we can see into a model's reasoning traces—thought summaries, raw thinking tokens, and circuit tracing over latent-space activations—before mapping the nine stakeholder concerns, six business risks, seven transparent system layers, and six architectural alternatives around the model.
+          </p>
+          <div class="actions">
+            <a class="btn" id="ep03-read-btn" href="ep03_enterprise_llm_trust.html">Read Episode 03</a>
+            <a class="btn secondary" id="ep03-pdf-btn" href="ep03_enterprise_llm_trust.pdf">Download PDF</a>
+          </div>
+        </article>
+
+        <article class="episode">
+          <p class="ep-num">Episode 04 · Interview Question 02</p>
+          <h2><a id="ep04-title-link" href="ep04_model_spectrum_economics.html">Open-Weight vs. Proprietary Models Across the Full Model Spectrum</a></h2>
+          <p class="ep-meta">November 2026 · about 10 minutes</p>
+          <p class="ep-summary">
+            Moves past the binary open-vs.-closed debate using a constraint-first selection funnel: enterprise privacy and Zero Data Retention boundaries, GPU memory and utilization math, and a five-tier hybrid router spanning classical ML to frontier reasoning.
+          </p>
+          <div class="actions">
+            <a class="btn" id="ep04-read-btn" href="ep04_model_spectrum_economics.html">Read Episode 04</a>
+            <a class="btn secondary" id="ep04-pdf-btn" href="ep04_model_spectrum_economics.pdf">Download PDF</a>
+          </div>
+        </article>
+
+        <article class="episode">
+          <p class="ep-num">Episode 05 · Interview Question 03</p>
+          <h2><a id="ep05-title-link" href="ep05_retail_demand_forecasting.html">Production Retail Demand Forecasting and Honest LLM Scoping</a></h2>
+          <p class="ep-meta">November 2026 · about 10 minutes</p>
+          <p class="ep-summary">
+            Explains why tabular GBDTs, time-series foundation models (TimesFM / BigQuery AI.FORECAST), and count models own reconciled demand quantiles after stockout uncensoring, while language models stay in three backtest-gated sidecars.
+          </p>
+          <div class="actions">
+            <a class="btn" id="ep05-read-btn" href="ep05_retail_demand_forecasting.html">Read Episode 05</a>
+            <a class="btn secondary" id="ep05-pdf-btn" href="ep05_retail_demand_forecasting.pdf">Download PDF</a>
+          </div>
+        </article>
+
+        <article class="episode">
+          <p class="ep-num">Episode 06 · Interview Question 04</p>
+          <h2><a id="ep06-title-link" href="ep06_modern_rag_pairings.html">Modern RAG and Multi-Store Context Engineering</a></h2>
+          <p class="ep-meta">November 2026 · about 9 minutes</p>
+          <p class="ep-summary">
+            Covers the six shifts from naive 500-token vector chunks to modern retrieval (structural parsing, contextual prefaces, inline ACLs, hybrid BM25 + dense RRF, reranking, and section hydration) and five production pairings with SQL, graphs, memory, and prefix-cached long context.
+          </p>
+          <div class="actions">
+            <a class="btn" id="ep06-read-btn" href="ep06_modern_rag_pairings.html">Read Episode 06</a>
+            <a class="btn secondary" id="ep06-pdf-btn" href="ep06_modern_rag_pairings.pdf">Download PDF</a>
+          </div>
+        </article>
+
+        <article class="episode">
+          <p class="ep-num">Episode 07 · Interview Question 05</p>
+          <h2><a id="ep07-title-link" href="ep07_domain_specific_agent.html">Building a Lean, Domain-Specific Agent</a></h2>
+          <p class="ep-meta">November 2026 · about 12 minutes</p>
+          <p class="ep-summary">
+            Equips one lean agent for domain terminology, cross-referenced rules, and conflicting policies via an offline policy compiler, auto-injected defined terms, parameterized DB lookups, deterministic precedence, and an ADK 2.x workflow traced on a prior-authorization example.
+          </p>
+          <div class="actions">
+            <a class="btn" id="ep07-read-btn" href="ep07_domain_specific_agent.html">Read Episode 07</a>
+            <a class="btn secondary" id="ep07-pdf-btn" href="ep07_domain_specific_agent.pdf">Download PDF</a>
+          </div>
+        </article>
       </section>
     </main>
 
