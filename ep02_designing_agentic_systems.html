@@ -965,7 +965,7 @@
 
         <h3 id="four-blocks">The 60-Second Mental Model: 4 Blocks to Remember</h3>
         <p>
-          To structure that architecture, I suggest framing an agentic system around four components, shown in <em>Figure 2</em>.
+          To grow that sketch, I suggest framing an agentic system around four components, shown in <em>Figure 2</em>.
         </p>
       </div>
       <div class="diagram-frame" id="fig-four-blocks">
@@ -1074,7 +1074,7 @@
         <div class="qh"><div class="n">3</div><h3>How does work get from the event to a worker without being lost?</h3></div>
         <div class="q3">
           <div class="a"><span class="lab">Skip it and…</span><ul><li>The sender's 5–10s HTTP timeout expires waiting on a slow run, while an early <code>200</code> that holds work only in memory loses it on restart.</li><li>A burst drops events, or an unverified endpoint accepts spoofed webhooks.</li></ul></div>
-          <div class="b"><span class="lab">Decide</span><ul><li>Place a stateless <strong>Receiver</strong> in front: verify sender signature/token, drop passing-build events, reply <code>200</code> at once.</li><li>Buffer in a durable <strong>Queue</strong>; send <code>ack</code> only at a terminal exit or on <code>PARKED</code>, with exponential backoff and a dead-letter queue after repeated failed deliveries.</li></ul></div>
+          <div class="b"><span class="lab">Decide</span><ul><li>Place a stateless <strong>Receiver</strong> in front: verify sender signature/token, drop passing-build events, reply <code>200</code> at once.</li><li>Buffer in a durable <strong>Queue</strong>; send <code>ack</code> only at a terminal exit or on <code>PARKED</code>, with exponential backoff and a dead-letter queue after repeated failed deliveries.</li><li>Keep live mitigation and deploy rights outside; the workflow does only asynchronous diagnosis and repair.</li></ul></div>
           <div class="c"><span class="lab">In the self-healing repo</span><ul><li>Webhook receiver → durable queue → worker.</li><li>HMAC/OIDC check, reply <code>200</code> immediately; <code>ack</code> at a terminal exit (<code>COMPLETED</code>, <code>SKIPPED</code>, <code>ESCALATED</code>) or on <code>PARKED</code>; DLQ after 5 failed deliveries.</li></ul></div>
         </div>
       </div>
@@ -1168,8 +1168,8 @@
       <div class="qb" id="q4" style="margin-top:20px;">
         <div class="qh"><div class="n">4</div><h3>How do I avoid doing the same thing twice?</h3></div>
         <div class="q3">
-          <div class="a"><span class="lab">Skip it and…</span><ul><li>Fifteen identical pull requests, tickets, or refunds open for one bug.</li><li>A retry repeats an external write that already succeeded.</li></ul></div>
-          <div class="b"><span class="lab">Decide</span><ul><li>Compute a deterministic duplicate key in plain code from stable fields.</li><li>Keep one durable row per key—<code>IN_PROGRESS</code> while leased, <code>PARKED</code> when paused, and terminal states <code>COMPLETED</code>, <code>SKIPPED</code>, or <code>ESCALATED</code>—and pass an idempotency key on external writes.</li></ul></div>
+          <div class="a"><span class="lab">Skip it and…</span><ul><li>Fifteen identical pull requests, tickets, or refunds open for one bug.</li><li>A retry repeats an external write that already succeeded.</li><li>A shared outage makes the bot “fix” 20 healthy targets at once.</li></ul></div>
+          <div class="b"><span class="lab">Decide</span><ul><li>Compute a deterministic duplicate key in plain code from stable fields.</li><li>Keep one durable row per key—<code>IN_PROGRESS</code> while leased, <code>PARKED</code> when paused, and terminal states <code>COMPLETED</code>, <code>SKIPPED</code>, or <code>ESCALATED</code>—and pass an idempotency key on external writes.</li><li>Count distinct failing targets in a short sliding window, and pause plus page an operator above a threshold.</li></ul></div>
           <div class="c"><span class="lab">In the self-healing repo</span><ul><li><code>failure_fingerprint</code>: hash of structured error type, target, and normalized summary already in the webhook payload (no log download needed).</li><li>One row per <code>(repo, failure_fingerprint)</code>; finished rows immediately <code>ack</code> and skip.</li></ul></div>
         </div>
       </div>
@@ -1484,7 +1484,7 @@
 
           <rect class="b-store" x="842" y="370" width="334" height="114" rx="9"/>
           <text class="t-b" x="860" y="394">Coordination DB</text>
-          <text class="t-m-g" x="860" y="412" style="fill:var(--amber)">WRITTEN BY: GUARD &amp; ACT GATE ONLY</text>
+          <text class="t-m-g" x="860" y="412" style="fill:var(--amber);font-size:9.5px">WRITTEN BY: WORKFLOW CODE (GUARD, ACT GATE, ESCALATE)</text>
           <text class="t-s" x="860" y="432">• Atomic duplicate lock + expiring lease</text>
           <text class="t-s" x="860" y="450">• Monotonic fencing token checked on write</text>
           <text class="t-s" x="860" y="468">• Kill switch &amp; terminal state (COMPLETED)</text>
@@ -1499,13 +1499,13 @@
           <rect x="780" y="520" width="14" height="14" rx="3" style="fill:#fef2f2;stroke:#b91c1c;stroke-width:1.8"/>
           <text class="t-s" x="802" y="532">Untrusted / retry / escalate</text>
         </svg>
-        <div class="fig-caption"><span>Figure 5 — Inside the Workflow Harness: Each model sees only its own validated contract (no shared history), the harness gates schemas and retries, and deterministic code owns every database write.</span>
+        <div class="fig-caption"><span>Figure 5 — Inside the Workflow Harness: Each model sees only its own validated contract (no shared history), the harness gates schemas and retries, and deterministic code owns every database write (Intake / Proposal / Feedback JSON map to IncidentReport / ProposedPatch / RetryFeedback in the self-healing repo example).</span>
           <div class="legend-items"><span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good)"></i> Harness / plain code</span><span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> Scoped LLM</span><span><i class="swatch-dot" style="background:var(--amber-soft);border-color:var(--amber)"></i> Durable store</span><span><i class="swatch-dot" style="background:var(--stop-soft);border-color:var(--stop)"></i> Retry / escalate</span></div>
         </div>
       </div>
       <div class="post-prose" style="margin-top:18px;">
         <p>
-          <a href="#fig-s5"><em>Figure 6</em></a> wires those six handoff contracts—five forward contracts along the main path (<code>FailureEvent</code>, <code>IncidentReport</code>, <code>ProposedPatch</code>, <code>VerifiedPatch</code>, and the evidence-backed <code>Draft PR</code>) plus <code>RetryFeedback</code> on the bounded retry back-edge—and state rules onto the graph: each step emits a validated schema with shared chat history disabled, the Verifier emits <code>VerifiedPatch</code> on <code>PASS</code> or returns <code>RetryFeedback</code> (at most <code>3</code> total attempts—initial try plus <code>2</code> retries) before taking the <code>ESCALATE to person</code> exit, and <strong>Session, blobs &amp; memory</strong> sit alongside the coordination database under code-owned write boundaries.
+          <a href="#fig-s5"><em>Figure 6</em></a> wires those contracts, bounded retries, human escalation, and session/memory stores back into the outer system.
         </p>
       </div>
       <div class="diagram-frame" id="fig-s5">
@@ -2262,7 +2262,7 @@
       <div>
         <span class="sec-badge">Appendix · Implementation Sketch</span>
         <h2>The Workflow Graph in ADK 2.x</h2>
-        <p>The worker from Workflow written as an explicit graph: two model nodes, and plain functions for everything else.</p>
+        <p>The worker from the Workflow block written as an explicit graph: two model nodes, and plain functions for everything else.</p>
       </div>
     </div>
     <div class="sheet-b">
