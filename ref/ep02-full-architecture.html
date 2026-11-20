@@ -1198,7 +1198,7 @@
       <div class="phase-banner">Phase 3 · Inside the Single-Worker Harness: Dual-LLM Split, Sandboxes &amp; Verifier</div>
       <div class="post-prose">
         <p>
-          Once the Guard claims a lease, the deterministic worker harness drives every internal step in-process, passing small code-validated artifacts with shared chat history disabled (<code>include_contents="none"</code>):
+          Once the Guard claims a lease, the deterministic worker harness drives every internal step in-process, passing small code-validated artifacts with shared conversation history disabled:
         </p>
       </div>
 
@@ -1242,7 +1242,7 @@
           </div>
           <div class="step-why"><b>Problem solved:</b> Build and runtime logs mix unstructured stack traces with untrusted strings (commit messages, test inputs, dependency output) capable of hijacking a tool-calling agent via indirect prompt injection.</div>
           <p class="step-how">
-            Deterministic code fetches at most 100 screened failure lines from <code>log_pointer</code> and invokes the <strong>Quarantined LLM</strong> in a single turn with zero tools, <code>include_contents="none"</code>, and a closed output schema (<code>IncidentReport</code>). Plain code verifies that <code>category</code> belongs to the allowed enum (<code>CODE_BUG</code>, <code>INFRA</code>, <code>FLAKY</code>, <code>UNKNOWN</code>) and that <code>suspect_files</code> and <code>target_test</code> exist at <code>commit_sha</code>. Raw untrusted log text stops permanently at this boundary; <code>INFRA</code> and <code>FLAKY</code> cases route straight to escalation or skip.
+            Deterministic code fetches at most 100 screened failure lines from <code>log_pointer</code> and invokes the <strong>Quarantined LLM</strong> in a single turn with zero tools, prior conversation history disabled (for example, <code>include_contents="none"</code> on ADK's <code>Agent(...)</code> constructor), and a closed output schema (<code>IncidentReport</code>). Plain code verifies that <code>category</code> belongs to the allowed enum (<code>CODE_BUG</code>, <code>INFRA</code>, <code>FLAKY</code>, <code>UNKNOWN</code>) and that <code>suspect_files</code> and <code>target_test</code> exist at <code>commit_sha</code>. Raw untrusted log text stops permanently at this boundary; <code>INFRA</code> and <code>FLAKY</code> cases route straight to escalation or skip.
           </p>
         </div>
 
