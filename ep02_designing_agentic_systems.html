@@ -2055,16 +2055,16 @@
       <div class="nine-q-wrap" id="tbl-5" style="margin:14px 0 12px;">
         <div class="nine-q-head">Table 6 · Applying the Same Architecture Across Three Domains</div>
         <div class="tbl-wrap" style="margin:0;">
-          <table>
-            <thead><tr><th></th><th>Self-healing repo</th><th>Invoice exception → propose resolution</th><th>Risk review of 100,000 bank clients</th></tr></thead>
+                    <table>
+            <thead><tr><th style="width:13%">Block</th><th style="width:15%"></th><th>Self-healing repo</th><th>Invoice exception → propose resolution</th><th>Risk review of 100,000 bank clients</th></tr></thead>
             <tbody>
-              <tr><td><b>Wakes it up</b></td><td>CI, deployment controller, monitoring</td><td>Invoice that fails matching, supplier email, ERP alert</td><td>Nightly feed of clients whose data changed</td></tr>
+              <tr><td rowspan="2" style="vertical-align:middle;font-weight:700;color:var(--ink)">1 · Boundary</td><td><b>Wakes it up</b></td><td>CI, deployment controller, monitoring</td><td>Invoice that fails matching, supplier email, ERP alert</td><td>Nightly feed of clients whose data changed</td></tr>
               <tr><td><b>Real size</b></td><td>100 failures a day</td><td>Only the invoices that fail the three-way match</td><td>Only the clients whose data changed</td></tr>
-              <tr><td><b>Duplicate key</b></td><td><code>(repo, failure_fingerprint)</code></td><td><code>(supplier_id, invoice_number)</code></td><td><code>(client_id, review_period)</code></td></tr>
+              <tr><td rowspan="2" style="vertical-align:middle;font-weight:700;color:var(--ink)">2 · Control Plane</td><td><b>Duplicate key</b></td><td><code>(repo, failure_fingerprint)</code></td><td><code>(supplier_id, invoice_number)</code></td><td><code>(client_id, review_period)</code></td></tr>
               <tr><td><b>Everything on fire?</b></td><td>5 repos fail in 5 minutes</td><td>A price-list or tax-table update mismatches hundreds of invoices at once</td><td>Broken data feed flags thousands at once</td></tr>
-              <tr><td><b>Quarantined / Privileged LLM</b></td><td>Classify logs; iteratively patch &amp; test</td><td>Read invoice and supplier emails; investigate order, receipt, and contract</td><td>Extract filing facts; draft risk narrative</td></tr>
+              <tr><td rowspan="2" style="vertical-align:middle;font-weight:700;color:var(--ink)">3 · Workflow</td><td><b>Quarantined / Privileged LLM</b></td><td>Classify logs; iteratively patch &amp; test</td><td>Read invoice and supplier emails; investigate order, receipt, and contract</td><td>Extract filing facts; draft risk narrative</td></tr>
               <tr><td><b>Code steps</b></td><td>Verify suite; path rules; open draft PR</td><td>Tolerance and amount rules; idempotent ledger posting</td><td>Financial ratios in code; tier routing</td></tr>
-              <tr><td><b>Human</b></td><td>Reviews and merges the draft PR</td><td>Approves adjustments above an amount threshold</td><td>Signs off by risk tier</td></tr>
+              <tr><td rowspan="2" style="vertical-align:middle;font-weight:700;color:var(--ink)">4 · Safeguards</td><td><b>Human</b></td><td>Reviews and merges the draft PR</td><td>Approves adjustments above an amount threshold</td><td>Signs off by risk tier</td></tr>
               <tr><td><b>Safeguards</b></td><td>Zero-net, zero-cred sandboxes; narrow <code>autofix/*</code> PR token; replay evals</td><td>Deterministic tolerance rules replace sandboxes; narrow ERP write key + replay evals</td><td>Deterministic ratio checks replace sandboxes; read-only DB role + replay evals</td></tr>
             </tbody>
           </table>
