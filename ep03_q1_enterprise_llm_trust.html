@@ -8,7 +8,7 @@
 <meta property="og:title" content="Making an LLM Trustworthy for an Enterprise Customer">
 <meta property="og:description" content="How far we can see into a model&#x27;s reasoning traces, what &quot;black box&quot; means to a customer beyond latent activations, and the system layers that make an LLM solution transparent.">
 <meta property="og:type" content="article">
-<meta property="og:url" content="https://evekhm.github.io/all-about-agents/ep03_enterprise_llm_trust.html">
+<meta property="og:url" content="https://evekhm.github.io/all-about-agents/ep03_q1_enterprise_llm_trust.html">
 <title>All About Agents — Making an LLM Trustworthy for an Enterprise Customer</title>
 <style>
   :root,
@@ -860,7 +860,7 @@
 <body>
 
 <header class="topbar">
-  <a class="brand" id="brand-home-link" href="index.html">All About Agents · Episode 03</a>
+  <a class="brand" id="brand-home-link" href="index.html">All About Agents · Episode 03 · Q1</a>
   <nav class="navlinks">
     <a class="home-link" id="home-link" href="index.html">← Home</a>
     <a href="#intro">Overview</a>
@@ -887,7 +887,7 @@
     <div class="sheet-b">
       <div class="post-prose">
         <p>My goal with this episode is to answer one of the most common questions in enterprise AI system-design interviews: how to make a language model trustworthy to a skeptical customer. We start inside the model—what reasoning traces exist, what granularity each reaches, and why open weights still require multi-step instrumentation—before stepping outside to the nine stakeholder concerns, seven transparent system layers, and six architectural alternatives.</p>
-        <p>Next in this track: <a href="ep04_model_spectrum_economics.html">Episode 04 · Open-Weight vs. Proprietary Models Across the Full Model Spectrum</a> (or view the <a href="ref/ai-interview-cheat-sheet.html">5-Question Master Cheat Sheet</a>).</p>
+        <p>Next in Episode 03: <a href="ep03_q2_model_spectrum_economics.html">Question 02 · Open-Weight vs. Proprietary Models Across the Full Model Spectrum</a> (or view the <a href="ref/ai-interview-cheat-sheet.html">5-Question Master Cheat Sheet</a>).</p>
       </div>
     </div>
   </section>
@@ -909,7 +909,7 @@
         </p>
         <ol>
           <li><strong>Instrument the forward pass:</strong> Host the model locally and attach activation hooks to record the floating-point vectors at each layer as the prompt runs.</li>
-          <li><strong>Decompose polysemantic vectors:</strong> Individual neurons and raw dimensions respond to many unrelated concepts at once, so you pass the recorded activations through <strong>sparse autoencoders (SAEs)</strong> or transcoders trained for that specific model (Gemma Scope 2, for example, covers Gemma 3, while <a href="ep04_model_spectrum_economics.html">Episode 04</a> recommends Gemma 4) to isolate candidate human-interpretable features.</li>
+          <li><strong>Decompose polysemantic vectors:</strong> Individual neurons and raw dimensions respond to many unrelated concepts at once, so you pass the recorded activations through <strong>sparse autoencoders (SAEs)</strong> or transcoders trained for that specific model (Gemma Scope 2, for example, covers Gemma 3, while <a href="ep03_q2_model_spectrum_economics.html">Question 02</a> recommends Gemma 4) to isolate candidate human-interpretable features.</li>
           <li><strong>Trace feature-to-feature attribution:</strong> Link active features across layers into an <strong>attribution graph</strong> to see which internal concepts amplified or suppressed the final sampled token—an expensive, research-grade investigation that still captures only a fraction of the total computation.</li>
         </ol>
         <p>

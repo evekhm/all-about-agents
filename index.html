@@ -148,6 +148,16 @@
   .btn.secondary:hover { background: var(--panel-2); color: var(--accent-hover); }
 
   .ep-note { margin: 0; font-size: 14.5px; line-height: 1.55; color: var(--dim); }
+  .sub-list { display: flex; flex-direction: column; gap: 14px; margin-top: 24px; padding-top: 22px; border-top: 1px solid var(--line-2); }
+  .sub-card { background: var(--panel-2); border: 1px solid var(--line-2); border-radius: 12px; padding: 20px 24px; }
+  .sub-card .ep-num { margin: 0 0 4px; font-size: 12px; }
+  .sub-card h3 { margin: 0 0 4px; padding: 0; border: 0; font-size: 19px; line-height: 1.3; }
+  .sub-card h3 a { color: var(--ink); text-decoration: none; }
+  .sub-card h3 a:hover { color: var(--accent); }
+  .sub-card .ep-meta { margin: 0 0 10px; font-size: 12.5px; }
+  .sub-card .ep-summary { margin: 0 0 14px; font-size: 15.5px; line-height: 1.55; }
+  .sub-card .actions { margin: 0; }
+  .sub-card .btn { padding: 8px 14px; font-size: 14px; }
 
   /* Planned episodes */
   .planned { padding: 48px 0 0; }
@@ -190,14 +200,14 @@
   <div class="wrap">
     <header class="masthead">
       <h1>All About Agents</h1>
-      <p class="lede">Architecture notes, system-design mental models, and governance blueprints for production AI agents.</p>
+      <p class="lede">Field notes, architectures, and reference guides on building and operating production AI systems.</p>
       <p class="byline">By Eva Khmelinskaya</p>
     </header>
 
     <main>
       <section class="about" aria-label="About this site">
         <p>
-          These notes cover how production AI agents are designed, connected to real systems, and secured—from problem-first system design mental models to zero-trust governance architectures and runnable reference labs.
+          This is a living collection of technical notes on production AI—covering how systems are designed, grounded, secured, evaluated, and operated across topics and architectures.
         </p>
       </section>
 
@@ -269,72 +279,85 @@
 
       <section aria-labelledby="interview-label" style="margin-top:40px;">
         <p class="section-label" id="interview-label">Topic · AI System Design Interviews</p>
-        <p style="margin:0 0 18px;font-size:15.5px;line-height:1.6;color:var(--muted);">
-          Five standalone deep dives covering core questions companies test in AI system-design interviews—each with its own architecture diagram, reference tables, and printable PDF, plus a <a href="ref/ai-interview-cheat-sheet.html" style="color:var(--accent);font-weight:600;text-decoration:none;">5-question Master Cheat Sheet</a>.
-        </p>
 
         <article class="episode">
-          <p class="ep-num">Episode 03 · Interview Question 01</p>
-          <h2><a id="ep03-title-link" href="ep03_enterprise_llm_trust.html">Making an LLM Trustworthy for an Enterprise Customer</a></h2>
-          <p class="ep-meta">November 2026 · about 12 minutes</p>
+          <p class="ep-num">Episode 03</p>
+          <h2><a id="ep03-title-link" href="ep03_q1_enterprise_llm_trust.html">Five Foundational Questions in AI System Design</a></h2>
+          <p class="ep-meta">November 2026 · about 45 minutes in full</p>
+
           <p class="ep-summary">
-            Opens with how far we can see into a model's reasoning traces—thought summaries, raw thinking tokens, and circuit tracing over latent-space activations—before mapping the nine stakeholder concerns, six business risks, seven transparent system layers, and six architectural alternatives around the model.
+            This episode builds a ground-up foundation across five questions that companies ask in AI system-design interviews: making a language model trustworthy for an enterprise customer, choosing across the full model spectrum, retail demand forecasting, modern RAG and what it pairs with, and building a lean domain-specific agent.
           </p>
-          <div class="actions">
-            <a class="btn" id="ep03-read-btn" href="ep03_enterprise_llm_trust.html">Read Episode 03</a>
-            <a class="btn secondary" id="ep03-pdf-btn" href="ep03_enterprise_llm_trust.pdf">Download PDF</a>
+
+          <div class="actions" style="margin-bottom:0;">
+            <a class="btn secondary" id="ep03-cheat-btn" href="ref/ai-interview-cheat-sheet.html">5-Question Master Cheat Sheet</a>
           </div>
-        </article>
 
-        <article class="episode">
-          <p class="ep-num">Episode 04 · Interview Question 02</p>
-          <h2><a id="ep04-title-link" href="ep04_model_spectrum_economics.html">Open-Weight vs. Proprietary Models Across the Full Model Spectrum</a></h2>
-          <p class="ep-meta">November 2026 · about 10 minutes</p>
-          <p class="ep-summary">
-            Moves past the binary open-vs.-closed debate using a constraint-first selection funnel: enterprise privacy and Zero Data Retention boundaries, GPU memory and utilization math, and a five-tier hybrid router spanning classical ML to frontier reasoning.
-          </p>
-          <div class="actions">
-            <a class="btn" id="ep04-read-btn" href="ep04_model_spectrum_economics.html">Read Episode 04</a>
-            <a class="btn secondary" id="ep04-pdf-btn" href="ep04_model_spectrum_economics.pdf">Download PDF</a>
-          </div>
-        </article>
+          <div class="sub-list">
+            <div class="sub-card">
+              <p class="ep-num">Question 01</p>
+              <h3><a id="ep03-q1-link" href="ep03_q1_enterprise_llm_trust.html">Making an LLM Trustworthy for an Enterprise Customer</a></h3>
+              <p class="ep-meta">about 12 minutes</p>
+              <p class="ep-summary">
+                Opens with how far we can see into a model's reasoning traces—thought summaries, raw thinking tokens, and circuit tracing over latent-space activations—before mapping the nine stakeholder concerns, six business risks, seven transparent system layers, and six architectural alternatives around the model.
+              </p>
+              <div class="actions">
+                <a class="btn" href="ep03_q1_enterprise_llm_trust.html">Read Question 01</a>
+                <a class="btn secondary" href="ep03_q1_enterprise_llm_trust.pdf">Download PDF</a>
+              </div>
+            </div>
 
-        <article class="episode">
-          <p class="ep-num">Episode 05 · Interview Question 03</p>
-          <h2><a id="ep05-title-link" href="ep05_retail_demand_forecasting.html">Production Retail Demand Forecasting and Honest LLM Scoping</a></h2>
-          <p class="ep-meta">November 2026 · about 10 minutes</p>
-          <p class="ep-summary">
-            Explains why tabular GBDTs, time-series foundation models (TimesFM / BigQuery AI.FORECAST), and count models own reconciled demand quantiles after stockout uncensoring, while language models stay in three backtest-gated sidecars.
-          </p>
-          <div class="actions">
-            <a class="btn" id="ep05-read-btn" href="ep05_retail_demand_forecasting.html">Read Episode 05</a>
-            <a class="btn secondary" id="ep05-pdf-btn" href="ep05_retail_demand_forecasting.pdf">Download PDF</a>
-          </div>
-        </article>
+            <div class="sub-card">
+              <p class="ep-num">Question 02</p>
+              <h3><a id="ep03-q2-link" href="ep03_q2_model_spectrum_economics.html">Open-Weight vs. Proprietary Models Across the Full Model Spectrum</a></h3>
+              <p class="ep-meta">about 10 minutes</p>
+              <p class="ep-summary">
+                Moves past the binary open-vs.-closed debate using a constraint-first selection funnel: enterprise privacy and Zero Data Retention boundaries, GPU memory and utilization math, and a five-tier hybrid router spanning classical ML to frontier reasoning.
+              </p>
+              <div class="actions">
+                <a class="btn" href="ep03_q2_model_spectrum_economics.html">Read Question 02</a>
+                <a class="btn secondary" href="ep03_q2_model_spectrum_economics.pdf">Download PDF</a>
+              </div>
+            </div>
 
-        <article class="episode">
-          <p class="ep-num">Episode 06 · Interview Question 04</p>
-          <h2><a id="ep06-title-link" href="ep06_modern_rag_pairings.html">Modern RAG and Multi-Store Context Engineering</a></h2>
-          <p class="ep-meta">November 2026 · about 9 minutes</p>
-          <p class="ep-summary">
-            Covers the six shifts from naive 500-token vector chunks to modern retrieval (structural parsing, contextual prefaces, inline ACLs, hybrid BM25 + dense RRF, reranking, and section hydration) and five production pairings with SQL, graphs, memory, and prefix-cached long context.
-          </p>
-          <div class="actions">
-            <a class="btn" id="ep06-read-btn" href="ep06_modern_rag_pairings.html">Read Episode 06</a>
-            <a class="btn secondary" id="ep06-pdf-btn" href="ep06_modern_rag_pairings.pdf">Download PDF</a>
-          </div>
-        </article>
+            <div class="sub-card">
+              <p class="ep-num">Question 03</p>
+              <h3><a id="ep03-q3-link" href="ep03_q3_retail_demand_forecasting.html">Production Retail Demand Forecasting and Honest LLM Scoping</a></h3>
+              <p class="ep-meta">about 10 minutes</p>
+              <p class="ep-summary">
+                Explains why tabular GBDTs, time-series foundation models (TimesFM / BigQuery AI.FORECAST), and count models own reconciled demand quantiles after stockout uncensoring, while language models stay in three backtest-gated sidecars.
+              </p>
+              <div class="actions">
+                <a class="btn" href="ep03_q3_retail_demand_forecasting.html">Read Question 03</a>
+                <a class="btn secondary" href="ep03_q3_retail_demand_forecasting.pdf">Download PDF</a>
+              </div>
+            </div>
 
-        <article class="episode">
-          <p class="ep-num">Episode 07 · Interview Question 05</p>
-          <h2><a id="ep07-title-link" href="ep07_domain_specific_agent.html">Building a Lean, Domain-Specific Agent</a></h2>
-          <p class="ep-meta">November 2026 · about 12 minutes</p>
-          <p class="ep-summary">
-            Equips one lean agent for domain terminology, cross-referenced rules, and conflicting policies via an offline policy compiler, auto-injected defined terms, parameterized DB lookups, deterministic precedence, and an ADK 2.x workflow traced on a prior-authorization example.
-          </p>
-          <div class="actions">
-            <a class="btn" id="ep07-read-btn" href="ep07_domain_specific_agent.html">Read Episode 07</a>
-            <a class="btn secondary" id="ep07-pdf-btn" href="ep07_domain_specific_agent.pdf">Download PDF</a>
+            <div class="sub-card">
+              <p class="ep-num">Question 04</p>
+              <h3><a id="ep03-q4-link" href="ep03_q4_modern_rag_pairings.html">Modern RAG and Multi-Store Context Engineering</a></h3>
+              <p class="ep-meta">about 9 minutes</p>
+              <p class="ep-summary">
+                Covers the six shifts from naive 500-token vector chunks to modern retrieval (structural parsing, contextual prefaces, inline ACLs, hybrid BM25 + dense RRF, reranking, and section hydration) and five production pairings with SQL, graphs, memory, and prefix-cached long context.
+              </p>
+              <div class="actions">
+                <a class="btn" href="ep03_q4_modern_rag_pairings.html">Read Question 04</a>
+                <a class="btn secondary" href="ep03_q4_modern_rag_pairings.pdf">Download PDF</a>
+              </div>
+            </div>
+
+            <div class="sub-card">
+              <p class="ep-num">Question 05</p>
+              <h3><a id="ep03-q5-link" href="ep03_q5_domain_specific_agent.html">Building a Lean, Domain-Specific Agent</a></h3>
+              <p class="ep-meta">about 12 minutes</p>
+              <p class="ep-summary">
+                Equips one lean agent for domain terminology, cross-referenced rules, and conflicting policies via an offline policy compiler, auto-injected defined terms, parameterized DB lookups, deterministic precedence, and an ADK 2.x workflow traced on a prior-authorization example.
+              </p>
+              <div class="actions">
+                <a class="btn" href="ep03_q5_domain_specific_agent.html">Read Question 05</a>
+                <a class="btn secondary" href="ep03_q5_domain_specific_agent.pdf">Download PDF</a>
+              </div>
+            </div>
           </div>
         </article>
       </section>

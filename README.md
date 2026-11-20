@@ -1,19 +1,13 @@
 # All About Agents
 
-Architecture notes, system-design mental models, and governance blueprints for production AI agents.
+Architecture notes, field guides, and reference blueprints on building and operating production AI systems.
 
 ## Read Online
 
 - **Series home:** <https://evekhm.github.io/all-about-agents/>
 - **Episode 01 — Securing the Agent-to-Database Connection:** [web page](https://evekhm.github.io/all-about-agents/ep01_securing_agent_to_database.html) · [PDF](https://evekhm.github.io/all-about-agents/ep01_securing_agent_to_database.pdf)
 - **Episode 02 — A Mental Model for Designing Agentic Systems:** [web page](https://evekhm.github.io/all-about-agents/ep02_designing_agentic_systems.html) · [PDF](https://evekhm.github.io/all-about-agents/ep02_designing_agentic_systems.pdf) · [Medium](https://medium.com/google-cloud/a-mental-model-for-designing-agentic-systems-aaf90dcc9f3d)
-- **Episode 03 — Making an LLM Trustworthy for an Enterprise Customer:** [web page](https://evekhm.github.io/all-about-agents/ep03_enterprise_llm_trust.html) · [PDF](https://evekhm.github.io/all-about-agents/ep03_enterprise_llm_trust.pdf)
-- **Episode 04 — Open-Weight vs. Proprietary Models Across the Full Model Spectrum:** [web page](https://evekhm.github.io/all-about-agents/ep04_model_spectrum_economics.html) · [PDF](https://evekhm.github.io/all-about-agents/ep04_model_spectrum_economics.pdf)
-- **Episode 05 — Production Retail Demand Forecasting and Honest LLM Scoping:** [web page](https://evekhm.github.io/all-about-agents/ep05_retail_demand_forecasting.html) · [PDF](https://evekhm.github.io/all-about-agents/ep05_retail_demand_forecasting.pdf)
-- **Episode 06 — Modern RAG and Multi-Store Context Engineering:** [web page](https://evekhm.github.io/all-about-agents/ep06_modern_rag_pairings.html) · [PDF](https://evekhm.github.io/all-about-agents/ep06_modern_rag_pairings.pdf)
-- **Episode 07 — Building a Lean, Domain-Specific Agent:** [web page](https://evekhm.github.io/all-about-agents/ep07_domain_specific_agent.html) · [PDF](https://evekhm.github.io/all-about-agents/ep07_domain_specific_agent.pdf)
-- **5-Question Master Cheat Sheet:** [web page](https://evekhm.github.io/all-about-agents/ref/ai-interview-cheat-sheet.html) · [PDF](https://evekhm.github.io/all-about-agents/ref/ai-interview-cheat-sheet.pdf)
-
+- **Episode 03 — Five Foundational Questions in AI System Design:** [Question 01 · Trust](https://evekhm.github.io/all-about-agents/ep03_q1_enterprise_llm_trust.html) · [Question 02 · Model Spectrum](https://evekhm.github.io/all-about-agents/ep03_q2_model_spectrum_economics.html) · [Question 03 · Forecasting](https://evekhm.github.io/all-about-agents/ep03_q3_retail_demand_forecasting.html) · [Question 04 · Modern RAG](https://evekhm.github.io/all-about-agents/ep03_q4_modern_rag_pairings.html) · [Question 05 · Domain Agent](https://evekhm.github.io/all-about-agents/ep03_q5_domain_specific_agent.html) · [Cheat Sheet](https://evekhm.github.io/all-about-agents/ref/ai-interview-cheat-sheet.html)
 ## Topic: Agentic Governance
 
 ### [Episode 01 — Securing the Agent-to-Database Connection](https://evekhm.github.io/all-about-agents/ep01_securing_agent_to_database.html) ([PDF](ep01_securing_agent_to_database.pdf))
@@ -30,10 +24,12 @@ Starts from an abstract sequence of agents and follows it down to what that sket
 
 ## Topic: AI System Design Interviews
 
+### Episode 03 — Five Foundational Questions in AI System Design
+
 Five standalone deep dives covering core questions companies test in AI system-design interviews ([5-Question Master Cheat Sheet](ref/ai-interview-cheat-sheet.html)):
 
-- **[Episode 03 — Making an LLM Trustworthy for an Enterprise Customer](https://evekhm.github.io/all-about-agents/ep03_enterprise_llm_trust.html)** ([PDF](ep03_enterprise_llm_trust.pdf)): Reasoning-trace granularity, weight/activation opacity, nine stakeholder concerns, seven transparent system layers, and six architectural alternatives.
-- **[Episode 04 — Open-Weight vs. Proprietary Models Across the Full Model Spectrum](https://evekhm.github.io/all-about-agents/ep04_model_spectrum_economics.html)** ([PDF](ep04_model_spectrum_economics.pdf)): Governance constraints, Zero Data Retention boundaries, GPU VRAM and utilization math, and a five-tier hybrid router.
-- **[Episode 05 — Production Retail Demand Forecasting and Honest LLM Scoping](https://evekhm.github.io/all-about-agents/ep05_retail_demand_forecasting.html)** ([PDF](ep05_retail_demand_forecasting.pdf)): Stockout uncensoring, quantile safety stock, LightGBM + TimesFM + count ensembles, and three backtest-gated LLM sidecars.
-- **[Episode 06 — Modern RAG and Multi-Store Context Engineering](https://evekhm.github.io/all-about-agents/ep06_modern_rag_pairings.html)** ([PDF](ep06_modern_rag_pairings.pdf)): Six retrieval engineering shifts and five production pairings with SQL, graphs, prefix-cached long context, LoRA, and two-hop memory.
-- **[Episode 07 — Building a Lean, Domain-Specific Agent](https://evekhm.github.io/all-about-agents/ep07_domain_specific_agent.html)** ([PDF](ep07_domain_specific_agent.pdf)): Compiled policy RAG, auto-injected defined terms, parameterized DB access, deterministic precedence, and an ADK 2.x prior-authorization workflow.
+- **[Question 01 — Making an LLM Trustworthy for an Enterprise Customer](https://evekhm.github.io/all-about-agents/ep03_q1_enterprise_llm_trust.html)** ([PDF](ep03_q1_enterprise_llm_trust.pdf)): Reasoning-trace granularity, weight/activation opacity, nine stakeholder concerns, seven transparent system layers, and six architectural alternatives.
+- **[Question 02 — Open-Weight vs. Proprietary Models Across the Full Model Spectrum](https://evekhm.github.io/all-about-agents/ep03_q2_model_spectrum_economics.html)** ([PDF](ep03_q2_model_spectrum_economics.pdf)): Governance constraints, Zero Data Retention boundaries, GPU VRAM and utilization math, and a five-tier hybrid router.
+- **[Question 03 — Production Retail Demand Forecasting and Honest LLM Scoping](https://evekhm.github.io/all-about-agents/ep03_q3_retail_demand_forecasting.html)** ([PDF](ep03_q3_retail_demand_forecasting.pdf)): Stockout uncensoring, quantile safety stock, LightGBM + TimesFM + count ensembles, and three backtest-gated LLM sidecars.
+- **[Question 04 — Modern RAG and Multi-Store Context Engineering](https://evekhm.github.io/all-about-agents/ep03_q4_modern_rag_pairings.html)** ([PDF](ep03_q4_modern_rag_pairings.pdf)): Six retrieval engineering shifts and five production pairings with SQL, graphs, prefix-cached long context, LoRA, and two-hop memory.
+- **[Question 05 — Building a Lean, Domain-Specific Agent](https://evekhm.github.io/all-about-agents/ep03_q5_domain_specific_agent.html)** ([PDF](ep03_q5_domain_specific_agent.pdf)): Compiled policy RAG, auto-injected defined terms, parameterized DB access, deterministic precedence, and an ADK 2.x prior-authorization workflow.

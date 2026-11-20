@@ -4,12 +4,12 @@
 <meta charset="UTF-8">
 <meta name="author" content="Eva Khmelinskaya">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="A retail stakeholder asks if a language model can forecast store-level SKU demand; we cover how retail forecasting works from the ground up and place each model family where it excels.">
-<meta property="og:title" content="Production Retail Demand Forecasting and Honest LLM Scoping">
-<meta property="og:description" content="A retail stakeholder asks if a language model can forecast store-level SKU demand; we cover how retail forecasting works from the ground up and place each model family where it excels.">
+<meta name="description" content="Moving beyond fixed-window vector chunking to understand how modern retrieval works and which complementary data engines it pairs with in production.">
+<meta property="og:title" content="Modern RAG and Multi-Store Context Engineering">
+<meta property="og:description" content="Moving beyond fixed-window vector chunking to understand how modern retrieval works and which complementary data engines it pairs with in production.">
 <meta property="og:type" content="article">
-<meta property="og:url" content="https://evekhm.github.io/all-about-agents/ep05_retail_demand_forecasting.html">
-<title>All About Agents — Production Retail Demand Forecasting and Honest LLM Scoping</title>
+<meta property="og:url" content="https://evekhm.github.io/all-about-agents/ep03_q4_modern_rag_pairings.html">
+<title>All About Agents — Modern RAG and Multi-Store Context Engineering</title>
 <style>
   :root,
   html[data-theme="light"] {
@@ -860,13 +860,12 @@
 <body>
 
 <header class="topbar">
-  <a class="brand" id="brand-home-link" href="index.html">All About Agents · Episode 05</a>
+  <a class="brand" id="brand-home-link" href="index.html">All About Agents · Episode 03 · Q4</a>
   <nav class="navlinks">
     <a class="home-link" id="home-link" href="index.html">← Home</a>
     <a href="#intro">Overview</a>
-    <a href="#sec-1">The Four Mechanics That</a>
-    <a href="#sec-2">Why Text LLMs Fail</a>
-    <a href="#sec-3">Where Language and Multimodal</a>
+    <a href="#sec-1">Six Engineering Shifts That</a>
+    <a href="#sec-2">What Modern RAG Combines</a>
     <a href="#references">References</a>
     <button class="theme-btn" id="theme-toggle" type="button">◑ Switch to Dark Mode</button>
   </nav>
@@ -877,15 +876,15 @@
   <section class="hero" id="intro">
     <div class="hero-card">
       <div class="hero-top">
-        <span class="eyebrow">Episode 05 · AI System Design Interviews · Question 03</span>
-        <h1>Production Retail Demand Forecasting and Honest LLM Scoping</h1>
-        <p>A retail stakeholder asks if a language model can forecast store-level SKU demand; we cover how retail forecasting works from the ground up and place each model family where it excels.</p>
+        <span class="eyebrow">Episode 03 · AI System Design Interviews · Question 04</span>
+        <h1>Modern RAG and Multi-Store Context Engineering</h1>
+        <p>Moving beyond fixed-window vector chunking to understand how modern retrieval works and which complementary data engines it pairs with in production.</p>
       </div>
     </div>
     <div class="sheet-b">
       <div class="post-prose">
-        <p>In this episode, we tackle a classic scoping question: whether a language model can run store-level SKU demand forecasting. We break down the four retail demand mechanics (stockout uncensoring, three SKU regimes, quantile safety stock, and hierarchical reconciliation), explain why LightGBM, TimesFM (BigQuery AI.FORECAST), and count models own the numerical core, and place language models in three backtest-gated sidecars.</p>
-        <p>Next in this track: <a href="ep06_modern_rag_pairings.html">Episode 06 · Modern RAG and Multi-Store Context Engineering</a> (or view the <a href="ref/ai-interview-cheat-sheet.html">5-Question Master Cheat Sheet</a>).</p>
+        <p>In this episode, we examine how Retrieval-Augmented Generation has evolved beyond naive 500-token vector chunks—and why million-token context windows have not replaced it. We walk through the six engineering shifts behind modern RAG and five production pairings with parameterized SQL, graphs, prefix-cached long context, fine-tuned adapters, and two-hop memory.</p>
+        <p>Next in Episode 03: <a href="ep03_q5_domain_specific_agent.html">Question 05 · Building a Lean, Domain-Specific Agent</a> (or view the <a href="ref/ai-interview-cheat-sheet.html">5-Question Master Cheat Sheet</a>).</p>
       </div>
     </div>
   </section>
@@ -895,78 +894,37 @@
       <div class="post-prose">
 
         <p>
-          Retail demand forecasting predicts future unit demand across a massive three-dimensional panel (<code>Store × SKU × Day</code> or Week) spanning tens of thousands of products across hundreds or thousands of locations. Every downstream physical decision depends on those numbers: automated vendor purchase orders, distribution-center pallet allocation, store labor scheduling, and perishable markdowns. Four domain mechanics explain why specialized tabular and time-series models own the numerical core.
+          Retrieval-Augmented Generation remains essential in enterprise systems, though the early 2023 recipe of slicing PDFs into arbitrary 500-token windows, computing dense cosine similarity, and pasting the top five snippets into a prompt has evolved into a multi-stage retrieval architecture. Even with million-token context windows available, dumping an entire enterprise repository into a prompt fails on three operational grounds: enterprise knowledge bases hold millions of documents requiring pre-inference user access-control (ACL) and tenant filtering, uncached multi-hundred-thousand-token prompts add multi-second prefill latency and linear cost on every turn, and burying a few governing sentences inside massive noisy context degrades middle-of-prompt recall (<a href="https://arxiv.org/abs/2307.03172" target="_blank" rel="noopener">Liu et al., TACL 2024</a>). Modern architectures use retrieval to narrow millions of ACL-governed records down to the right three to five documents, and then use long context windows to hydrate complete, coherent sections intact.
         </p>
 
-        <h2 id="sec-1">1. The Four Mechanics That Define Retail Demand</h2>
-        <ul>
-          <li>
-            <strong>Stockout Censoring (Observed Sales vs. True Demand):</strong> Point-of-sale (POS) systems record <em>units sold</em>, which equals true customer demand only while inventory sits on the shelf. If a store stocks 12 cartons of strawberries on Saturday morning, sells out by 11:00 a.m., and turns away 25 shoppers in the afternoon, POS logs record <code>sales = 12</code> on Saturday and <code>sales = 0</code> on Sunday, since the next delivery arrives on Monday. Feeding raw POS zeros directly into any forecasting model creates a <strong>replenishment death spiral</strong>: the model mistakes out-of-stock zeros for zero shopper interest, lowers next week's forecast, orders even fewer units, and triggers earlier stockouts. Production pipelines always join daily <code>inventory_on_hand</code> snapshots first, mask stockout periods (<code>inventory == 0</code>) as right-censored observations, and impute unconstrained latent demand before model fitting.
-          </li>
-          <li>
-            <strong>Three Distinct SKU Regimes (Dense, Cold-Start, and Intermittent Tail):</strong> High-velocity staples (milk, bananas, cola) generate smooth daily curves driven by price elasticity, promotions, holidays, payday cycles, and sibling-SKU cannibalization (putting 12-packs on 30% promo depresses sales of the 6-packs next to them). Newly launched seasonal apparel or electronics arrive with zero historical sales (cold start). Meanwhile, 50% to 70% of a typical catalog sits in the slow-moving intermittent tail (auto parts, specialty cookware, fringe sizes), where most days record legitimate zero sales punctuated by occasional 1-to-3-unit purchases.
-          </li>
-          <li>
-            <strong>Asymmetric Replenishment Economics and Quantile Forecasts (<code>P10 / P50 / P90</code>):</strong> Ordering strictly to a median point forecast (<code>P50</code>) leaves stores out of stock on roughly half of supplier lead-time cycles. Retail replenishment solves an asymmetric Newsvendor trade-off using probabilistic quantiles trained with <strong>pinball loss</strong>: fresh cut fruit with high 48-hour spoilage cost is ordered near <code>P55–P60</code>, whereas high-margin shelf-stable batteries with high lost-sale cost and negligible holding cost are ordered at <code>P85–P95</code>. One critical mathematical rule governs lead times: daily <code>P90</code> predictions are per-day marginals, so summing seven daily <code>P90</code> values assumes perfect error correlation across all seven days and inflates safety stock; production pipelines forecast directly over the supplier lead-time window (such as 7-day cumulative demand) or simulate joint trajectories.
-          </li>
-          <li>
-            <strong>Hierarchical Coherence and Retail Error Metrics:</strong> Merchandising VPs plan national category budgets, regional warehouses allocate pallets, and local stores replenish shelves. Independent models rarely add up across levels, so production systems apply <strong>Minimum Trace (MinT) / weighted least-squares hierarchical reconciliation</strong> so noisy store-SKU forecasts borrow statistical strength from category trends and sum cleanly to regional totals. Teams evaluate accuracy using <strong>WAPE</strong> (Weighted Absolute Percentage Error: <code>sum(|actual - forecast|) / sum(actual)</code>, avoiding division-by-zero blowups on zero-sale days), <strong>Forecast Bias</strong> (<code>sum(forecast - actual) / sum(actual)</code> to catch systematic over- or under-ordering), and <strong>Pinball Loss</strong> across target quantiles.
-          </li>
-        </ul>
-
-        <h2 id="sec-2">2. Why Text LLMs Fail on Raw Time Series and Which Numerical Models Own the Core</h2>
+        <h2 id="sec-1">1. Six Engineering Shifts That Evolved Naive Vector Search into Modern RAG</h2>
         <p>
-          Passing historical sales arrays into a conversational text LLM produces miscalibrated numbers, breaks seasonality, and explodes inference budgets across millions of SKU-store combinations.
-        </p>
-        <p>
-          Autoregressive language models split numbers into arbitrary subword text tokens, lack continuous inductive bias for periodic frequencies or lag autocorrelation, shift seasonal phase if a single date is missing, and cannot calibrate pinball-loss quantiles. Controlled ablations confirm that replacing text-LLM backbones with lightweight attention or linear patching layers matches or improves forecasting accuracy at orders-of-magnitude lower compute cost (<a href="https://arxiv.org/abs/2406.16964" target="_blank" rel="noopener">Tan et al., NeurIPS 2024</a>). Production retail architectures instead run a three-part numerical ensemble (<em>Figure 1</em>):
+          Each stage of the 2026 retrieval stack exists to fix a specific failure mode observed when early vector-only prototypes met real enterprise documents:
         </p>
         <ol>
-          <li><strong>Global Tabular GBDTs (<code>LightGBM</code> / <code>XGBoost</code>) or Dense Time-Series Encoders (<code>TiDE</code>):</strong> Own mature, promotion-sensitive SKUs because tree splits and dense covariates capture non-linear price thresholds, promo mechanics (BOGO vs. end-cap display), cross-SKU cannibalization, calendar flags, and local weather.</li>
-          <li><strong>Pretrained Time-Series Foundation Models (<code>TimesFM</code>, <a href="https://arxiv.org/abs/2310.10688" target="_blank" rel="noopener">Das et al., ICML 2024</a>):</strong> <code>TimesFM</code> is a patch-decoder foundation model pretrained directly on about 100 billion real and synthetic <em>numerical time-series</em> points, which sets it apart from a text LLM. Exposed directly in SQL via BigQuery <code>AI.FORECAST</code> (<a href="https://docs.cloud.google.com/bigquery/docs/reference/standard-sql/bigqueryml-syntax-ai-forecast" target="_blank" rel="noopener">Google Cloud, 2026</a>), it produces strong zero-shot trend, multi-seasonality, and prediction-interval baselines for cold-start stores, short-history SKUs, and rapid SQL analytics without per-SKU training pipelines.</li>
-          <li><strong>Discrete Count and Hurdle Models (<code>Croston-TSB</code>, Negative Binomial, Two-Stage Hurdle GBDT):</strong> Own intermittent slow-moving tail SKUs where continuous instance normalization degenerates on near-zero variance, modeling demand occurrence probability (<code>P(demand &gt; 0)</code>) separately from conditional order size.</li>
+          <li>
+            <strong>Layout-Aware Structural Parsing (Fixes Severed Tables and Orphaned Exceptions):</strong> Fixed token splitters slice a 200-row pricing table away from its column headers and cut <em>"Except as provided in subsection (c)"</em> away from the rule above it. Modern ingestion parses document XML and PDF layout structure, keeps numbered clauses whole, preserves ancestor heading breadcrumbs, and repeats column headers on every table block.
+          </li>
+          <li>
+            <strong>Contextual Retrieval Prefaces (Fixes Anonymous Chunks):</strong> A chunk reading <em>"Quarterly revenue grew 3%, while service fees rose 4% in Region B"</em> lacks the company name, contract title, and fiscal year. Prepending a compact 50-to-100-token document-and-section context summary to each chunk prior to both dense embedding and lexical indexing reduced retrieval failure rates by <code>49%</code> on its own and by <code>67%</code> when combined with reranking (<a href="https://www.anthropic.com/research/contextual-retrieval" target="_blank" rel="noopener">Anthropic, Sep 2024</a>).
+          </li>
+          <li>
+            <strong>Inline Pre-Filtering + Hybrid Lexical BM25 + Dense Vector + RRF (Fixes Exact-Code Blindness and Recall Collapse):</strong> Dense embeddings capture semantic synonyms well while blurring exact SKU numbers, error codes, procedure codes (<code>10021</code> vs. <code>10022</code>), statute identifiers, and dosages. In parallel, filtering tenant ACLs <em>after</em> approximate nearest-neighbor graph search collapses recall when a user is allowed to see only 2% of the corpus. Modern stores enforce caller ACL principals and active date filters inline during index scan, execute sparse lexical BM25 alongside dense vector search, and merge the top 30 to 50 candidates via Reciprocal Rank Fusion (RRF).
+          </li>
+          <li>
+            <strong>Cross-Encoder Reranking (Fixes Bi-Encoder Precision Gaps):</strong> Fast bi-encoders compress query and document into single vectors independently. Running a compact cross-encoder reranker over the top 40 fused candidates attends across query and passage tokens jointly, promoting the 5 to 10 passages that directly answer the question.
+          </li>
+          <li>
+            <strong>Parent-Section and Whole-Document Hydration (Fixes Fragmented Reasoning):</strong> Indexing happens at fine clause or section granularity for sharp matching, while retrieval swaps matched child chunks for their complete parent section (or whole policy when under 15K–30K tokens) so qualifiers and definitions travel together.
+          </li>
+          <li>
+            <strong>Bounded Agentic Search and Supersession Lineage (Fixes Multi-Aspect Queries and Stale Re-Imports):</strong> A bounded retrieval loop decomposes compound questions into targeted sub-queries and checks whether retrieved passages leave an unresolved cross-reference (capped at 1 to 2 follow-up hops). In living workspaces, outdated meeting notes overridden by signed contracts are marked <code>role: "superseded"</code> with a <code>superseded_by</code> pointer so automated folder syncs preserve history without re-importing stale numbers.
+          </li>
         </ol>
 
-        <p>
-          The SQL sketch below illustrates running zero-shot probabilistic 14-day forecasting across store-SKU series in BigQuery using <code>AI.FORECAST</code> (backed by <code>TimesFM</code>) <em>after</em> joining inventory snapshots to replace stockout zeros with imputed latent demand:
-        </p>
-        <div class="code-card">
-          <div class="code-title">Zero-Shot Probabilistic SKU-Store Baseline Forecast over Stockout-Uncensored Demand (BigQuery AI.FORECAST)</div>
-<pre><span class="hl-k">WITH</span> uncensored_daily_panel <span class="hl-k">AS</span> (
-  <span class="hl-k">SELECT</span>
-    store_id,
-    sku_id,
-    sales_date,
-    <span class="hl-c">-- Use observed POS units when stock is available; use imputed latent demand on stockout days</span>
-    <span class="hl-k">CASE</span>
-      <span class="hl-k">WHEN</span> ending_inventory_units &gt; <span class="hl-n">0</span> <span class="hl-k">THEN</span> CAST(pos_units_sold <span class="hl-k">AS</span> FLOAT64)
-      <span class="hl-k">ELSE</span> imputed_latent_demand_units
-    <span class="hl-k">END</span> <span class="hl-k">AS</span> true_demand_units
-  <span class="hl-k">FROM</span> <span class="hl-s">`retail_prod.daily_store_sku_panel`</span>
-  <span class="hl-k">WHERE</span> sales_date &gt;= DATE_SUB(CURRENT_DATE(), <span class="hl-k">INTERVAL</span> <span class="hl-n">365</span> DAY)
-    <span class="hl-k">AND</span> sku_regime <span class="hl-k">IN</span> (<span class="hl-s">'SEASONAL_SHORT_HISTORY'</span>, <span class="hl-s">'CORE_BASELINE'</span>)
-)
-<span class="hl-k">SELECT</span>
-  store_id,
-  sku_id,
-  forecast_timestamp,
-  forecast_value <span class="hl-k">AS</span> p50_demand,                     <span class="hl-c">-- Median (50th percentile) forecast</span>
-  prediction_interval_lower_bound <span class="hl-k">AS</span> p10_demand,    <span class="hl-c">-- Lower bound at confidence_level = 0.80</span>
-  prediction_interval_upper_bound <span class="hl-k">AS</span> p90_demand     <span class="hl-c">-- Upper bound (90th percentile safety stock)</span>
-<span class="hl-k">FROM</span>
-  <span class="hl-f">AI.FORECAST</span>(
-    (<span class="hl-k">SELECT</span> * <span class="hl-k">FROM</span> uncensored_daily_panel),
-    data_col =&gt; <span class="hl-s">'true_demand_units'</span>,
-    timestamp_col =&gt; <span class="hl-s">'sales_date'</span>,
-    id_cols =&gt; [<span class="hl-s">'store_id'</span>, <span class="hl-s">'sku_id'</span>],
-    horizon =&gt; <span class="hl-n">14</span>,
-    confidence_level =&gt; <span class="hl-n">0.80</span>
-  );</pre>
-        </div>
-
         
-<div class="diagram-frame" id="fig-q3">
-  <svg viewBox="0 0 920 606" role="img" aria-label="Production retail demand forecasting pipeline separating the numerical forecasting core from scoped multimodal and language-model sidecars">
+<div class="diagram-frame" id="fig-q4">
+  <svg viewBox="0 0 920 596" role="img" aria-label="Modern 2026 retrieval architecture combining structure-aware ingestion, hybrid lexical and dense search with reranking, parameterized SQL tools, graph traversal, and prefix-cached long-context hydration">
     
   <defs>
     <marker id="arr-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -986,149 +944,151 @@
     </marker>
   </defs>
 
-    <rect x="14" y="14" width="892" height="578" rx="14" style="fill:var(--panel-2);stroke:var(--line);stroke-width:1.8"/>
+    <rect x="14" y="14" width="892" height="568" rx="14" style="fill:var(--panel-2);stroke:var(--line);stroke-width:1.8"/>
 
-    <!-- Top Sidecar Zone: Scoped LLM / Multimodal Feature Extractor -->
-    <rect class="zone-ours" x="32" y="30" width="856" height="118" rx="10" style="fill:var(--panel)"/>
-    <text class="t-m-v" x="50" y="53">SCOPED MULTIMODAL &amp; LLM SIDECAR A · UPSTREAM EXOGENOUS FEATURES (OFFLINE / ASYNC)</text>
+    <!-- Top Band: Ingestion & Epistemic Indexing -->
+    <rect class="b-store" x="32" y="30" width="856" height="96" rx="10"/>
+    <text class="t-m-c" x="50" y="54" style="fill:var(--amber)">OFFLINE INGESTION · STRUCTURE, CONTEXTUAL PREFACES, ACLs &amp; SUPERSESSION LINEAGE</text>
+    <text class="t-b" x="50" y="79">Layout &amp; Table-Header Parser  →  Contextual Chunk Preface  →  ACL + Effective-Date + Supersession Tags</text>
+    <text class="t-s" x="50" y="103">Keeps section trees &amp; table headers intact, indexes BM25 + dense vectors + links, and marks old records superseded_by</text>
 
-    <rect class="node-card" x="50" y="66" width="236" height="68" rx="8"/>
-    <text class="t-b" x="168" y="92" text-anchor="middle">Unstructured Inputs</text>
-    <text class="t-s" x="168" y="114" text-anchor="middle">Promo PDFs, supplier emails, photos</text>
+    <!-- Query & ACL Router -->
+    <line x1="460" y1="126" x2="460" y2="148" class="flow" marker-end="url(#arr-ink)"/>
+    <rect class="b-code" x="32" y="152" width="856" height="66" rx="9"/>
+    <text class="t-b" x="460" y="179" text-anchor="middle">Runtime Query &amp; Identity Router (Propagates Caller ACL Token &amp; Effective-Date Scope First)</text>
+    <text class="t-s" x="460" y="201" text-anchor="middle">Dispatches structured sub-queries across specialized stores based on question shape</text>
 
-    <line x1="286" y1="100" x2="312" y2="100" class="flow" marker-end="url(#arr-ink)"/>
+    <!-- 4 Parallel Context Paths -->
+    <line x1="150" y1="218" x2="150" y2="244" class="flow" marker-end="url(#arr-ink)"/>
+    <line x1="365" y1="218" x2="365" y2="244" class="flow" marker-end="url(#arr-ink)"/>
+    <line x1="585" y1="218" x2="585" y2="244" class="flow" marker-end="url(#arr-ink)"/>
+    <line x1="790" y1="218" x2="790" y2="244" class="flow" marker-end="url(#arr-ink)"/>
 
-    <rect class="b-model" x="316" y="66" width="258" height="68" rx="8"/>
-    <text class="t-b" x="445" y="92" text-anchor="middle">Multimodal / LLM Extractor</text>
-    <text class="t-s" x="445" y="114" text-anchor="middle">Typed promo flags &amp; cold-start analogs</text>
+    <!-- Path 1: Hybrid RAG + Rerank -->
+    <rect class="node-cyan" x="32" y="248" width="232" height="176" rx="9"/>
+    <text class="t-m-c" x="48" y="272">1 · HYBRID SEARCH + RERANK</text>
+    <text class="t-b" x="48" y="295">Unstructured Prose</text>
+    <text class="t-s" x="48" y="318">• Inline ACL + date pre-filter</text>
+    <text class="t-s" x="48" y="338">• Dense vector + lexical BM25</text>
+    <text class="t-s" x="48" y="358">• RRF rank fusion (top 40)</text>
+    <text class="t-s" x="48" y="378">• Cross-encoder rerank (top 5)</text>
+    <text class="t-s" x="48" y="398">• Hydrate parent section</text>
 
-    <line x1="574" y1="100" x2="600" y2="100" class="flow-g" marker-end="url(#arr-good)"/>
+    <!-- Path 2: SQL & Live APIs -->
+    <rect class="b-code" x="278" y="248" width="200" height="176" rx="9"/>
+    <text class="t-m-g" x="294" y="272">2 · SQL &amp; LIVE TOOLS</text>
+    <text class="t-b" x="294" y="295">Exact State &amp; Math</text>
+    <text class="t-s" x="294" y="318">• Parameterized SQL</text>
+    <text class="t-s" x="294" y="338">• Aggregations &amp; counts</text>
+    <text class="t-s" x="294" y="358">• Live ERP / ledger APIs</text>
+    <text class="t-s" x="294" y="378">• Numeric range bounds</text>
+    <text class="t-s" x="294" y="398">• Row-level security</text>
 
-    <rect class="b-code" x="604" y="66" width="266" height="68" rx="8"/>
-    <text class="t-b" x="737" y="92" text-anchor="middle">Backtest Validation Gate</text>
-    <text class="t-s" x="737" y="114" text-anchor="middle">Admits feature if WAPE drops &gt;= 3%</text>
+    <!-- Path 3: Graph Traversal -->
+    <rect class="b-store" x="492" y="248" width="200" height="176" rx="9"/>
+    <text class="t-m-c" x="508" y="272" style="fill:var(--amber)">3 · GRAPH TRAVERSAL</text>
+    <text class="t-b" x="508" y="295">Multi-Hop Links</text>
+    <text class="t-s" x="508" y="318">• Cross-policy citations</text>
+    <text class="t-s" x="508" y="338">• Dependency &amp; org tiers</text>
+    <text class="t-s" x="508" y="358">• Vector seed → 1–2 hop</text>
+    <text class="t-s" x="508" y="378">  deterministic walk</text>
+    <text class="t-s" x="508" y="398">• Preserves exact clauses</text>
 
-    <!-- Arrow down from feature gate into Numerical Core -->
-    <path d="M 737 134 L 737 156 L 448 156 L 448 176" class="flow-g" marker-end="url(#arr-good)"/>
+    <!-- Path 4: Workspace & Episodic Memory -->
+    <rect class="node-card" x="706" y="248" width="182" height="176" rx="9"/>
+    <text class="t-m-c" x="722" y="272">4 · MEMORY &amp; INDEX</text>
+    <text class="t-b" x="722" y="295">2-Hop State</text>
+    <text class="t-s" x="722" y="318">• Compact root index</text>
+    <text class="t-s" x="722" y="338">• Small domain files</text>
+    <text class="t-s" x="722" y="358">• Verified case history</text>
+    <text class="t-s" x="722" y="378">• Fewer tokens read</text>
+    <text class="t-s" x="722" y="398">  on every turn</text>
 
-    <!-- Middle Zone: Deterministic & Numerical Forecasting Core -->
-    <rect x="32" y="178" width="856" height="270" rx="11" style="fill:var(--panel);stroke:var(--good);stroke-width:2.2"/>
-    <text class="t-m-g" x="50" y="202">NUMERICAL FORECASTING &amp; OPTIMIZATION CORE · ZERO TEXT LLMs ON RAW TIME SERIES</text>
+    <!-- Converge into Long-Context Window + Corrective Check -->
+    <line x1="150" y1="424" x2="150" y2="452" class="flow-g" marker-end="url(#arr-good)"/>
+    <line x1="378" y1="424" x2="378" y2="452" class="flow-g" marker-end="url(#arr-good)"/>
+    <line x1="592" y1="424" x2="592" y2="452" class="flow-g" marker-end="url(#arr-good)"/>
+    <line x1="790" y1="424" x2="790" y2="452" class="flow-g" marker-end="url(#arr-good)"/>
 
-    <!-- Left: POS + Inventory Uncensoring -->
-    <rect class="b-store" x="50" y="218" width="180" height="210" rx="9"/>
-    <text class="t-b" x="140" y="246" text-anchor="middle">Structured Panel</text>
-    <text class="t-s" x="140" y="270" text-anchor="middle">• POS sales history</text>
-    <text class="t-s" x="140" y="291" text-anchor="middle">• Daily inventory</text>
-    <text class="t-s" x="140" y="312" text-anchor="middle">• Price &amp; calendar</text>
-    <line x1="68" y1="330" x2="212" y2="330" style="stroke:var(--line);stroke-width:1.2"/>
-    <text class="t-m-g" x="140" y="352" text-anchor="middle">UNCENSOR DEMAND</text>
-    <text class="t-s" x="140" y="373" text-anchor="middle">Mask stockout zeros</text>
-    <text class="t-s" x="140" y="392" text-anchor="middle">(inv == 0) &amp; impute</text>
-    <text class="t-s" x="140" y="411" text-anchor="middle">latent true demand</text>
-
-    <line x1="230" y1="323" x2="250" y2="323" class="flow-g" marker-end="url(#arr-good)"/>
-
-    <!-- Center: 3-Regime Model Ensemble -->
-    <rect class="b-code" x="254" y="218" width="348" height="64" rx="8"/>
-    <text class="t-b" x="428" y="243" text-anchor="middle">1 · Global GBDTs (LightGBM / XGBoost)</text>
-    <text class="t-s" x="428" y="264" text-anchor="middle">Dense SKUs: promos, price elasticity &amp; halos</text>
-
-    <rect class="b-code" x="254" y="291" width="348" height="64" rx="8"/>
-    <text class="t-b" x="428" y="316" text-anchor="middle">2 · Time-Series FM (TimesFM / AI.FORECAST)</text>
-    <text class="t-s" x="428" y="337" text-anchor="middle">Zero-shot cold-start, short history &amp; SQL baselines</text>
-
-    <rect class="b-code" x="254" y="364" width="348" height="64" rx="8"/>
-    <text class="t-b" x="428" y="389" text-anchor="middle">3 · Intermittent Count (Croston-TSB / Hurdle)</text>
-    <text class="t-s" x="428" y="410" text-anchor="middle">Slow-moving tail SKUs: occurrence × order size</text>
-
-    <line x1="602" y1="323" x2="620" y2="323" class="flow-g" marker-end="url(#arr-good)"/>
-
-    <!-- Right: Reconciliation + Quantiles + Replenishment -->
-    <rect class="b-code" x="624" y="218" width="246" height="210" rx="9"/>
-    <text class="t-b" x="747" y="246" text-anchor="middle">Reconcile &amp; Optimize</text>
-    <text class="t-s" x="747" y="270" text-anchor="middle">• MinT hierarchy coherence</text>
-    <text class="t-s" x="747" y="291" text-anchor="middle">  (SKU → Store → Region)</text>
-    <text class="t-s" x="747" y="314" text-anchor="middle">• Lead-time quantiles:</text>
-    <text class="t-s" x="747" y="334" text-anchor="middle">  P10 / P50 / P90 pinball</text>
-    <line x1="640" y1="350" x2="854" y2="350" style="stroke:var(--line);stroke-width:1.2"/>
-    <text class="t-m-g" x="747" y="372" text-anchor="middle">ORDER OPTIMIZER</text>
-    <text class="t-s" x="747" y="393" text-anchor="middle">Perishables ~P55 vs.</text>
-    <text class="t-s" x="747" y="412" text-anchor="middle">shelf-stable goods ~P90</text>
-
-    <!-- Arrow down to Planner Copilot Sidecar -->
-    <line x1="741" y1="428" x2="741" y2="462" class="flow" marker-end="url(#arr-cyan)" style="stroke:var(--cyan)"/>
-
-    <!-- Bottom Sidecar Zone: Planner Explainability & Bounded Shock Proposals -->
-    <rect class="zone-ours" x="32" y="466" width="856" height="108" rx="10" style="fill:var(--panel)"/>
-    <text class="t-m-v" x="50" y="489">SCOPED LLM SIDECARS B &amp; C · PLANNER DECISION SUPPORT (READS FORECAST OUTPUTS &amp; SHAP DRIVERS)</text>
-
-    <rect class="b-model" x="50" y="500" width="402" height="60" rx="8"/>
-    <text class="t-b" x="251" y="525" text-anchor="middle">Merchandiser Copilot &amp; Scenario Runner</text>
-    <text class="t-s" x="251" y="546" text-anchor="middle">Explains SHAP drivers &amp; runs parameterized what-if calls</text>
-
-    <rect class="b-model" x="470" y="500" width="400" height="60" rx="8"/>
-    <text class="t-b" x="670" y="525" text-anchor="middle">Human-Approved Shock Proposal Card</text>
-    <text class="t-s" x="670" y="546" text-anchor="middle">Bounded RESCALE / OVERWRITE for store closures or strikes</text>
+    <rect class="b-model" x="32" y="456" width="856" height="104" rx="10"/>
+    <text class="t-m-v" x="52" y="481">5 · PREFIX-CACHED LONG-CONTEXT SYNTHESIS + BOUNDED CORRECTIVE LOOP (MAX 2 HOPS)</text>
+    <text class="t-b" x="52" y="506">Static System &amp; Cached Reference Prefix First  →  Hydrated Whole Sections &amp; SQL Rows  →  Grounded Answer</text>
+    <text class="t-s" x="52" y="531">If evidence is missing a referenced section, executes a targeted follow-up lookup; emits server-verified inline citations</text>
   </svg>
   <div class="fig-caption">
-    <span>Figure 1 — Production retail demand forecasting: tabular GBDTs, time-series foundation models, and count models compute reconciled quantiles, while language models stay in validated upstream feature extraction and planner decision support.</span>
+    <span>Figure 1 — Modern 2026 context architecture: retrieval narrows millions of ACL-governed records down to the right coherent sections, combining hybrid search and reranking with parameterized SQL, graph hops, two-hop memory, and prefix-cached long context.</span>
     <div class="legend-items">
-      <span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good)"></i> Numerical ML &amp; optimization</span>
-      <span><i class="swatch-dot" style="background:var(--amber-soft);border-color:var(--amber)"></i> Structured retail panel</span>
-      <span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> Scoped multimodal / LLM sidecar</span>
+      <span><i class="swatch-dot" style="background:var(--cyan-soft);border-color:var(--cyan)"></i> Hybrid search &amp; rerank</span>
+      <span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good)"></i> Deterministic router &amp; SQL</span>
+      <span><i class="swatch-dot" style="background:var(--amber-soft);border-color:var(--amber)"></i> Metadata &amp; graph store</span>
+      <span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> Grounded synthesis</span>
     </div>
   </div>
 </div>
 
 
-        <h2 id="sec-3">3. Where Language and Multimodal Models Genuinely Fit and How to Avoid Overselling</h2>
+        <h2 id="sec-2">2. What Modern RAG Combines With in Production and What Each Pairing Solves</h2>
         <p>
-          Important real-world demand shocks live in unstructured supplier emails, PDF promotional flyers, and catalog photos that tabular models cannot read natively, while asking a language model to predict raw SKU numbers directly produces noisy, miscalibrated orders.
+          Real business questions rarely live inside unstructured text alone; users ask questions that span prose rules, live database ledgers, multi-hop entity networks, domain formatting conventions, and ongoing session history.
         </p>
         <p>
-          Place multimodal and language models in three bounded sidecars around the numerical core, and hold every extracted feature to a strict backtest gate:
+          In production, RAG functions as one specialized arm inside a multi-store context router (<em>Table 1</em>):
         </p>
-        <ul>
-          <li><strong>Sidecar A · Upstream Exogenous Feature &amp; Cold-Start Analog Extraction:</strong> Parse unstructured vendor delay notices, regional promo calendars, and multimodal product images + fabric descriptions into typed tabular columns (<code>promo_mechanic = "BOGO"</code>, <code>supplier_lead_time_delta_days = +5</code>) or nearest-neighbor historical SKU analogs for Day-0 launches. Admit an LLM-extracted covariate into production only if historical walk-forward backtesting proves it reduces out-of-sample WAPE by a meaningful margin (for instance, <code>&gt;= 3%</code>) and passes a timestamp-shuffle check against spurious correlation.</li>
-          <li><strong>Sidecar B · Auditable Shock-Adjustment Proposals for Unprecedented Events:</strong> When a one-off event occurs outside historical training data (a temporary store remodel closure, port strike, or sudden tariff change), have the model draft a human-reviewed proposal card specifying bounded post-processing operators on the numerical quantile curve (such as <code>OVERWRITE = 0</code> during closure dates or a bounded <code>RESCALE</code> multiplier) with linked source evidence.</li>
-          <li><strong>Sidecar C · Merchandiser Explainability &amp; What-If Copilot:</strong> Translate a planner's natural-language question (<em>"Why is the Northeast cold-brew forecast up 28% next week, and what if we shift the 20% promo by seven days?"</em>) into parameterized calls against SHAP feature attributions and the GBDT/TimesFM forecasting service, and return grounded explanations and exception summaries.</li>
-        </ul>
 
         <div class="nine-q-wrap">
-          <div class="nine-q-head">Table 1 · Scoping Retail AI Honestly and Keeping Language-Model Claims Realistic</div>
+          <div class="nine-q-head">Table 1 · Five Production Combinations with Modern RAG and What Each Pairing Solves</div>
           <div class="tbl-wrap">
             <table>
               <thead>
                 <tr>
-                  <th>Executive Question</th>
-                  <th>Overpromised Pitch Risk</th>
-                  <th>Honest, High-Trust Architectural Framing</th>
+                  <th>Production Combination</th>
+                  <th>Problem Solved</th>
+                  <th>Division of Labor</th>
+                  <th>Concrete Example</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td><b>"Can an LLM replace our demand forecasting pipeline?"</b></td>
-                  <td>High token bills, broken seasonality, uncalibrated safety stock, and immediate pushback from customer data scientists</td>
-                  <td>"Tabular GBDTs and pretrained time-series foundation models (<code>TimesFM</code>) own the numerical quantiles at a small fraction of the cost; language models extract unstructured promo/supply signals and power the planner copilot."</td>
+                  <td><b>1. RAG + Parameterized SQL &amp; Live APIs</b></td>
+                  <td>Vector chunks cannot count rows, sum ledgers, or read live order state</td>
+                  <td><b>RAG</b> retrieves prose rules &amp; SLA terms; <b>SQL / MCP tools</b> fetch live counts, balances, &amp; row-secured records</td>
+                  <td>"Under our cold-chain SLA (RAG), which Q3 shipments qualify for temperature credits and what is total exposure (BigQuery SQL)?"</td>
                 </tr>
                 <tr>
-                  <td><b>"Can AI predict brand-new seasonal fashion launches?"</b></td>
-                  <td>Claiming deterministic accuracy on zero-history trends without inventory feedback</td>
-                  <td>"Multimodal embeddings match new items to historical lookalike launch curves for Day-0 allocation, then re-anchor rapidly to actual first-72-hour sell-through."</td>
+                  <td><b>2. RAG + Graph Traversal (GraphRAG)</b></td>
+                  <td>Top-k similarity misses multi-hop entity paths and explicit cross-document citations (<a href="https://arxiv.org/abs/2404.16130" target="_blank" rel="noopener">Edge et al., Apr 2024</a>)</td>
+                  <td><b>Vector/BM25</b> seeds entry nodes; <b>Property Graph</b> walks multi-hop entity networks (ownership, supply tiers) or <b>Citation Graph</b> walks linked policy sections</td>
+                  <td>Tracing how a tier-3 chip plant outage impacts customer SKUs, or following "Subject to Schedule C" across versioned contracts</td>
                 </tr>
                 <tr>
-                  <td><b>"Can it read news and social media to adjust orders automatically?"</b></td>
-                  <td>Noisy sentiment hallucinates fake demand spikes and triggers bullwhip over-ordering</td>
-                  <td>"Every unstructured signal must prove out-of-sample WAPE lift on historical holdouts first; one-off disruptions surface as human-approved shock cards with hard volume clamps."</td>
+                  <td><b>3. RAG + Long Context &amp; KV Prefix Caching</b></td>
+                  <td>Tiny 300-token chunks strip surrounding exceptions; raw corpus dumps exceed budget</td>
+                  <td><b>RAG</b> selects the 3–5 right documents out of millions; <b>Long Context</b> hydrates whole docs with static prefixes cached (up to <code>90%</code> off cached input)</td>
+                  <td>Routing a claim to 3 applicable 20-page policies and placing their full text in a prefix-cached reasoning window</td>
+                </tr>
+                <tr>
+                  <td><b>4. RAG + Fine-Tuning / LoRA Adapters</b></td>
+                  <td>Prompts waste tokens teaching specialized output syntax; weights go stale if trained on mutable facts</td>
+                  <td><b>Fine-tuning</b> teaches stable behavior, domain shorthand, &amp; strict JSON/rubric skill; <b>RAG</b> injects mutable facts, prices, &amp; revocable tenant data</td>
+                  <td>A fine-tuned clinical or legal rubric model grading fresh daily filings retrieved with caller ACLs</td>
+                </tr>
+                <tr>
+                  <td><b>5. RAG + Two-Hop Workspace / Episodic Memory</b></td>
+                  <td>Stateless retrieval forgets verified prior case resolutions; flat history logs overflow tool read limits</td>
+                  <td><b>Two-hop memory</b> reads a compact root index + one targeted domain file, each sized under the agent's file-read limit; <b>RAG</b> searches the enterprise corpus</td>
+                  <td>Customer engineering or support agent combining verified account history with current product runbooks</td>
                 </tr>
               </tbody>
             </table>
           </div>
         </div>
 
+        <p>
+          One design distinction inside Pairing 2 (<code>RAG + Graph</code>) matters early: reserve full entity-relation property graphs for genuine multi-hop network problems (corporate beneficial ownership, supply-chain dependencies, biomedical pathways). When documents reference one another by title, section number, or code range (as in legal contracts and compliance manuals), building a deterministic <strong>citation and metadata link index</strong> in code preserves exact clause wording and avoids lossy LLM triple extraction.
+        </p>
+
         <div class="closes">
-          <span><b>Takeaway:</b> Uncensor stockouts first, let LightGBM, TimesFM, and count models own reconciled quantiles, and keep LLMs in backtest-gated feature extraction and planner decision support.</span>
+          <span><b>Takeaway:</b> Modern RAG pairs structure-aware Contextual Retrieval, inline ACL pre-filtering, BM25 + dense RRF, and cross-encoder reranking with SQL tools, deterministic or entity graphs, and prefix-cached whole-section hydration.</span>
         </div>
       </div>
     </div>
@@ -1145,8 +1105,9 @@
     <div class="sheet-b">
       <div class="post-prose">
         <ol class="ref-list">
-          <li>Das et al. (Google Research), <a href="https://arxiv.org/abs/2310.10688" target="_blank" rel="noopener">A Decoder-Only Foundation Model for Time-Series Forecasting (TimesFM)</a> (arXiv:2310.10688), October 14, 2023 (ICML 2024), and Google Cloud, <a href="https://docs.cloud.google.com/bigquery/docs/reference/standard-sql/bigqueryml-syntax-ai-forecast" target="_blank" rel="noopener">BigQuery <code>AI.FORECAST</code> Syntax Reference</a>, 2026. Pretrained patch-decoder numerical forecasting and SQL-native quantile prediction intervals.</li>
-          <li>Tan et al., <a href="https://arxiv.org/abs/2406.16964" target="_blank" rel="noopener">Are Language Models Actually Useful for Time Series Forecasting?</a> (arXiv:2406.16964), June 22, 2024 (NeurIPS 2024). Ablation benchmarks showing text-LLM backbones add compute overhead without outperforming lightweight time-series architectures.</li>
+          <li>Liu et al., <a href="https://arxiv.org/abs/2307.03172" target="_blank" rel="noopener">Lost in the Middle: How Language Models Use Long Contexts</a> (arXiv:2307.03172), July 6, 2023 (TACL 2024). Positional attention degradation when relevant facts sit buried inside long prompts.</li>
+          <li>Anthropic, <a href="https://www.anthropic.com/research/contextual-retrieval" target="_blank" rel="noopener">Introducing Contextual Retrieval</a>, September 19, 2024. Combining chunk-level context prefaces across dense embeddings and lexical BM25 with reranking to cut retrieval failures by 67%.</li>
+          <li>Edge et al. (Microsoft Research), <a href="https://arxiv.org/abs/2404.16130" target="_blank" rel="noopener">From Local to Global: A Graph RAG Approach to Query-Focused Summarization</a> (arXiv:2404.16130), April 24, 2024. Graph-indexed entity and community structures complementing vector search for multi-hop questions.</li>
         </ol>
         <div class="back-home">
           <a href="https://evekhm.github.io/all-about-agents/#interview-label">← All About Agents · AI System Design Interviews</a>

@@ -871,7 +871,7 @@
       <div class="hero-top">
         <span class="eyebrow">Reference · AI System Design Interviews</span>
         <h1>Five-Question Architectural Cheat Sheet</h1>
-        <p>One-page comparison matrix across Episodes 03–07, connecting the failure mode, foundational pattern, model role, and deterministic boundary for each topic.</p>
+        <p>One-page comparison matrix across Episode 03 (Questions 01–05), connecting the failure mode, foundational pattern, model role, and deterministic boundary for each topic.</p>
       </div>
     </div>
   </section>
@@ -893,35 +893,35 @@
             </thead>
             <tbody>
               <tr>
-                <td><b><a href="../ep03_enterprise_llm_trust.html">Ep 03 · Earning Customer Trust</a></b></td>
+                <td><b><a href="../ep03_q1_enterprise_llm_trust.html">Ep 03 · Q1 · Earning Customer Trust</a></b></td>
                 <td>Treating "black box" as one problem or overpromising interpretable weights</td>
                 <td>Diagnose 9 concerns &amp; 6 risks → stay candid on weights → 7 system layers (A–G) + six alternatives</td>
                 <td>Extract fields, draft with clickable citations, &amp; abstain when unsupported</td>
                 <td>Customer controls guardrails, pinned versions, SME eval gates, HITL sign-off, &amp; deterministic decision logic</td>
               </tr>
               <tr>
-                <td><b><a href="../ep04_model_spectrum_economics.html">Ep 04 · Open vs. Closed &amp; Spectrum</a></b></td>
+                <td><b><a href="../ep03_q2_model_spectrum_economics.html">Ep 03 · Q2 · Open vs. Closed &amp; Spectrum</a></b></td>
                 <td>Paying frontier prices for easy turns or buying idle GPUs for spiky load</td>
                 <td>Constraint-first funnel (Residency/ZDR → Utilization TCO → Task Eval) + 2–3 tier router</td>
                 <td>Tier 1 SLMs triage/rerank; Tier 2 workhorses run 80%–90%; Tier 3/4 handle sovereign or hard reasoning</td>
                 <td>Static step routing first; cap session tiers at 2–3 to protect KV prefix cache; track cost per resolved task</td>
               </tr>
               <tr>
-                <td><b><a href="../ep05_retail_demand_forecasting.html">Ep 05 · Retail Demand Forecasting</a></b></td>
+                <td><b><a href="../ep03_q3_retail_demand_forecasting.html">Ep 03 · Q3 · Retail Demand Forecasting</a></b></td>
                 <td>Training on stockout zeros; asking text LLMs to predict raw SKU numbers</td>
                 <td>Uncensor inventory zeros → LightGBM + TimesFM (<code>AI.FORECAST</code>) + Count ensemble → MinT quantiles</td>
                 <td>Upstream promo/photo feature extraction, planner copilot, &amp; bounded shock proposals</td>
                 <td>Numerical core computes <code>P10/P50/P90</code> lead-time quantiles; backtest gate drops noisy LLM features</td>
               </tr>
               <tr>
-                <td><b><a href="../ep06_modern_rag_pairings.html">Ep 06 · Modern RAG &amp; Pairings</a></b></td>
+                <td><b><a href="../ep03_q4_modern_rag_pairings.html">Ep 03 · Q4 · Modern RAG &amp; Pairings</a></b></td>
                 <td>500-token chunks sever table headers, miss SKU codes, &amp; leak stale docs</td>
                 <td>Structural parsing + Contextual Retrieval + ACL pre-filter + BM25/Dense RRF + Reranker + Hydration</td>
                 <td>Decompose compound queries, synthesize hydrated whole sections, &amp; cite verified spans</td>
                 <td>SQL owns counts/ledgers; graphs walk citations &amp; entity hops; metadata marks superseded docs</td>
               </tr>
               <tr>
-                <td><b><a href="../ep07_domain_specific_agent.html">Ep 07 · Domain-Specific Agent</a></b></td>
+                <td><b><a href="../ep03_q5_domain_specific_agent.html">Ep 03 · Q5 · Domain-Specific Agent</a></b></td>
                 <td>Generic chat agents miss domain Defined Terms, sever cross-references, &amp; guess across conflicts</td>
                 <td>1 domain-specific agent equipped with compiled RAG, <code>SKILL.md</code> + Glossary, MCP DB tool, &amp; code verifier</td>
                 <td>Single Domain Agent evaluates hydrated sections + <code>&lt;defined_terms&gt;</code> &amp; quotes governing text before status</td>
