@@ -907,13 +907,10 @@
       </div>
       <div class="post-prose">
         <p>
-          As frontier language models get better in everyday interactive work, handing them a high-level goal and letting them work out the steps becomes routine. Carrying that habit into system design makes it easy to sketch an architecture as a sequence of autonomous black boxes, naming what each agent should accomplish while leaving control flow, state, failure recovery, and security unspecified. At the same time, new frameworks, SDKs, and agent protocols arrive constantly, while the architectural questions underneath that churn change far more slowly. My goal with this episode is to build muscle memory for the new set of questions we need to ask and answer when working with agent-based systems, and to turn them into a generic approach that applies across domains and problem types.
+          As frontier language models get better in everyday interactive work, handing them a high-level goal and letting them work out the steps becomes routine. Carrying that habit into system design makes it easy to sketch an architecture as a sequence of autonomous black boxes, naming what each agent should accomplish while leaving control flow, state, failure recovery, and security unspecified. My goal with this episode is to build muscle memory for the new set of questions we need to ask and answer when working with agent-based systems, and to turn them into a generic approach that applies across domains and problem types.
         </p>
         <p>
-          Our focus is systems that wake up asynchronously on an external event, such as a webhook, a monitoring alert, an incoming document, or a scheduled feed. Once triggered, the system has to make sense of unstructured, potentially untrusted input, gather context across external stores and tools, check its proposed result against domain rules, and prepare or apply an external state change safely under traffic bursts, duplicate deliveries, and mid-run crashes. That same problem shape comes up across domains: resolving supplier invoice mismatches, triaging production incidents, reviewing updated client filings, or repairing failing builds.
-        </p>
-        <p>
-          Classical software handles the predictable parts of that pipeline whenever inputs arrive in fixed schemas and rules are known up front. It breaks down at two boundaries: interpreting unstructured, noisy inputs that resist static parsers, and exploring an open-ended solution space where the next lookup or candidate change depends on what the previous step uncovered. Language models earn their place at those two points, while deterministic code owns the guarantees around them: queueing, deduplication, leases, verification, and write credentials. Production systems combine both in a <strong>hybrid architecture</strong> that embeds scoped agents inside deterministic workflows (<a href="https://www.anthropic.com/research/building-effective-agents" target="_blank" rel="noopener">Anthropic</a>, <a href="https://github.com/humanlayer/12-factor-agents" target="_blank" rel="noopener">12-Factor Agents</a>, <a href="https://docs.cloud.google.com/architecture/choose-design-pattern-agentic-ai-system" target="_blank" rel="noopener">Google Cloud</a>): <em>proposing</em> a diagnosis or candidate fix uses a model, whereas <em>verifying</em> that proposal against schemas, policies, and test suites, and committing the side effect once, stays in deterministic code.
+          Our focus is systems that wake up asynchronously on an external event—such as a webhook, alert, incoming document, or scheduled feed—across domains like invoice exceptions, incident triage, client filings, or failing builds. Classical software handles the fixed-schema rules, queueing, deduplication, leases, verification, and write credentials; models earn their place only at the two boundaries where static code breaks down: interpreting noisy, unstructured inputs and exploring open-ended solutions. Production systems combine both in a <strong>hybrid architecture</strong> (<a href="https://www.anthropic.com/research/building-effective-agents" target="_blank" rel="noopener">Anthropic</a>, <a href="https://github.com/humanlayer/12-factor-agents" target="_blank" rel="noopener">12-Factor Agents</a>, <a href="https://docs.cloud.google.com/architecture/choose-design-pattern-agentic-ai-system" target="_blank" rel="noopener">Google Cloud</a>): models <em>propose</em> diagnoses or candidates, while deterministic code <em>verifies</em> rules and commits external side effects safely under bursts, duplicates, and crashes.
         </p>
         <p>
           We will walk through one example of such a system, starting from the simplest whiteboard sketch.
@@ -933,7 +930,7 @@
           <rect class="zone-box" x="12" y="12" width="888" height="156" rx="10"/>
           <text class="t-zone" x="30" y="36">INITIAL SEQUENCE · THE SCENARIO AS GIVEN</text>
           <rect class="node-card" x="22" y="58" width="128" height="92" rx="8"/>
-          <text class="t-title" x="34" y="86">Failed deploy</text>
+          <text class="t-title" x="34" y="86">External Event</text>
           <text class="t-sub" x="34" y="108">build, rollout</text>
           <text class="t-sub" x="34" y="126">or canary</text>
           <rect class="node-violet" x="176" y="58" width="174" height="92" rx="8"/>
@@ -1570,7 +1567,7 @@
           </g>
           <g class="stg-new">
 
-            <text class="t-m-g" x="102" y="360" text-anchor="middle">→ FailureEvent</text>
+            <text class="t-m-g" x="102" y="360" text-anchor="middle">→ Event JSON</text>
           </g>
           <g class="stg-prev">
             <rect class="b-model" x="208" y="266" width="174" height="108" rx="8"/>
@@ -1605,10 +1602,10 @@
           </g>
           <g class="stg-new">
 
-            <text class="t-m-v" x="295" y="360" text-anchor="middle">→ IncidentReport</text>
-            <text class="t-m-v" x="505" y="360" text-anchor="middle">→ ProposedPatch</text>
+            <text class="t-m-v" x="295" y="360" text-anchor="middle">→ Triage JSON</text>
+            <text class="t-m-v" x="505" y="360" text-anchor="middle">→ Proposal JSON</text>
             <text class="t-m-g" x="705" y="360" text-anchor="middle" style="font-size:11.8px">PASS · RETRY · ESCALATE</text>
-            <text class="t-m-g" x="907" y="360" text-anchor="middle">→ Draft PR</text>
+            <text class="t-m-g" x="907" y="360" text-anchor="middle">→ External Write</text>
           </g>
           <g class="stg-prev">
             <rect class="b-ext" x="1014" y="266" width="168" height="108" rx="8"/>
@@ -1625,7 +1622,7 @@
           </g>
           <g class="stg-new">
             <path d="M705 374 V432 H398 V342 H412" style="fill:none;stroke:var(--stop);stroke-width:1.9;stroke-dasharray:5 4" marker-end="url(#ps5-stop)"/>
-            <text class="t-m-r" x="552" y="448" text-anchor="middle">RETRY (≤ 3 attempts) · RetryFeedback</text>
+            <text class="t-m-r" x="552" y="448" text-anchor="middle">RETRY (≤ 3 attempts) · Feedback JSON</text>
             <path d="M776 374 V414 H1010" style="fill:none;stroke:var(--ink);stroke-width:1.7" marker-end="url(#ps5-ink)"/>
             <rect class="b-ext" x="1014" y="388" width="168" height="58" rx="8"/>
             <text class="t-b" x="1098" y="411" text-anchor="middle" style="font-size:14.6px">ESCALATE to person</text>
@@ -1771,7 +1768,7 @@
           </g>
           <g class="stg-prev">
 
-            <text class="t-m-g" x="102" y="360" text-anchor="middle">→ FailureEvent</text>
+            <text class="t-m-g" x="102" y="360" text-anchor="middle">→ Event JSON</text>
           </g>
           <g class="stg-prev">
             <rect class="b-model" x="208" y="266" width="174" height="108" rx="8"/>
@@ -1806,10 +1803,10 @@
           </g>
           <g class="stg-prev">
 
-            <text class=\"t-m-v\" x="295" y="360" text-anchor="middle">→ IncidentReport</text>
-            <text class=\"t-m-v\" x="505" y="360" text-anchor="middle">→ ProposedPatch</text>
+            <text class=\"t-m-v\" x="295" y="360" text-anchor="middle">→ Triage JSON</text>
+            <text class=\"t-m-v\" x="505" y="360" text-anchor="middle">→ Proposal JSON</text>
             <text class="t-m-g" x="705" y="360" text-anchor="middle" style="font-size:11.8px">PASS · RETRY · ESCALATE</text>
-            <text class="t-m-g" x="907" y="360" text-anchor="middle">→ Draft PR</text>
+            <text class="t-m-g" x="907" y="360" text-anchor="middle">→ External Write</text>
           </g>
           <g class="stg-new">
             <rect class="b-ext" x="1014" y="266" width="168" height="108" rx="8"/>
@@ -1828,7 +1825,7 @@
           </g>
           <g class="stg-prev">
             <path d="M693 452 V468 H398 V342 H412" style="fill:none;stroke:var(--stop);stroke-width:1.9;stroke-dasharray:5 4" marker-end="url(#ps6-stop)"/>
-            <text class="t-m-r" x="545" y="484" text-anchor="middle">RETRY (≤ 3 attempts) · RetryFeedback</text>
+            <text class="t-m-r" x="545" y="484" text-anchor="middle">RETRY (≤ 3 attempts) · Feedback JSON</text>
             <path d="M788 374 V424 H1010" style="fill:none;stroke:var(--ink);stroke-width:1.7" marker-end="url(#ps6-ink)"/>
             <rect class="b-ext" x="1014" y="396" width="168" height="56" rx="8"/>
             <text class="t-b" x="1098" y="418" text-anchor="middle" style="font-size:14.6px">ESCALATE to person</text>
@@ -1966,7 +1963,7 @@
           <text class="t-m-g" x="102" y="309" text-anchor="middle" style="font-size:11.8px">CLOUD SQL TXN</text>
           <text class="t-s" x="102" y="327" text-anchor="middle" style="font-size:13.4px">kill switch &amp; storm check,</text>
           <text class="t-s" x="102" y="343" text-anchor="middle" style="font-size:13.4px">120s row lease</text>
-          <text class="t-m-g" x="102" y="360" text-anchor="middle">→ FailureEvent</text>
+          <text class="t-m-g" x="102" y="360" text-anchor="middle">→ Event JSON</text>
           <path class="flow" d="M184 320 H204" marker-end="url(#pgcp-ink)"/>
 
           <rect class="b-model" x="208" y="266" width="174" height="108" rx="8"/>
@@ -1974,7 +1971,7 @@
           <text class="t-m-v" x="295" y="309" text-anchor="middle">MODEL ARMOR → LLM</text>
           <text class="t-s" x="295" y="327" text-anchor="middle" style="font-size:13.4px">Cloud Logging / GCS,</text>
           <text class="t-s" x="295" y="343" text-anchor="middle" style="font-size:13px">1 call, no tools</text>
-          <text class=\"t-m-v\" x="295" y="360" text-anchor="middle">→ IncidentReport</text>
+          <text class=\"t-m-v\" x="295" y="360" text-anchor="middle">→ Triage JSON</text>
           <path class="flow" d="M382 320 H412" marker-end="url(#pgcp-ink)"/>
 
           <rect class="b-model" x="416" y="266" width="178" height="108" rx="8"/>
@@ -1982,7 +1979,7 @@
           <text class="t-m-v" x="505" y="309" text-anchor="middle">ADK AGENT LOOP</text>
           <text class="t-s" x="505" y="327" text-anchor="middle" style="font-size:13.4px">model call on worker,</text>
           <text class="t-s" x="505" y="343" text-anchor="middle" style="font-size:13px">tools in Code Exec</text>
-          <text class=\"t-m-v\" x="505" y="360" text-anchor="middle">→ ProposedPatch</text>
+          <text class=\"t-m-v\" x="505" y="360" text-anchor="middle">→ Proposal JSON</text>
           <path class="flow" d="M594 320 H614" marker-end="url(#pgcp-ink)"/>
 
           <rect class="b-code" x="618" y="266" width="174" height="108" rx="8"/>
@@ -2020,7 +2017,7 @@
           <text class="t-s" x="700" y="436" text-anchor="middle" style="font-size:13px;fill:var(--ink)">fresh verification run</text>
 
           <path d="M693 452 V468 H398 V342 H412" style="fill:none;stroke:var(--stop);stroke-width:1.9;stroke-dasharray:5 4" marker-end="url(#pgcp-stop)"/>
-          <text class="t-m-r" x="545" y="484" text-anchor="middle">RETRY (≤ 3 attempts) · RetryFeedback</text>
+          <text class="t-m-r" x="545" y="484" text-anchor="middle">RETRY (≤ 3 attempts) · Feedback JSON</text>
 
           <path d="M788 374 V424 H1010" style="fill:none;stroke:var(--ink);stroke-width:1.7" marker-end="url(#pgcp-ink)"/>
           <rect class="b-ext" x="1014" y="396" width="168" height="56" rx="8"/>
