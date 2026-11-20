@@ -1233,7 +1233,7 @@
             <rect class="b-code" x="20" y="266" width="168" height="108" rx="8"/>
             <text class="t-b" x="104" y="292" text-anchor="middle" style="font-size:15.8px">Guard</text>
             <text class="t-s" x="104" y="313" text-anchor="middle" style="font-size:13.4px">kill switch &amp; storm window,</text>
-            <text class="t-s" x="104" y="331" text-anchor="middle" style="font-size:13.4px">claims 120s case lease</text>
+            <text class="t-s" x="104" y="331" text-anchor="middle" style="font-size:13.4px">claims expiring lease</text>
             <path class="flow" d="M188 320 H224" marker-end="url(#ps3-ink)"/>
             <path class="flow-d" d="M104 374 V426" marker-end="url(#ps3-mut)"/>
             <path class="flow-d" d="M890 374 V412 H104"/>
@@ -1292,7 +1292,7 @@
       <div class="beat">Where we are</div>
       <div class="post-prose">
         <p>
-          Up to <a href="#fig-s3"><em>Figure 4</em></a>, all three scenario agents were drawn as identical purple boxes. Question 7 breaks that illusion. Inside the deterministic worker (<strong>the harness</strong>—the plain-code controller around the models), the two genuine model steps follow the <strong>Dual-LLM pattern</strong> (<a href="https://simonwillison.net/2023/Apr/25/dual-llm-pattern/" target="_blank" rel="noopener">Willison</a>; formalized with capability enforcement in <a href="https://arxiv.org/abs/2503.18813" target="_blank" rel="noopener">CaMeL</a>): Agent 1 becomes a toolless <strong>Quarantined LLM</strong> that turns untrusted log text into a fixed schema, while Agent 2 becomes the <strong>Privileged LLM</strong> permitted to invoke workspace tools in a bounded loop. Between Agent 2 and Agent 3 we insert a deterministic <strong>Verifier</strong> so the model never grades its own work, and Agent 3 turns green as a plain-code <strong>Act gate</strong>—because the external write follows a fixed rule and needs no language model at all.
+          Up to <a href="#fig-s3"><em>Figure 4</em></a>, all three scenario agents were drawn as identical purple boxes. Question 7 breaks that illusion. Inside the deterministic worker (<strong>the harness</strong>—the plain-code controller around the models), the two genuine model steps follow the <strong>Dual-LLM pattern</strong> (<a href="https://simonwillison.net/2023/Apr/25/dual-llm-pattern/" target="_blank" rel="noopener">Willison</a>; formalized with capability enforcement in <a href="https://arxiv.org/abs/2503.18813" target="_blank" rel="noopener">CaMeL</a>): Agent 1 becomes a toolless <strong>Quarantined LLM</strong> that turns untrusted input text into a fixed schema, while Agent 2 becomes the <strong>Privileged LLM</strong> permitted to invoke its tools in a bounded loop. Between Agent 2 and Agent 3 we insert a deterministic <strong>Verifier</strong> so the model never grades its own work, and Agent 3 turns green as a plain-code <strong>Act gate</strong>—because the external write follows a fixed rule and needs no language model at all.
         </p>
       </div>
       <div class="qb" id="q7" style="margin-top:20px;">
@@ -1348,13 +1348,13 @@
         <div class="tbl-wrap" style="margin:0;">
           <table>
             <thead><tr><th>State</th><th>Where it lives</th><th>Who writes it</th><th>Why</th></tr></thead>
-            <tbody>
-              <tr><td><b>Kill switch &amp; 5-minute storm count</b></td><td>Transactional coordination database</td><td>Workflow code / operators</td><td>Trips the circuit breaker when 5+ distinct repos fail in 5 minutes, or pauses all workers when an operator flips the kill switch.</td></tr>
-              <tr><td><b>Incident lock, expiring lease &amp; fencing</b></td><td>Coordination DB row per <code>(repo, failure_<wbr>fingerprint)</code></td><td>Workflow code only</td><td><strong>Lock:</strong> one active owner. <strong>Lease:</strong> expires after 120 seconds unless renewed every 30 seconds so crashed work recovers. <strong>Fencing:</strong> monotonic fencing token checked right before PR creation so a stalled worker's late write is rejected.</td></tr>
-              <tr><td><b>Per-run workflow state &amp; raw blobs</b></td><td>Session store and object storage</td><td>Workflow runner and workflow code</td><td>Carries typed outputs and <code>fix_attempts</code> across <code>RETRY</code> while keeping raw logs and diffs out of prompts by pointer.</td></tr>
-              <tr><td><b>Sandbox working scratchpad</b></td><td>Ephemeral container filesystem (<code>Sandbox 1</code>)</td><td>Privileged LLM tools (ephemeral)</td><td>Holds the checked-out commit, trial edits, and local test output for one attempt; destroyed when the attempt ends.</td></tr>
-              <tr><td><b>Long-term memory of approved fixes</b></td><td>Managed memory store</td><td>Post-merge code only (read-only to Agent 2)</td><td>Lets Agent 2 look up lessons from fixes a human engineer already reviewed and merged. It is written only after a merge.</td></tr>
-              <tr><td><b>Audit trace &amp; eval replay store</b></td><td>Trace and analytics store</td><td>Harness on every call</td><td>Records every model turn, tool call, latency, and verifier verdict for incident audit, offline replay, and online quality tracking.</td></tr>
+                        <tbody>
+              <tr><td><b>Kill switch &amp; short-window storm count</b></td><td>Transactional coordination database</td><td>Workflow code / operators</td><td>Trips the circuit breaker when distinct failing targets cross a threshold in a short window, or pauses all workers when an operator flips the kill switch.</td></tr>
+              <tr><td><b>Case lock, expiring lease &amp; fencing</b></td><td>Coordination DB row per duplicate key</td><td>Workflow code only</td><td><strong>Lock:</strong> one active owner. <strong>Lease:</strong> expires after a short TTL unless renewed on a heartbeat so crashed work recovers. <strong>Fencing:</strong> monotonic fencing token checked right before the external write so a stalled worker's late write is rejected.</td></tr>
+              <tr><td><b>Per-run workflow state &amp; raw blobs</b></td><td>Session store and object storage</td><td>Workflow runner and workflow code</td><td>Carries typed outputs and the attempt counter across <code>RETRY</code> while keeping raw payloads out of prompts by pointer.</td></tr>
+              <tr><td><b>Trial working scratchpad</b></td><td>Ephemeral trial workspace</td><td>Privileged LLM tools (ephemeral)</td><td>Holds intermediate edits and local check outputs for one attempt; destroyed when the attempt ends.</td></tr>
+              <tr><td><b>Long-term memory of approved cases</b></td><td>Managed memory store</td><td>Post-approval code only (read-only to Privileged LLM)</td><td>Lets the Privileged LLM look up lessons from approved past cases. It is written only after human sign-off.</td></tr>
+              <tr><td><b>Audit trace &amp; eval replay store</b></td><td>Trace and analytics store</td><td>Harness on every call</td><td>Records every model turn, tool call, latency, and verifier verdict for audit, offline replay, and online quality tracking.</td></tr>
             </tbody>
           </table>
         </div>
@@ -1586,8 +1586,8 @@
           </g>
           <g class="stg-new">
 
-            <text class="t-m-v" x="295" y="360" text-anchor="middle">→ Intake JSON</text>
-            <text class="t-m-v" x="505" y="360" text-anchor="middle">→ Proposal JSON</text>
+            <text class="t-m-v" x="295" y="360" text-anchor="middle" style="font-size:12.6px">→ Intake JSON</text>
+            <text class="t-m-v" x="505" y="360" text-anchor="middle" style="font-size:12.6px">→ Proposal JSON</text>
             <text class="t-m-g" x="705" y="360" text-anchor="middle" style="font-size:11.8px">PASS · RETRY · ESCALATE</text>
             <text class="t-m-g" x="907" y="360" text-anchor="middle">→ External Write</text>
           </g>
@@ -1654,13 +1654,13 @@
       <div class="beat">Where we are</div>
       <div class="post-prose">
         <p>
-          Even with typed contracts and a plain-code verifier in <a href="#fig-s5"><em>Figure 6</em></a>, two production risks remain open. First, Agent 2's tools and the Verifier's test runner execute repository code and candidate diffs—running them inside the worker container would expose cloud workload credentials and write credentials to malicious tool runs or prompt-injected patches. Second, switching an autonomous bot on without offline replay benchmarks and staged promotion leaves operators blind to silent regressions until noisy external writes erode trust. Questions 10 and 11 close execution isolation and launch governance.
+          Even with typed contracts and a plain-code verifier in <a href="#fig-s5"><em>Figure 6</em></a>, two production risks remain open. First, Agent 2's tools and the Verifier's test runner execute untrusted code and candidate outputs—running them inside the worker container would expose cloud workload credentials and write credentials to malicious tool runs or prompt-injected proposals. Second, switching an autonomous bot on without offline replay benchmarks and staged promotion leaves operators blind to silent regressions until noisy external writes erode trust. Questions 10 and 11 close execution isolation and launch governance.
         </p>
       </div>
       <div class="qb" id="q10" style="margin-top:20px;">
         <div class="qh"><div class="n">10</div><h3>What would an attacker do with it?</h3></div>
         <div class="q3">
-          <div class="a"><span class="lab">Skip it and…</span><ul><li>Injected log text steers a tool-calling model.</li><li>Malicious test code or a crafted diff steals cloud IAM or write credentials from the worker host.</li><li>Over-broad write scopes allow writes outside the intended scope.</li></ul></div>
+          <div class="a"><span class="lab">Skip it and…</span><ul><li>Injected input text steers a tool-calling model.</li><li>Malicious tool code or a crafted proposal steals cloud IAM or write credentials from the worker host.</li><li>Over-broad write scopes allow writes outside the intended scope.</li></ul></div>
           <div class="b"><span class="lab">Decide</span><ul><li>Keep the <strong>Quarantined LLM</strong> toolless and sever shared history (<a href="https://simonwillison.net/2023/Apr/25/dual-llm-pattern/" target="_blank" rel="noopener">Dual-LLM</a>). That stops injected text from choosing which tools run. The values the model reports can still be manipulated (<a href="https://arxiv.org/abs/2503.18813" target="_blank" rel="noopener">CaMeL</a>), so validate every field in code.</li><li>Execute the <strong>Privileged LLM</strong>'s tools and the <strong>Verifier</strong>'s test suite inside ephemeral sandboxes with zero network and zero credentials.</li><li>Enforce protected-path rules and narrow write scopes in code; keep a human on irreversible actions.</li></ul></div>
           <div class="c"><span class="lab">In the self-healing repo</span><ul><li>HMAC check, content screening, and toolless Agent 1.</li><li><code>Sandbox 1</code> (Agent 2 tools) and fresh <code>Sandbox 2</code> (Verifier pytest) with <code>--network=none</code> and 0 credentials.</li><li>Protected-path blocklist, token restricted to <code>autofix/*</code> branches, draft PRs only.</li></ul></div>
         </div>
@@ -1669,7 +1669,7 @@
       <div class="qb" id="q11">
         <div class="qh"><div class="n">11</div><h3>How do I switch it on, and how do I know it is working?</h3></div>
         <div class="q3">
-          <div class="a"><span class="lab">Skip it and…</span><ul><li>A noisy bot produces noisy or wrong outputs and gets muted by operators within a week.</li><li>Prompt or model upgrades silently regress accuracy with no safety net.</li></ul></div>
+          <div class="a"><span class="lab">Skip it and…</span><ul><li>A bot that produces wrong outputs gets muted within a week.</li><li>Prompt or model upgrades silently regress accuracy with no safety net.</li></ul></div>
           <div class="b"><span class="lab">Decide</span><ul><li><strong>Offline evals:</strong> gate every prompt, tool, or model change against a golden replay set—tracking <code>pass@1</code> (resolved on the first patch attempt) and <code>pass@3</code> (resolved within the 3-attempt budget, <a href="https://arxiv.org/abs/2107.03374" target="_blank" rel="noopener">Chen et al.</a>). Start small and judge the end state: Anthropic began with about 20 cases (<a href="https://www.anthropic.com/research/multi-agent-research-system" target="_blank" rel="noopener">multi-agent research system</a>).</li><li><strong>Online rollout:</strong> progress through tiers (shadow → draft → ready-for-review) with automatic demotion on human rejection spikes.</li><li>Record one end-to-end trace per case across every call and verdict.</li></ul></div>
           <div class="c"><span class="lab">In the self-healing repo</span><ul><li>Replay 20+ historical bugs before every release.</li><li>Illustrative rollout gates: promote draft → ready-for-review after 50 cases at ≥ 70% merge-without-edit rate; auto-demote on 3 rejections in a day.</li></ul></div>
         </div>
