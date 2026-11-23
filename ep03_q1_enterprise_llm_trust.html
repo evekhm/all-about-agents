@@ -890,7 +890,7 @@
       <div class="post-prose">
         <p>My goal with this question is to answer one of the most common questions in enterprise AI system-design interviews: how to make a language model trustworthy to a skeptical customer. We start inside the model—what reasoning traces exist, what granularity each reaches, and why open weights still require multi-step instrumentation—before stepping outside to the nine stakeholder concerns, seven transparent system layers, and six architectural alternatives.</p>
         <div class="closes" style="margin:14px 0 16px;">
-          <span><b>The short answer:</b> First I'd ask what "black box" means to them: why it said something, whether it will change under them, or where their data goes. Each has a different fix. I'd be upfront that nobody can fully explain a model's internals, so I don't ask them to trust the model; I give them ways to check it. Every answer cites their documents, a golden set built from their own historical cases sets the bar, and for risky decisions the model extracts facts while code applies their rules. We start in shadow mode beside their team and automate only when the numbers clear that bar.</span>
+          <span><b>The 30-second answer:</b> Every LLM, open or closed, spreads its knowledge across billions of weights and computes per-request activations that are discarded after each token. Thought summaries, raw thinking tokens, and research-grade circuit tracing on open weights offer partial visibility, while leaving the causal reason behind a specific answer unverified. Trust therefore comes from three pillars around the model:<br>1. <strong>Verify</strong> every output: ground answers in cited sources, measure quality on a golden set, and let code make high-stakes decisions on verified facts.<br>2. <strong>Control</strong> and audit execution: enforce code guardrails, pin model versions, protect data governance boundaries, and log every step for replay.<br>3. <strong>Roll out</strong> safely: match human review to risk, and graduate from shadow mode to automation behind an instant kill switch.</span>
         </div>
         <p><strong>What we will walk through step by step:</strong></p>
         <ol>
@@ -1047,8 +1047,8 @@
           <strong>Three things you can look at</strong> (the three levels in <em>Figure 1</em>):
         </p>
         <ul>
-          <li><strong>Level 1 · Thought summaries.</strong> <em>What you see:</em> a short prose summary of the model's reasoning. <em>Who can see it:</em> anyone using a reasoning API such as Gemini (<a href="https://ai.google.dev/gemini-api/docs/thinking" target="_blank" rel="noopener">Google, 2026</a>); this is usually all a proprietary API returns. <em>What it proves:</em> little about why the model answered as it did. A summary sits two steps removed from the computation: it condenses tokens that were themselves sampled from activations (<em>Figure 1</em>).</li>
-          <li><strong>Level 2 · Raw thinking tokens.</strong> <em>What you see:</em> the actual tokens the model wrote to itself before answering. <em>Who can see it:</em> users of open-weight reasoning models such as DeepSeek-R1; proprietary APIs usually keep them with the provider. <em>What it proves:</em> what the model wrote, not what caused its answer. On hard multi-step problems, the model has to write intermediate results down to use them in later steps, which makes the trace useful working memory to monitor (<a href="https://arxiv.org/abs/2507.11473" target="_blank" rel="noopener">Korbak et al., Jul 2025</a>). But it can leave out the real reason, as the hint test below shows.</li>
+          <li><strong>Level 1 · Thought summaries.</strong> <em>What you see:</em> a short prose summary of the model's reasoning. <em>Who can see it:</em> anyone using a reasoning API such as Gemini (<a href="https://ai.google.dev/gemini-api/docs/thinking" target="_blank" rel="noopener">Google, 2026</a>); this is usually all a proprietary API returns. <em>What it proves:</em> little about why the model answered as it did. A summary sits two steps removed from the computation: it condenses tokens that were themselves sampled from activations.</li>
+          <li><strong>Level 2 · Raw thinking tokens.</strong> <em>What you see:</em> the actual tokens the model wrote to itself before answering. <em>Who can see it:</em> users of open-weight reasoning models such as DeepSeek-R1 (<a href="https://api-docs.deepseek.com/guides/thinking_mode/" target="_blank" rel="noopener">DeepSeek Thinking Mode</a>, which exposes the full reasoning trace in <code>reasoning_content</code> or <code>&lt;think&gt;</code> tags); proprietary APIs usually keep them with the provider. <em>What it proves:</em> what the model wrote, not what caused its answer. On hard multi-step problems, the model has to write intermediate results down to use them in later steps, which makes the trace useful working memory to monitor (<a href="https://arxiv.org/abs/2507.11473" target="_blank" rel="noopener">Korbak et al., Jul 2025</a>). But it can leave out the real reason, as the hint test below shows.</li>
           <li><strong>Level 3 · Activations (circuit tracing).</strong> <em>What you see:</em> which internal features fired and how they pushed the model toward its next token. <em>Who can see it:</em> only teams running open weights on infrastructure they control, with specialist tooling. <em>What it proves:</em> part of the real internal path for one prompt. Attribution graphs (<a href="https://transformer-circuits.pub/2025/attribution-graphs/biology.html" target="_blank" rel="noopener">Lindsey et al., Mar 2025</a>)—brought to open-weight models by the <a href="https://www.anthropic.com/research/open-source-circuit-tracing" target="_blank" rel="noopener">circuit-tracing library</a>—and sparse autoencoders (<a href="https://deepmind.google/blog/gemma-scope-2-helping-the-ai-safety-community-deepen-understanding-of-complex-language-model-behavior/" target="_blank" rel="noopener">Gemma Scope 2</a>) capture only a fraction of the computation, at research cost.</li>
         </ul>
 
@@ -1056,9 +1056,6 @@
           <span><b>Example: the hint test.</b> Researchers ask a model a multiple-choice question with a hint added, such as "A Stanford professor indicates the answer is (A)," pointing to an answer the model would not otherwise pick. When the hint changes the answer, they check whether the model's reasoning mentions it. Often it does not: the trace builds a plausible argument for (A), like a student who saw the answer key and writes out a full solution without mentioning it. In these tests, reasoning models often disclosed the hint in fewer than 20% of cases (<a href="https://arxiv.org/abs/2505.05410" target="_blank" rel="noopener">Chen et al., May 2025</a>), extending earlier results on prompted chain-of-thought (<a href="https://arxiv.org/abs/2305.04388" target="_blank" rel="noopener">Turpin et al., NeurIPS 2023</a>). Newer models follow planted hints less often, which makes this test harder to run, but it does not make their traces proof.</span>
         </div>
 
-        <p>
-          <strong>The practical rule:</strong> save reasoning traces (raw thinking tokens or thought summaries) in your audit logs so engineers can debug and monitor the model, and base any customer-facing or regulatory justification on artifacts that code can verify, such as exact source quotes, database records, and explicit rule checks. Research models that reason directly in continuous latent space (<a href="https://arxiv.org/abs/2412.06769" target="_blank" rel="noopener">Hao et al., Dec 2024</a>) skip generated tokens altogether, which would remove Level 2 entirely.
-        </p>
         <p>
           <strong>What it takes to look inside (Level 3).</strong> Downloading open weights does not explain anything by itself: the checkpoint is a static archive of trained numbers. Explaining one prompt takes three engineering steps:
         </p>
@@ -1068,7 +1065,7 @@
           <li><strong>Trace how features influence each other.</strong> Link the active features across layers into an <strong>attribution graph</strong> showing which ones pushed the final token up or down. This is an expensive, research-grade investigation that still captures only part of the computation.</li>
         </ol>
         <p>
-          <strong>The way out: make the written reasoning the computation.</strong> A fourth route avoids the faithfulness problem altogether: have the model translate the case into a checklist or program that deterministic code executes, so the written reasoning is the computation that produced the answer (<a href="https://arxiv.org/abs/2301.13379" target="_blank" rel="noopener">Lyu et al., Jan 2023</a>). This is Option 3 (Hybrid) in <em>Table 2</em>; Section 5 and <em>Figure 4</em> walk through it on a real prior-authorization request.
+          <strong>The way out: separate reading from deciding.</strong> Have the model extract structured facts (with exact source quotes) into a checklist, and let deterministic code apply the rules to those facts (<a href="https://arxiv.org/abs/2301.13379" target="_blank" rel="noopener">Lyu et al., Jan 2023</a>). Because code executes the rules directly on the recorded facts, the audit trail shows what truly produced the answer. This is <a href="#table-2-option-3">Option 3 (Hybrid) in <em>Table 2</em></a>; Section 5 and <em>Figure 4</em> walk through it on a real prior-authorization request.
         </p>
 
         <h2 id="sec-2">2. Beyond Latent Activations: What "Black Box" Means to a Customer</h2>
@@ -1081,8 +1078,9 @@
         <ul>
           <li><strong>End users</strong> want sources behind an answer.</li>
           <li><strong>Engineering</strong> wants predictable outputs and version stability.</li>
-          <li><strong>Risk and legal</strong> want to know what data the model learned from and whether anyone can inspect its weights.</li>
-          <li><strong>Security</strong> wants data boundaries.</li>
+          <li><strong>Legal</strong> wants to know what data the model learned from, whether its license and IP terms are safe, and who is liable when it is wrong.</li>
+          <li><strong>Model-risk and validation teams</strong> want to test the exact model independently, and some want to host or inspect it themselves (open weights).</li>
+          <li><strong>Security</strong> wants data boundaries and an approved, untampered model.</li>
           <li><strong>Compliance</strong> wants an audit trail.</li>
         </ul>
 
@@ -1402,7 +1400,7 @@
                   <td>Decision trees, logistic regression, or GBDTs with per-feature SHAP attributions</td>
                   <td>Tabular inputs; ideal for regulated credit scoring, risk grading, &amp; numerical forecasting</td>
                 </tr>
-                <tr>
+                <tr id="table-2-option-3">
                   <td><b>3. Hybrid Architecture (Sweet Spot)</b></td>
                   <td>LLM extracts structured fields or drafts; deterministic rules or scoring models decide</td>
                   <td>Combines unstructured language understanding with 100% auditable final decision logic</td>
@@ -1788,6 +1786,7 @@
           <li><a href="https://eur-lex.europa.eu/eli/reg/2016/679/oj" target="_blank" rel="noopener">Regulation (EU) 2016/679 (GDPR)</a>, Articles 13–15 and 22.</li>
           <li>Federal Reserve, OCC, and FDIC, <a href="https://www.federalreserve.gov/supervisionreg/srletters/sr2602.htm" target="_blank" rel="noopener">SR 26-2 (superseding SR 11-7): Supervisory Guidance on Model Risk Management</a> (OCC Bulletin 2026-13; FDIC FIL-15-2026), April 17, 2026 (original SR 11-7 issued April 4, 2011).</li>
           <li>CMS, <a href="https://www.cms.gov/newsroom/fact-sheets/cms-interoperability-and-prior-authorization-final-rule-cms-0057-f" target="_blank" rel="noopener">Interoperability and Prior Authorization Final Rule (CMS-0057-F)</a>, January 17, 2024.</li>
+          <li>DeepSeek, <a href="https://api-docs.deepseek.com/guides/thinking_mode/" target="_blank" rel="noopener">Thinking Mode (API Documentation)</a> and <a href="https://arxiv.org/abs/2501.12948" target="_blank" rel="noopener">DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning</a> (arXiv:2501.12948), January 2025. Documents how DeepSeek reasoning models emit raw thinking tokens in <code>reasoning_content</code> / <code>&lt;think&gt;</code> tags.</li>
         </ol>
         <div class="back-home">
           <a href="https://evekhm.github.io/all-about-agents/#interview-label">← All About Agents · AI System Design Interviews</a>
