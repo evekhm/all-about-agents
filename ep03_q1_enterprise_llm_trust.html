@@ -864,7 +864,7 @@
   <nav class="navlinks">
     <a class="home-link" id="home-link" href="index.html">← Home</a>
     <a href="#intro">Overview</a>
-    <a href="#sec-1">Tracing a Model's Reasoning</a>
+    <a href="#sec-1">What You Can and Cannot See</a>
     <a href="#sec-2">Beyond Latent Activations</a>
     <a href="#sec-3">Seven System Layers</a>
     <a href="#sec-4">Scoping &amp; Six Alternatives</a>
@@ -890,8 +890,16 @@
       <div class="post-prose">
         <p>My goal with this question is to answer one of the most common questions in enterprise AI system-design interviews: how to make a language model trustworthy to a skeptical customer. We start inside the model—what reasoning traces exist, what granularity each reaches, and why open weights still require multi-step instrumentation—before stepping outside to the nine stakeholder concerns, seven transparent system layers, and six architectural alternatives.</p>
         <div class="closes" style="margin:14px 0 16px;">
-          <span><b>The 30-second answer:</b> Every LLM, open or closed, is opaque at the level of its weights and activations, and its reasoning traces are unverified as proof of why it answered. Trust comes from the system around the model. First, find out which "black box" concern the customer actually has. Then ground every answer in cited sources, measure quality on a golden set built with their experts, log every step so any decision can be replayed, let code make high-stakes decisions on verified facts, and roll out from shadow mode to automation behind a kill switch.</span>
+          <span><b>The 30-second answer:</b> Every LLM, open or closed, is opaque at the level of its weights and activations, and its reasoning traces are unverified as proof of why it answered. Trust comes from building an engineered system around the model so we can control and verify it even while its internals stay opaque. Ground every answer in cited sources, and measure quality and consistency on a golden set. Log every step so any decision can be replayed, and enforce deterministic code guardrails with pinned model versions. Let code make high-stakes decisions on verified facts, route uncertain cases to human review, and roll out gradually from shadow mode to automation behind an instant kill switch.</span>
         </div>
+        <p><strong>What we will walk through step by step:</strong></p>
+        <ol>
+          <li><a href="#sec-1"><strong>Inside the model:</strong></a> why weights and activations are opaque for both APIs and open weights, and the three levels of reasoning-trace granularity.</li>
+          <li><a href="#sec-2"><strong>What "black box" means:</strong></a> the nine distinct stakeholder concerns and six business risks that matter outside the weights.</li>
+          <li><a href="#sec-3"><strong>Seven system layers:</strong></a> the engineering controls (<code>A</code>–<code>G</code>) and Google Cloud services that address each concern.</li>
+          <li><a href="#sec-4"><strong>Scoping, regulations, and six alternatives:</strong></a> how scoping questions, regulatory rules, and cost determine which controls and architectural options to apply.</li>
+          <li><a href="#sec-5"><strong>Worked example:</strong></a> tracing a prior-authorization request end to end to compare a trace-based denial against a verifiable hybrid design, followed by a spoken summary and likely follow-up questions.</li>
+        </ol>
         <p>Next in Episode 03: <a href="ep03_q2_model_spectrum_economics.html">Question 02 · Open-Weight vs. Proprietary Models Across the Full Model Spectrum</a> (or view the <a href="ref/ai-interview-cheat-sheet.html">5-Question Master Cheat Sheet</a>).</p>
       </div>
     </div>
@@ -902,33 +910,18 @@
       <div class="post-prose">
 
         <p>
-          When enterprise stakeholders characterize a language-model system as a "black box," the objection reflects four operational requirements: <strong>behavioral predictability</strong>, <strong>output verifiability</strong>, <strong>enforceable boundaries</strong>, and <strong>defensibility</strong> under executive, audit, and regulatory scrutiny. Addressing those requirements begins with the model itself—specifically, which internal reasoning traces are <strong>observable</strong>, the <strong>granularity</strong> each trace exposes, and where the boundary of opaque weights and latent activations lies.
+          Calling a language model a "black box" points to four general engineering requirements: <strong>behavioral predictability</strong>, <strong>output verifiability</strong>, <strong>enforceable boundaries</strong>, and <strong>defensibility</strong> under audit and regulatory scrutiny. Understanding how to meet those requirements begins with the model itself—specifically, which internal reasoning traces are <strong>observable</strong>, the <strong>granularity</strong> each trace exposes, and where the boundary of opaque weights and latent activations lies.
         </p>
 
-        <h2 id="sec-1">1. Tracing a Model's Reasoning: Granularity, Guarantees, and Weight Opacity</h2>
+        <h2 id="sec-1">1. Tracing a Model's Reasoning: What You Can and Cannot See</h2>
         <p>
-          Direct access to how an LLM reasons is difficult to obtain for both <strong>proprietary APIs</strong> and <strong>open-weight models</strong>. A model's knowledge sits in billions of continuous floating-point weights with no human-readable <code>if-then</code> rules. During inference, each output token requires one forward pass through every layer, computing high-dimensional <strong>latent-space activations</strong> (floating-point vectors at each layer) and projecting the final layer into a vocabulary distribution. The pass then samples one token and discards the rest of the activations (each layer's keys and values are cached for reuse by later tokens, and they are recomputable from the tokens themselves). With a proprietary API, both the weights and those layer activations stay behind the provider's endpoint.
+          You can read what a model writes while it reasons, but not reliably why it reached its answer. This section explains where reasoning actually happens, what each kind of trace shows, and what each one can prove.
         </p>
         <p>
-          <strong>Even when you download open weights</strong>, the checkpoint on disk is a static archive of trained matrices; turning those numbers into an explanation for a single prompt requires a multi-step engineering process:
+          <strong>Weights and activations.</strong> A model works with two kinds of numbers. <strong>Weights</strong> are the billions of values learned during training. They are fixed, identical for every request, and hold the model's knowledge with no human-readable <code>if-then</code> rules. <strong>Activations</strong> are the numbers the model computes from those weights and your input while it handles one request: its working state, which exists only during that request. In the formula <code>y = 2x + 3</code>, the <code>2</code> and the <code>3</code> play the role of weights; with <code>x = 5</code>, the intermediate <code>10</code> and the result <code>13</code> play the role of activations. This is the same for every LLM, whether it runs behind a proprietary API or on open weights. The difference is only who can see the numbers.
         </p>
-        <ol>
-          <li><strong>Instrument the forward pass:</strong> Host the model locally and attach activation hooks to record the floating-point vectors at each layer as the prompt runs.</li>
-          <li><strong>Decompose polysemantic vectors:</strong> Individual neurons and raw dimensions respond to many unrelated concepts at once, so you pass the recorded activations through <strong>sparse autoencoders (SAEs)</strong> or transcoders trained for that specific model (Gemma Scope 2, for example, covers Gemma 3, while <a href="ep03_q2_model_spectrum_economics.html">Question 02</a> recommends Gemma 4) to isolate candidate human-interpretable features.</li>
-          <li><strong>Trace feature-to-feature attribution:</strong> Link active features across layers into an <strong>attribution graph</strong> to see which internal concepts amplified or suppressed the final sampled token—an expensive, research-grade investigation that still captures only a fraction of the total computation.</li>
-        </ol>
         <p>
-          Because activation tracing is still research-grade, production and audit teams rely on two practical text-level traces, plus activation tracing as a third level, each with a different mechanism and a different guarantee (<em>Figure 1</em>):
-        </p>
-        <ul>
-          <li><strong>Thought Summaries (High-Level Text Trace):</strong> Proprietary reasoning APIs (such as the Gemini API; <a href="https://ai.google.dev/gemini-api/docs/thinking" target="_blank" rel="noopener">Google, 2026</a>) return condensed summaries of the model's reasoning steps. They are easy to log for debugging and monitoring, yet they sit two steps removed from the model's internal computation: raw thinking tokens are themselves sampled outputs of the activations, and a separate pass condenses those tokens into short prose (<em>Figure 1</em>). A summary therefore gives a readable overview without a one-to-one mapping back to the raw tokens, let alone the activations.</li>
-          <li><strong>Raw Thinking Tokens (Token-Level Text Trace):</strong> Open-weight reasoning models (such as DeepSeek-R1) expose the actual tokens the model feeds back to itself as working memory on hard multi-step tasks (<a href="https://arxiv.org/abs/2507.11473" target="_blank" rel="noopener">Korbak et al., Jul 2025</a>). They are finer-grained than summaries, yet they remain sampled text and cannot serve as proof of what caused the answer. When a planted hint changed the answer, reasoning models often disclosed it in fewer than 20% of cases (<a href="https://arxiv.org/abs/2505.05410" target="_blank" rel="noopener">Chen et al., May 2025</a>), extending earlier results on prompted chain-of-thought (<a href="https://arxiv.org/abs/2305.04388" target="_blank" rel="noopener">Turpin et al., NeurIPS 2023</a>).
-            <p style="margin:8px 0 0;">Save reasoning traces (raw thinking tokens or thought summaries) in your audit logs so engineers can debug and monitor the model. Base any customer-facing or regulatory justification on artifacts that code can verify: exact source quotes, database records, and explicit rule checks. Research models that reason directly in continuous latent space (<a href="https://arxiv.org/abs/2412.06769" target="_blank" rel="noopener">Hao et al., Dec 2024</a>) skip written tokens altogether, which would remove this level of visibility.</p>
-          </li>
-          <li><strong>Circuit Tracing &amp; Latent-Space Activations (Internal Feature Granularity):</strong> Attribution graphs (<a href="https://transformer-circuits.pub/2025/attribution-graphs/biology.html" target="_blank" rel="noopener">Lindsey et al., Mar 2025</a>)—brought to open-weight models by the <a href="https://www.anthropic.com/research/open-source-circuit-tracing" target="_blank" rel="noopener">circuit-tracing library</a>—and sparse autoencoders (<a href="https://deepmind.google/blog/gemma-scope-2-helping-the-ai-safety-community-deepen-understanding-of-complex-language-model-behavior/" target="_blank" rel="noopener">Gemma Scope 2</a>) trace parts of the internal pathway behind an individual prompt, yet they capture only a fraction of the computation and serve audits and investigations at research cost.</li>
-        </ul>
-        <p>
-          A fourth route avoids the faithfulness problem altogether: have the model translate the case into a checklist or program that deterministic code executes, so the written reasoning is the computation that produced the answer (<a href="https://arxiv.org/abs/2301.13379" target="_blank" rel="noopener">Lyu et al., Jan 2023</a>). This is Option 3 (Hybrid) in <em>Table 2</em>, Section 4. Section 5 walks through this route on a real prior-authorization request.
+          <strong>One token at a time.</strong> A model writes its answer one token, a word or part of a word, at a time. For each token it runs one forward pass: the input and everything written so far flow up through every layer, each layer computes new activations, and the last layer turns them into probabilities for the next token. One token is sampled, and the rest of that pass's activations are discarded. Each layer's keys and values are cached for speed, but they can be rebuilt from the tokens. The new token is appended to the input, and the next pass begins. <em>Figure 1</em> shows four steps of this loop on the prior-authorization case from Section 5.
         </p>
 
 <div class="diagram-frame" id="fig-q1a">
@@ -1046,6 +1039,37 @@
     </div>
   </div>
 </div>
+
+        <p>
+          <strong>What this means.</strong> Everything the model weighs while choosing a token lives in activations that are never written down. The only thing carried from one step to the next is the written token. The written reasoning is the model's notepad, not a recording of its thinking.
+        </p>
+        <p>
+          <strong>Three things you can look at</strong> (the three levels in <em>Figure 1</em>):
+        </p>
+        <ul>
+          <li><strong>Level 1 · Thought summaries.</strong> <em>What you see:</em> a short prose summary of the model's reasoning. <em>Who can see it:</em> anyone using a reasoning API such as Gemini (<a href="https://ai.google.dev/gemini-api/docs/thinking" target="_blank" rel="noopener">Google, 2026</a>); this is usually all a proprietary API returns. <em>What it proves:</em> little about why the model answered as it did. A summary sits two steps removed from the computation: it condenses tokens that were themselves sampled from activations (<em>Figure 1</em>).</li>
+          <li><strong>Level 2 · Raw thinking tokens.</strong> <em>What you see:</em> the actual tokens the model wrote to itself before answering. <em>Who can see it:</em> users of open-weight reasoning models such as DeepSeek-R1; proprietary APIs usually keep them with the provider. <em>What it proves:</em> what the model wrote, not what caused its answer. On hard multi-step problems, the model has to write intermediate results down to use them in later steps, which makes the trace useful working memory to monitor (<a href="https://arxiv.org/abs/2507.11473" target="_blank" rel="noopener">Korbak et al., Jul 2025</a>). But it can leave out the real reason, as the hint test below shows.</li>
+          <li><strong>Level 3 · Activations (circuit tracing).</strong> <em>What you see:</em> which internal features fired and how they pushed the model toward its next token. <em>Who can see it:</em> only teams running open weights on infrastructure they control, with specialist tooling. <em>What it proves:</em> part of the real internal path for one prompt. Attribution graphs (<a href="https://transformer-circuits.pub/2025/attribution-graphs/biology.html" target="_blank" rel="noopener">Lindsey et al., Mar 2025</a>)—brought to open-weight models by the <a href="https://www.anthropic.com/research/open-source-circuit-tracing" target="_blank" rel="noopener">circuit-tracing library</a>—and sparse autoencoders (<a href="https://deepmind.google/blog/gemma-scope-2-helping-the-ai-safety-community-deepen-understanding-of-complex-language-model-behavior/" target="_blank" rel="noopener">Gemma Scope 2</a>) capture only a fraction of the computation, at research cost.</li>
+        </ul>
+
+        <div class="closes" style="margin:14px 0 16px;">
+          <span><b>Example: the hint test.</b> Researchers ask a model a multiple-choice question with a hint added, such as "A Stanford professor indicates the answer is (A)," pointing to an answer the model would not otherwise pick. When the hint changes the answer, they check whether the model's reasoning mentions it. Often it does not: the trace builds a plausible argument for (A), like a student who saw the answer key and writes out a full solution without mentioning it. In these tests, reasoning models often disclosed the hint in fewer than 20% of cases (<a href="https://arxiv.org/abs/2505.05410" target="_blank" rel="noopener">Chen et al., May 2025</a>), extending earlier results on prompted chain-of-thought (<a href="https://arxiv.org/abs/2305.04388" target="_blank" rel="noopener">Turpin et al., NeurIPS 2023</a>). Newer models follow planted hints less often, which makes this test harder to run, but it does not make their traces proof.</span>
+        </div>
+
+        <p>
+          <strong>The practical rule:</strong> save reasoning traces (raw thinking tokens or thought summaries) in your audit logs so engineers can debug and monitor the model, and base any customer-facing or regulatory justification on artifacts that code can verify, such as exact source quotes, database records, and explicit rule checks. Research models that reason directly in continuous latent space (<a href="https://arxiv.org/abs/2412.06769" target="_blank" rel="noopener">Hao et al., Dec 2024</a>) skip written tokens altogether, which would remove Level 2 entirely.
+        </p>
+        <p>
+          <strong>What it takes to look inside (Level 3).</strong> Downloading open weights does not explain anything by itself: the checkpoint is a static archive of trained numbers. Explaining one prompt takes three engineering steps:
+        </p>
+        <ol>
+          <li><strong>Record the activations.</strong> Host the model on infrastructure you control and attach hooks that save each layer's activations as the prompt runs.</li>
+          <li><strong>Split them into readable features.</strong> A single activation value usually mixes many unrelated concepts, so a second, specially trained model, a <strong>sparse autoencoder</strong> or transcoder, splits the activations into features a person can try to label. Each must be trained for that exact model.</li>
+          <li><strong>Trace how features influence each other.</strong> Link the active features across layers into an <strong>attribution graph</strong> showing which ones pushed the final token up or down. This is an expensive, research-grade investigation that still captures only part of the computation.</li>
+        </ol>
+        <p>
+          <strong>The way out: make the written reasoning the computation.</strong> A fourth route avoids the faithfulness problem altogether: have the model translate the case into a checklist or program that deterministic code executes, so the written reasoning is the computation that produced the answer (<a href="https://arxiv.org/abs/2301.13379" target="_blank" rel="noopener">Lyu et al., Jan 2023</a>). This is Option 3 (Hybrid) in <em>Table 2</em>; Section 5 and <em>Figure 4</em> walk through it on a real prior-authorization request.
+        </p>
 
         <h2 id="sec-2">2. Beyond Latent Activations: What "Black Box" Means to a Customer</h2>
         <p>
