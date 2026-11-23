@@ -1,5 +1,5 @@
 <div class="diagram-frame" id="fig-q1">
-  <svg viewBox="0 0 920 590" role="img" aria-label="The model stays opaque; trust comes from checks around it. Inside the customer's data perimeter (F), a request is screened (D), grounded in their sources (A), handled by the opaque model, verified with rules in code (A and D), and routed by risk (E), with every step logged (C). Evaluation (B) gates every change, and the rollout stage (G) sets how much is automated">
+  <svg viewBox="0 0 920 606" role="img" aria-label="The model stays opaque; trust comes from checks around it, lettered in the order a request meets them. Inside the customer's data perimeter, a request is screened (A), grounded in their sources (B), handled by the opaque model, checked in code (C), and routed by risk (D), with every step logged (E). Evaluation and pinning gate every change (F), and the rollout stage sets how much is automated (G)">
   <defs>
     <marker id="arr-q1l-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:var(--ink)"/>
@@ -9,60 +9,60 @@
     </marker>
   </defs>
 
-    <rect x="14" y="14" width="892" height="562" rx="14" style="fill:var(--panel-2);stroke:var(--line);stroke-width:1.75"/>
+    <rect x="14" y="14" width="892" height="578" rx="14" style="fill:var(--panel-2);stroke:var(--line);stroke-width:1.75"/>
     <text class="zl" x="34" y="42">THE MODEL STAYS OPAQUE · TRUST COMES FROM CHECKS AROUND IT</text>
 
-    <!-- B: evaluation gates changes -->
-    <rect class="node-good" x="34" y="58" width="852" height="40" rx="9"/>
-    <text class="t-b" x="52" y="84">B · Golden-set evaluation gates every change</text>
-    <path d="M 196 98 V 317 H 216" style="fill:none;stroke:var(--good);stroke-width:2.2" marker-end="url(#arr-q1l-good)"/>
+    <!-- A: data perimeter -->
+    <rect x="34" y="58" width="852" height="372" rx="12" style="fill:none;stroke:var(--cyan);stroke-width:1.8;stroke-dasharray:7 5"/>
+    <text class="t-m-c" x="50" y="84">A · DATA PERIMETER</text>
 
-    <!-- F: data perimeter -->
-    <rect x="34" y="116" width="852" height="370" rx="12" style="fill:none;stroke:var(--cyan);stroke-width:1.8;stroke-dasharray:7 5"/>
-    <text class="t-m-c" x="50" y="142">F · DATA PERIMETER</text>
+    <!-- Request path, in order -->
+    <rect class="node-dim" x="350" y="70" width="120" height="26" rx="13"/>
+    <text class="t-s t-c" x="410" y="88">request</text>
+    <line class="flow" x1="410" y1="96" x2="410" y2="112" marker-end="url(#arr-q1l-ink)"/>
 
-    <!-- Request path -->
-    <rect class="node-dim" x="350" y="128" width="120" height="26" rx="13"/>
-    <text class="t-s t-c" x="410" y="146">request</text>
-    <line class="flow" x1="410" y1="154" x2="410" y2="168" marker-end="url(#arr-q1l-ink)"/>
+    <rect class="node-cyan" x="220" y="116" width="380" height="42" rx="9"/>
+    <text class="t-b t-c" x="410" y="142">A · Screen input</text>
+    <line class="flow" x1="410" y1="158" x2="410" y2="174" marker-end="url(#arr-q1l-ink)"/>
 
-    <rect class="node-cyan" x="220" y="172" width="380" height="42" rx="9"/>
-    <text class="t-b t-c" x="410" y="198">D · Screen input</text>
-    <line class="flow" x1="410" y1="214" x2="410" y2="230" marker-end="url(#arr-q1l-ink)"/>
+    <rect class="node-cyan" x="220" y="178" width="380" height="42" rx="9"/>
+    <text class="t-b t-c" x="410" y="204">B · Ground in their sources</text>
+    <line class="flow" x1="410" y1="220" x2="410" y2="236" marker-end="url(#arr-q1l-ink)"/>
 
-    <rect class="node-cyan" x="220" y="234" width="380" height="42" rx="9"/>
-    <text class="t-b t-c" x="410" y="260">A · Ground in their sources</text>
-    <line class="flow" x1="410" y1="276" x2="410" y2="292" marker-end="url(#arr-q1l-ink)"/>
+    <rect class="node-violet" x="220" y="240" width="380" height="42" rx="9" style="stroke-dasharray:6 4"/>
+    <text class="t-b t-c" x="410" y="266">Model (opaque)</text>
+    <line class="flow" x1="410" y1="282" x2="410" y2="298" marker-end="url(#arr-q1l-ink)"/>
 
-    <rect class="node-violet" x="220" y="296" width="380" height="42" rx="9" style="stroke-dasharray:6 4"/>
-    <text class="t-b t-c" x="410" y="322">Model (opaque)</text>
-    <line class="flow" x1="410" y1="338" x2="410" y2="354" marker-end="url(#arr-q1l-ink)"/>
+    <rect class="node-cyan" x="220" y="302" width="380" height="42" rx="9"/>
+    <text class="t-b t-c" x="410" y="328">C · Check outputs in code</text>
+    <line class="flow" x1="410" y1="344" x2="410" y2="360" marker-end="url(#arr-q1l-ink)"/>
 
-    <rect class="node-cyan" x="220" y="358" width="380" height="42" rx="9"/>
-    <text class="t-b t-c" x="410" y="384">A + D · Verify, apply rules in code</text>
-    <line class="flow" x1="410" y1="400" x2="410" y2="416" marker-end="url(#arr-q1l-ink)"/>
+    <rect class="node-cyan" x="220" y="364" width="380" height="42" rx="9"/>
+    <text class="t-b t-c" x="410" y="390">D · Route by risk</text>
 
-    <rect class="node-cyan" x="220" y="420" width="380" height="42" rx="9"/>
-    <text class="t-b t-c" x="410" y="446">E · Route by risk</text>
-
-    <!-- C: every step logged -->
-    <rect class="node-cyan" x="640" y="172" width="226" height="290" rx="9"/>
-    <text class="t-b t-c" x="753" y="310">C · Logs &amp; traces</text>
-    <text class="t-s t-c" x="753" y="334">every step, replayable</text>
+    <!-- E: logs alongside every step -->
+    <rect class="node-cyan" x="640" y="116" width="226" height="290" rx="9"/>
+    <text class="t-b t-c" x="753" y="256">E · Log every step</text>
+    <text class="t-s t-c" x="753" y="280">replayable months later</text>
 
     <!-- Output -->
-    <line class="flow" x1="410" y1="462" x2="410" y2="502" marker-end="url(#arr-q1l-ink)"/>
-    <rect class="node-card" x="220" y="506" width="380" height="42" rx="9"/>
-    <text class="t-b t-c" x="410" y="532">Answer with citations</text>
+    <line class="flow" x1="410" y1="406" x2="410" y2="446" marker-end="url(#arr-q1l-ink)"/>
+    <rect class="node-card" x="220" y="450" width="380" height="42" rx="9"/>
+    <text class="t-b t-c" x="410" y="476">Answer with citations</text>
 
-    <!-- G: rollout sets how much E automates -->
-    <rect class="node-good" x="640" y="500" width="226" height="54" rx="9"/>
-    <text class="t-b t-c" x="753" y="522">G · Graduated rollout</text>
-    <text class="t-s t-c" x="753" y="543">shadow → auto, kill switch</text>
-    <path d="M 640 527 H 620 V 441 H 604" style="fill:none;stroke:var(--good);stroke-width:2.2" marker-end="url(#arr-q1l-good)"/>
+    <!-- F and G: controls on every change -->
+    <rect class="node-good" x="34" y="516" width="418" height="56" rx="9"/>
+    <text class="t-b t-c" x="243" y="539">F · Evaluate and pin</text>
+    <text class="t-s t-c" x="243" y="560">golden set gates every change</text>
+    <path d="M 196 516 V 261 H 216" style="fill:none;stroke:var(--good);stroke-width:2.2" marker-end="url(#arr-q1l-good)"/>
+
+    <rect class="node-good" x="468" y="516" width="418" height="56" rx="9"/>
+    <text class="t-b t-c" x="677" y="539">G · Roll out gradually</text>
+    <text class="t-s t-c" x="677" y="560">shadow → auto, kill switch</text>
+    <path d="M 620 516 V 385 H 604" style="fill:none;stroke:var(--good);stroke-width:2.2" marker-end="url(#arr-q1l-good)"/>
   </svg>
   <div class="fig-caption">
-    <span>Figure 2 — The model stays opaque; trust comes from checks around it. Inside the customer's data perimeter (F), each request is screened (D), grounded in their sources (A), verified with rules in code (A, D), and routed by risk (E), with every step logged (C). Evaluation gates every change (B), and the rollout stage sets how much is automated (G).</span>
+    <span>Figure 2 — The model stays opaque; trust comes from checks around it, lettered in the order a request meets them. Inside the customer's data perimeter, each request is screened (A), grounded in their sources (B), handled by the model, checked in code (C), and routed by risk (D), with every step logged (E). Evaluation and pinning gate every change (F), and the rollout stage sets how much is automated (G).</span>
     <div class="legend-items">
       <span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> Opaque model</span>
       <span><i class="swatch-dot" style="background:var(--cyan-soft);border-color:var(--cyan)"></i> Checks on every request</span>

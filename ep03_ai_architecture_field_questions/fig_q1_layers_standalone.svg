@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 606" role="img" aria-label="The model stays opaque; trust comes from checks around it, lettered in the order a request meets them. Inside the customer's data perimeter, a request is screened (A), grounded in their sources (B), handled by the opaque model, checked in code (C), and routed by risk (D), with every step logged (E). Evaluation and pinning gate every change (F), and the rollout stage sets how much is automated (G)" width="1840" height="1212">
+  <style>
+    .t-b { font-family: Inter, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 700; fill: #0f172a; }
+    .t-s { font-family: Inter, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 14px; fill: #475569; }
+    .t-c { text-anchor: middle; }
+    .t-m-c { font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, 'Courier New', monospace; font-size: 12px; font-weight: 700; fill: #0369a1; }
+    .zl { font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, 'Courier New', monospace; font-size: 13.2px; letter-spacing: 0.09em; font-weight: 700; fill: #475569; }
+    .flow { stroke: #0f172a; stroke-width: 2.1; fill: none; }
+    .node-card { fill: #ffffff; stroke: #cbd5e1; stroke-width: 1.75; }
+    .node-dim { fill: #f1f5f9; stroke: #cbd5e1; stroke-width: 1.2; }
+    .node-good { fill: #15803d; fill-opacity: 0.09; stroke: #15803d; stroke-width: 1.8; }
+    .node-violet { fill: #6d28d9; fill-opacity: 0.09; stroke: #6d28d9; stroke-width: 1.8; }
+    .node-cyan { fill: #0369a1; fill-opacity: 0.09; stroke: #0369a1; stroke-width: 1.8; }
+  </style>
+  <rect x="0" y="0" width="920" height="606" fill="#ffffff"/>
+  <defs>
+    <marker id="arr-q1l-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:#0f172a"/>
+    </marker>
+    <marker id="arr-q1l-good" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:#15803d"/>
+    </marker>
+  </defs>
+
+    <rect x="14" y="14" width="892" height="578" rx="14" style="fill:#f8fafc;stroke:#cbd5e1;stroke-width:1.75"/>
+    <text class="zl" x="34" y="42">THE MODEL STAYS OPAQUE · TRUST COMES FROM CHECKS AROUND IT</text>
+
+    <!-- A: data perimeter -->
+    <rect x="34" y="58" width="852" height="372" rx="12" style="fill:none;stroke:#0369a1;stroke-width:1.8;stroke-dasharray:7 5"/>
+    <text class="t-m-c" x="50" y="84">A · DATA PERIMETER</text>
+
+    <!-- Request path, in order -->
+    <rect class="node-dim" x="350" y="70" width="120" height="26" rx="13"/>
+    <text class="t-s t-c" x="410" y="88">request</text>
+    <line class="flow" x1="410" y1="96" x2="410" y2="112" marker-end="url(#arr-q1l-ink)"/>
+
+    <rect class="node-cyan" x="220" y="116" width="380" height="42" rx="9"/>
+    <text class="t-b t-c" x="410" y="142">A · Screen input</text>
+    <line class="flow" x1="410" y1="158" x2="410" y2="174" marker-end="url(#arr-q1l-ink)"/>
+
+    <rect class="node-cyan" x="220" y="178" width="380" height="42" rx="9"/>
+    <text class="t-b t-c" x="410" y="204">B · Ground in their sources</text>
+    <line class="flow" x1="410" y1="220" x2="410" y2="236" marker-end="url(#arr-q1l-ink)"/>
+
+    <rect class="node-violet" x="220" y="240" width="380" height="42" rx="9" style="stroke-dasharray:6 4"/>
+    <text class="t-b t-c" x="410" y="266">Model (opaque)</text>
+    <line class="flow" x1="410" y1="282" x2="410" y2="298" marker-end="url(#arr-q1l-ink)"/>
+
+    <rect class="node-cyan" x="220" y="302" width="380" height="42" rx="9"/>
+    <text class="t-b t-c" x="410" y="328">C · Check outputs in code</text>
+    <line class="flow" x1="410" y1="344" x2="410" y2="360" marker-end="url(#arr-q1l-ink)"/>
+
+    <rect class="node-cyan" x="220" y="364" width="380" height="42" rx="9"/>
+    <text class="t-b t-c" x="410" y="390">D · Route by risk</text>
+
+    <!-- E: logs alongside every step -->
+    <rect class="node-cyan" x="640" y="116" width="226" height="290" rx="9"/>
+    <text class="t-b t-c" x="753" y="256">E · Log every step</text>
+    <text class="t-s t-c" x="753" y="280">replayable months later</text>
+
+    <!-- Output -->
+    <line class="flow" x1="410" y1="406" x2="410" y2="446" marker-end="url(#arr-q1l-ink)"/>
+    <rect class="node-card" x="220" y="450" width="380" height="42" rx="9"/>
+    <text class="t-b t-c" x="410" y="476">Answer with citations</text>
+
+    <!-- F and G: controls on every change -->
+    <rect class="node-good" x="34" y="516" width="418" height="56" rx="9"/>
+    <text class="t-b t-c" x="243" y="539">F · Evaluate and pin</text>
+    <text class="t-s t-c" x="243" y="560">golden set gates every change</text>
+    <path d="M 196 516 V 261 H 216" style="fill:none;stroke:#15803d;stroke-width:2.2" marker-end="url(#arr-q1l-good)"/>
+
+    <rect class="node-good" x="468" y="516" width="418" height="56" rx="9"/>
+    <text class="t-b t-c" x="677" y="539">G · Roll out gradually</text>
+    <text class="t-s t-c" x="677" y="560">shadow → auto, kill switch</text>
+    <path d="M 620 516 V 385 H 604" style="fill:none;stroke:#15803d;stroke-width:2.2" marker-end="url(#arr-q1l-good)"/>
+  </svg>
