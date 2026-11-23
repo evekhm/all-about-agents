@@ -890,7 +890,7 @@
       <div class="post-prose">
         <p>My goal with this question is to answer one of the most common questions in enterprise AI system-design interviews: how to make a language model trustworthy to a skeptical customer. We start inside the model—what reasoning traces exist, what granularity each reaches, and why open weights still require multi-step instrumentation—before stepping outside to the nine stakeholder concerns, seven transparent system layers, and six architectural alternatives.</p>
         <div class="closes" style="margin:14px 0 16px;">
-          <span><b>The 30-second answer:</b> Every LLM, open or closed, spreads its knowledge across billions of weights and computes per-request activations that are discarded after each token. Thought summaries, raw thinking tokens, and research-grade circuit tracing on open weights offer partial visibility, while leaving the causal reason behind a specific answer unverified. Trust therefore comes from three pillars around the model:<br>1. <strong>Verify</strong> every output: ground answers in cited sources, measure quality on a golden set, and let code make high-stakes decisions on verified facts.<br>2. <strong>Control</strong> and audit execution: enforce code guardrails, pin model versions, protect data governance boundaries, and log every step for replay.<br>3. <strong>Roll out</strong> safely: match human review to risk, and graduate from shadow mode to automation behind an instant kill switch.</span>
+          <span><b>The 30-second answer:</b> The model's weights and latent activations remain opaque: knowledge is spread across billions of weights, per-request activations are discarded after each token, and thought summaries, raw thinking tokens, or circuit tracing leave the causal reason behind a specific answer unverified. Trust therefore comes from the surrounding system, which makes inputs, sources, limits, evaluations, and history transparent across three pillars:<br>1. <strong>Verify</strong> every output: ground answers in cited sources, measure quality on a golden set, and let code make high-stakes decisions on verified facts.<br>2. <strong>Control</strong> and audit execution: enforce code guardrails, pin model versions, protect data governance boundaries, and log every step for replay.<br>3. <strong>Roll out</strong> safely: match human review to risk, and graduate from shadow mode to automation behind an instant kill switch.</span>
         </div>
         <p><strong>What we will walk through step by step:</strong></p>
         <ol>
@@ -1073,25 +1073,19 @@
           In practice, internal model tracing hits a hard ceiling for both deployment models: <strong>proprietary APIs</strong> keep weights and layer activations behind the endpoint while exposing only condensed summaries, and <strong>open-weight models</strong> emit sampled tokens that can omit causal factors while full activation-level circuit tracing remains partial and costly.
         </p>
         <p>
-          Therefore, enterprise trust shifts from inspecting neural activations to engineering <strong>verifiable system controls</strong> around the model (Section 3). "Black box" maps to nine distinct concerns (<em>Table 1</em>), and who is in the room usually signals which ones matter first:
+          Therefore, enterprise trust shifts from inspecting neural activations to engineering <strong>verifiable system controls</strong> around the model (Section 3). "Black box" maps to nine distinct concerns. Each tends to come from a particular team and sits on a concrete business risk, so who is in the room usually signals which concerns matter first (<em>Table 1</em>):
         </p>
-        <ul>
-          <li><strong>End users</strong> want sources behind an answer.</li>
-          <li><strong>Engineering</strong> wants predictable outputs and version stability.</li>
-          <li><strong>Legal</strong> wants to know what data the model learned from, whether its license and IP terms are safe, and who is liable when it is wrong.</li>
-          <li><strong>Model-risk and validation teams</strong> want to test the exact model independently, and some want to host or inspect it themselves (open weights).</li>
-          <li><strong>Security</strong> wants data boundaries and an approved, untampered model.</li>
-          <li><strong>Compliance</strong> wants an audit trail.</li>
-        </ul>
 
         <div class="nine-q-wrap">
-          <div class="nine-q-head">Table 1 · What "Black Box" Can Mean</div>
+          <div class="nine-q-head">Table 1 · What "Black Box" Can Mean, Who Raises It, and the Risk Behind It</div>
           <div class="tbl-wrap">
             <table>
               <thead>
                 <tr>
                   <th>What the Customer Says</th>
-                  <th>Underlying Angle</th>
+                  <th>Concern</th>
+                  <th>Usually Raised By</th>
+                  <th>Risk Behind It</th>
                   <th>What Addresses It</th>
                 </tr>
               </thead>
@@ -1099,46 +1093,64 @@
                 <tr>
                   <td><b>"We don't know why it gave that answer."</b></td>
                   <td><b>Explainability</b></td>
+                  <td>End users, business owners</td>
+                  <td><b>Liability:</b> a wrong answer reaches a customer, patient, or ledger</td>
                   <td>Traceable source passages, structured criteria behind every claim, and faithful-by-construction reasoning (the model writes a checklist or program that code executes)</td>
                 </tr>
                 <tr>
                   <td><b>"It answers differently every time."</b></td>
                   <td><b>Predictability</b></td>
+                  <td>Engineering</td>
+                  <td><b>Reputational harm:</b> inconsistent answers in front of customers</td>
                   <td>Fixed output schemas and enumerated values, a pinned model version and thinking level, and measured <code>pass^k</code> consistency (the probability that all <code>k</code> i.i.d. trials of a task succeed, averaged across tasks; <a href="https://arxiv.org/abs/2406.12045" target="_blank" rel="noopener">Yao et al., ICLR 2025</a>). Current reasoning models are tuned for their default sampling settings, so consistency comes from structure, pinning, and measurement (Section 3, Layer D)</td>
                 </tr>
                 <tr>
                   <td><b>"We don't know what data it was trained on."</b></td>
                   <td><b>Training-Data Provenance</b></td>
+                  <td>Legal</td>
+                  <td><b>Liability:</b> IP, licensing, and privacy exposure</td>
                   <td>Model cards and data statements (source categories, knowledge cut-off, filtering), published bias and safety evaluations, licensing terms, and IP / copyright indemnification; fully open models with published training corpora (such as <a href="https://allenai.org/olmo" target="_blank" rel="noopener">AI2 OLMo</a>) when the customer requires line-level data disclosure</td>
                 </tr>
                 <tr>
                   <td><b>"We can't look inside the model."</b></td>
                   <td><b>Model Weights</b></td>
+                  <td>Model-risk and validation teams; security; sovereignty-bound customers</td>
+                  <td><b>Regulatory scrutiny:</b> independent validation; lock-in</td>
                   <td>Open-weight models (such as Gemma or Llama) that the customer can download, inspect, fine-tune, and self-host at a pinned checksum; per-decision explanations come from the system layers around the weights (Section 3)</td>
                 </tr>
                 <tr>
                   <td><b>"We don't know where our data goes."</b></td>
                   <td><b>Data Governance</b></td>
+                  <td>Security, privacy office</td>
+                  <td><b>Confidential data exposure:</b> leaks into training runs or across users</td>
                   <td>Contractual zero-training, regional residency, encryption, and retention bounds</td>
                 </tr>
                 <tr>
                   <td><b>"We can't tell when it is wrong."</b></td>
                   <td><b>Reliability</b></td>
+                  <td>Business owners, operations</td>
+                  <td><b>Liability and reputational harm:</b> fabricated or off-policy answers</td>
                   <td>Groundedness checks, calibrated abstention (the system declines to answer when checkable signals, such as quotes found and criteria resolved, fall below a threshold tuned on the golden set), and known failure rates</td>
                 </tr>
                 <tr>
                   <td><b>"We can't audit a past decision."</b></td>
                   <td><b>Accountability</b></td>
+                  <td>Compliance, internal audit</td>
+                  <td><b>Regulatory scrutiny:</b> an examiner asks how a decision was reached (Table 4)</td>
                   <td>Immutable logs and step traces capable of reconstructing any historical run</td>
                 </tr>
                 <tr>
                   <td><b>"You will update the model under us."</b></td>
                   <td><b>Version Stability</b></td>
+                  <td>Engineering, platform owners</td>
+                  <td><b>Lock-in:</b> vendor changes behavior, terms, or pricing</td>
                   <td>Strict model version pinning, regression-gated customer cutovers, and a planned migration calendar, because pinned API versions are retired on the provider's schedule</td>
                 </tr>
                 <tr>
                   <td><b>"We have no way to measure it."</b></td>
                   <td><b>Quality</b></td>
+                  <td>Executive sponsor</td>
+                  <td><b>Career risk:</b> the internal champion owns an opaque failure</td>
                   <td>Agreed numerical metrics over a golden set built with their experts</td>
                 </tr>
               </tbody>
@@ -1147,16 +1159,8 @@
         </div>
 
         <p>
-          Underneath those nine angles sit six concrete business and personal risks that decide whether a project moves forward:
+          The risks in the fourth column decide whether a project moves forward. Most are business risks: liability, regulatory scrutiny (<em>Table 4</em> lists the frameworks), confidential data exposure, reputational harm, and lock-in. One is personal: the internal champion who backs the project carries the blame if an opaque failure embarrasses their team, which is why measurable quality matters so much to the sponsor.
         </p>
-        <ul>
-          <li><strong>Legal and Financial Liability:</strong> A wrong answer reaches an external customer, a patient record, or a financial ledger, and the enterprise owns the consequences.</li>
-          <li><strong>Regulatory Scrutiny:</strong> Frameworks such as the EU AI Act, GDPR automated-decision rules, banking model risk management (<code>SR 26-2</code>, which replaced <code>SR 11-7</code>), HIPAA, and FDA guidance require defensible explanations when an examiner asks how a decision was reached.</li>
-          <li><strong>Confidential Data Exposure:</strong> Proprietary records leaking into vendor training runs or surfacing across users via prompt injection.</li>
-          <li><strong>Reputational Harm:</strong> A public screenshot of an assistant stating something fabricated or off-policy.</li>
-          <li><strong>Loss of Control and Lock-In:</strong> Unplanned vendor shifts in model behavior, terms, or unit pricing.</li>
-          <li><strong>Personal Career Risk for the Internal Champion:</strong> The sponsor backing the project carries personal accountability if an opaque failure embarrasses their team.</li>
-        </ul>
 
         <p>
           That gives us the governing boundary: <strong>the model's weights and latent activations remain opaque, while the surrounding system makes inputs, sources, limits, evaluations, and history transparent</strong> (<em>Figure 2</em>).
