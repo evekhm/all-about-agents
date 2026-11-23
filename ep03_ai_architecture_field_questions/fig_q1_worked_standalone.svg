@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 510" role="img" aria-label="Same chart, same model: when the model decides, its trace becomes the reason and produces a wrongful denial; when the model only extracts quoted facts and code applies the policy rule, the outcome is a request for the missing evidence" width="1840" height="1020">
+  <style>
+    .t-b { font-family: Inter, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 700; fill: #0f172a; }
+    .t-s { font-family: Inter, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 14px; fill: #475569; }
+    .t-c { text-anchor: middle; }
+    .t-e { text-anchor: end; }
+    .t-m-c { font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, 'Courier New', monospace; font-size: 12px; font-weight: 700; fill: #0369a1; }
+    .t-m-g { font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, 'Courier New', monospace; font-size: 12.6px; font-weight: 700; fill: #15803d; }
+    .t-m-r { font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, 'Courier New', monospace; font-size: 12.8px; font-weight: 700; fill: #b91c1c; }
+    .zl { font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, 'Courier New', monospace; font-size: 13.2px; letter-spacing: 0.09em; font-weight: 700; fill: #475569; }
+    .flow { stroke: #0f172a; stroke-width: 2.1; fill: none; }
+    .flow-g { stroke: #15803d; stroke-width: 2.4; fill: none; }
+    .node-card { fill: #ffffff; stroke: #cbd5e1; stroke-width: 1.75; }
+    .node-dim { fill: #f1f5f9; stroke: #cbd5e1; stroke-width: 1.2; }
+    .node-good { fill: #15803d; fill-opacity: 0.09; stroke: #15803d; stroke-width: 1.8; }
+    .node-bad { fill: #b91c1c; fill-opacity: 0.08; stroke: #b91c1c; stroke-width: 1.8; }
+    .node-violet { fill: #6d28d9; fill-opacity: 0.09; stroke: #6d28d9; stroke-width: 1.8; }
+    .node-cyan { fill: #0369a1; fill-opacity: 0.09; stroke: #0369a1; stroke-width: 1.8; }
+  </style>
+  <rect x="0" y="0" width="920" height="510" fill="#ffffff"/>
+  <defs>
+    <marker id="arr-q1w-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:#0f172a"/>
+    </marker>
+    <marker id="arr-q1w-stop" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:#b91c1c"/>
+    </marker>
+    <marker id="arr-q1w-good" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:#15803d"/>
+    </marker>
+  </defs>
+
+    <rect x="14" y="14" width="892" height="482" rx="14" style="fill:#f8fafc;stroke:#cbd5e1;stroke-width:1.75"/>
+    <text class="zl" x="34" y="42">SAME CHART, SAME MODEL · WHO DECIDES CHANGES THE OUTCOME</text>
+
+    <!-- Shared input -->
+    <rect class="node-dim" x="32" y="204" width="140" height="64" rx="9"/>
+    <text class="t-b t-c" x="102" y="230">Chart + policy</text>
+    <text class="t-s t-c" x="102" y="252">same input</text>
+    <path d="M 172 226 H 186 V 142 H 196" style="fill:none;stroke:#b91c1c;stroke-width:2.2" marker-end="url(#arr-q1w-stop)"/>
+    <path d="M 172 246 H 186 V 322 H 196" style="fill:none;stroke:#15803d;stroke-width:2.4" marker-end="url(#arr-q1w-good)"/>
+
+    <!-- Risky lane: the model decides -->
+    <text class="t-m-r" x="200" y="98">RISKY · THE MODEL DECIDES</text>
+    <rect class="node-violet" x="200" y="110" width="200" height="64" rx="9"/>
+    <text class="t-b t-c" x="300" y="137">Model decides</text>
+    <text class="t-s t-c" x="300" y="159">returns DENY</text>
+    <line class="flow" x1="400" y1="142" x2="426" y2="142" marker-end="url(#arr-q1w-ink)"/>
+    <rect class="node-card" x="430" y="110" width="200" height="64" rx="9"/>
+    <text class="t-b t-c" x="530" y="137">Trace becomes reason</text>
+    <text class="t-s t-c" x="530" y="159">"only 3 wks ibuprofen"</text>
+    <line class="flow" x1="630" y1="142" x2="656" y2="142" marker-end="url(#arr-q1w-ink)"/>
+    <rect class="node-bad" x="660" y="110" width="220" height="64" rx="9"/>
+    <text class="t-m-r t-c" x="770" y="137">WRONGFUL DENIAL</text>
+    <text class="t-s t-c" x="770" y="159">criterion (b) never checked</text>
+
+    <line x1="200" y1="214" x2="880" y2="214" style="stroke:#cbd5e1;stroke-width:1.4;stroke-dasharray:6 5"/>
+
+    <!-- Verifiable lane: the model extracts, code decides -->
+    <text class="t-m-g" x="200" y="278">VERIFIABLE · THE MODEL EXTRACTS, CODE DECIDES</text>
+    <rect class="node-violet" x="200" y="290" width="200" height="64" rx="9"/>
+    <text class="t-b t-c" x="300" y="317">Model extracts</text>
+    <text class="t-s t-c" x="300" y="339">facts + verbatim quotes</text>
+    <line class="flow" x1="400" y1="322" x2="426" y2="322" marker-end="url(#arr-q1w-ink)"/>
+    <rect class="node-cyan" x="430" y="290" width="200" height="64" rx="9"/>
+    <text class="t-b t-c" x="530" y="317">Code verifies</text>
+    <text class="t-s t-c" x="530" y="339">quotes found in chart</text>
+    <line class="flow" x1="630" y1="322" x2="656" y2="322" marker-end="url(#arr-q1w-ink)"/>
+    <rect class="node-cyan" x="660" y="290" width="220" height="64" rx="9"/>
+    <text class="t-b t-c" x="770" y="317">Code applies rule</text>
+    <text class="t-s t-c" x="770" y="339">policy criteria (a) and (b)</text>
+    <line class="flow" x1="770" y1="354" x2="770" y2="376" marker-end="url(#arr-q1w-ink)"/>
+
+    <rect class="node-card" x="560" y="380" width="320" height="100" rx="9"/>
+    <text class="t-b" x="578" y="406">Rule: (a) OR (b) approves</text>
+    <text class="t-s" x="578" y="428">(a) ≥ 6 wks supervised PT → not met</text>
+    <text class="t-s" x="578" y="448">(b) neuro deficit → missing evidence</text>
+    <text class="t-s" x="578" y="468">an open criterion can still approve</text>
+    <line class="flow-g" x1="560" y1="430" x2="524" y2="430" marker-end="url(#arr-q1w-good)"/>
+
+    <rect class="node-good" x="200" y="380" width="320" height="100" rx="9"/>
+    <text class="t-m-g t-c" x="360" y="410">PEND_FOR_EVIDENCE</text>
+    <text class="t-b t-c" x="360" y="436">Request the missing evidence</text>
+    <text class="t-s t-c" x="360" y="460">neuro exam notes · PT log if done</text>
+  </svg>
