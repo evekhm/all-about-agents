@@ -865,11 +865,10 @@
     <a class="home-link" id="home-link" href="index.html">← Home</a>
     <a href="#intro">Overview</a>
     <a href="#sec-1">What You Can and Cannot See</a>
-    <a href="#sec-2">Beyond Latent Activations</a>
-    <a href="#sec-3">Seven System Layers</a>
-    <a href="#sec-4">Scoping &amp; Six Alternatives</a>
-    <a href="#sec-5">Worked Example</a>
-    <a href="#sec-6">Summary</a>
+    <a href="#sec-2">Checkable System</a>
+    <a href="#sec-3">Scoping &amp; Six Alternatives</a>
+    <a href="#sec-4">Worked Example</a>
+    <a href="#sec-5">Summary</a>
     <a href="#sec-followups">Follow-Up Questions</a>
     <a href="#references">References</a>
     <button class="theme-btn" id="theme-toggle" type="button">◑ Switch to Dark Mode</button>
@@ -896,9 +895,9 @@
         <ol>
           <li><a href="#sec-1"><strong>Inside the model:</strong></a> why weights and activations are opaque for both APIs and open weights, and the three levels of reasoning-trace granularity.</li>
           <li><a href="#sec-2"><strong>What "black box" means:</strong></a> the nine distinct stakeholder concerns and six business risks that matter outside the weights.</li>
-          <li><a href="#sec-3"><strong>Seven system layers:</strong></a> the engineering controls (<code>A</code>–<code>G</code>) and Google Cloud services that address each concern.</li>
-          <li><a href="#sec-4"><strong>Scoping, regulations, and six alternatives:</strong></a> how scoping questions, regulatory rules, and cost determine which controls and architectural options to apply.</li>
-          <li><a href="#sec-5"><strong>Worked example:</strong></a> tracing a prior-authorization request end to end to compare a trace-based denial against a verifiable hybrid design, followed by a spoken summary and likely follow-up questions.</li>
+          <li><a href="#sec-2"><strong>Seven system layers:</strong></a> the engineering controls (<code>A</code>–<code>G</code>) and Google Cloud services that address each concern.</li>
+          <li><a href="#sec-3"><strong>Scoping, regulations, and six alternatives:</strong></a> how scoping questions, regulatory rules, and cost determine which controls and architectural options to apply.</li>
+          <li><a href="#sec-4"><strong>Worked example:</strong></a> tracing a prior-authorization request end to end to compare a trace-based denial against a verifiable hybrid design, followed by a spoken summary and likely follow-up questions.</li>
         </ol>
         <p>Next in Episode 03: <a href="ep03_q2_model_spectrum_economics.html">Question 02 · Open-Weight vs. Proprietary Models Across the Full Model Spectrum</a> (or view the <a href="ref/ai-interview-cheat-sheet.html">5-Question Master Cheat Sheet</a>).</p>
       </div>
@@ -921,7 +920,7 @@
           <strong>Weights and activations.</strong> A model works with two kinds of numbers. <strong>Weights</strong> are the billions of values learned during training. They are fixed and identical for every request. The model's knowledge is spread across all of them at once, so there is no rule or line you can point to and read. <strong>Activations</strong> are the numbers the model computes from those weights and your input while it handles one request: its working state, which exists only during that request. In the formula <code>y = 2x + 3</code>, the <code>2</code> and the <code>3</code> play the role of weights; with <code>x = 5</code>, the intermediate <code>10</code> and the result <code>13</code> play the role of activations. This is the same for every LLM, whether it runs behind a proprietary API or on open weights. The difference is only who can see the numbers.
         </p>
         <p>
-          <strong>One token at a time.</strong> A model writes its answer one token, a word or part of a word, at a time. For each token it runs one forward pass: the input and everything written so far flow up through every layer, each layer computes new activations, and the last layer turns them into probabilities for the next token. One token is sampled, and the rest of that pass's activations are discarded. Each layer's keys and values are cached for speed, but they can be rebuilt from the tokens. The new token is appended to the input, and the next pass begins. <em>Figure 1</em> shows four steps of this loop on the prior-authorization case from Section 5.
+          <strong>One token at a time.</strong> A model writes its answer one token, a word or part of a word, at a time. For each token it runs one forward pass: the input and everything written so far flow up through every layer, each layer computes new activations, and the last layer turns them into probabilities for the next token. One token is sampled, and the rest of that pass's activations are discarded. Each layer's keys and values are cached for speed, but they can be rebuilt from the tokens. The new token is appended to the input, and the next pass begins. <em>Figure 1</em> shows four steps of this loop on the prior-authorization case from Section 4.
         </p>
 
 <div class="diagram-frame" id="fig-q1a">
@@ -1065,15 +1064,15 @@
           <li><strong>Trace how features influence each other.</strong> Link the active features across layers into an <strong>attribution graph</strong> showing which ones pushed the final token up or down. This is an expensive, research-grade investigation that still captures only part of the computation.</li>
         </ol>
         <p>
-          <strong>The way out: separate reading from deciding.</strong> Have the model extract structured facts (with exact source quotes) into a checklist, and let deterministic code apply the rules to those facts (<a href="https://arxiv.org/abs/2301.13379" target="_blank" rel="noopener">Lyu et al., Jan 2023</a>). Because code executes the rules directly on the recorded facts, the audit trail shows what truly produced the answer. This is <a href="#table-2-option-3">Option 3 (Hybrid) in <em>Table 2</em></a>; Section 5 and <em>Figure 4</em> walk through it on a real prior-authorization request.
+          <strong>The way out: separate reading from deciding.</strong> Have the model extract structured facts (with exact source quotes) into a checklist, and let deterministic code apply the rules to those facts (<a href="https://arxiv.org/abs/2301.13379" target="_blank" rel="noopener">Lyu et al., Jan 2023</a>). Because code executes the rules directly on the recorded facts, the audit trail shows what truly produced the answer. This is <a href="#table-2-option-3">Option 3 (Hybrid) in <em>Table 2</em></a>; <a href="#fig-q1-worked"><em>Figure 4</em></a> walks through it on a real prior-authorization request.
         </p>
 
-        <h2 id="sec-2">2. Beyond Latent Activations: What "Black Box" Means to a Customer</h2>
+        <h2 id="sec-2">2. From "Black Box" to a Checkable System</h2>
         <p>
           In practice, internal model tracing hits a hard ceiling for both deployment models: <strong>proprietary APIs</strong> keep weights and layer activations behind the endpoint while exposing only condensed summaries, and <strong>open-weight models</strong> emit sampled tokens that can omit causal factors while full activation-level circuit tracing remains partial and costly.
         </p>
         <p>
-          Therefore, enterprise trust shifts from inspecting neural activations to engineering <strong>verifiable system controls</strong> around the model (Section 3). "Black box" maps to nine distinct concerns. Each tends to come from a particular team and sits on a concrete business risk, so who is in the room usually signals which concerns matter first (<em>Table 1</em>):
+          Therefore, enterprise trust shifts from inspecting neural activations to engineering <strong>verifiable system controls</strong> around the model. "Black box" maps to nine distinct concerns. Each tends to come from a particular team and sits on a concrete business risk, so who is in the room usually signals which concerns matter first:
         </p>
 
         <div class="nine-q-wrap">
@@ -1084,6 +1083,7 @@
                 <tr>
                   <th>What the Customer Says</th>
                   <th>Concern</th>
+                  <th>Layer</th>
                   <th>Usually Raised By</th>
                   <th>Risk Behind It</th>
                   <th>What Addresses It</th>
@@ -1091,64 +1091,73 @@
               </thead>
               <tbody>
                 <tr>
-                  <td><b>"We don't know why it gave that answer."</b></td>
+                  <td><b>We don't know why it gave that answer.</b></td>
                   <td><b>Explainability</b></td>
+                  <td>E, F</td>
                   <td>End users, business owners</td>
                   <td><b>Liability:</b> a wrong answer reaches a customer, patient, or ledger</td>
                   <td>Traceable source passages, structured criteria behind every claim, and faithful-by-construction reasoning (the model writes a checklist or program that code executes)</td>
                 </tr>
                 <tr>
-                  <td><b>"It answers differently every time."</b></td>
+                  <td><b>It answers differently every time.</b></td>
                   <td><b>Predictability</b></td>
+                  <td>A, E</td>
                   <td>Engineering</td>
                   <td><b>Reputational harm:</b> inconsistent answers in front of customers</td>
-                  <td>Fixed output schemas and enumerated values, a pinned model version and thinking level, and measured <code>pass^k</code> consistency (the probability that all <code>k</code> i.i.d. trials of a task succeed, averaged across tasks; <a href="https://arxiv.org/abs/2406.12045" target="_blank" rel="noopener">Yao et al., ICLR 2025</a>). Current reasoning models are tuned for their default sampling settings, so consistency comes from structure, pinning, and measurement (Section 3, Layer D)</td>
+                  <td>Fixed output schemas and enumerated values, a pinned model version and thinking level, and measured <code>pass^k</code> consistency (the probability that all <code>k</code> i.i.d. trials of a task succeed, averaged across tasks; <a href="https://arxiv.org/abs/2406.12045" target="_blank" rel="noopener">Yao et al., ICLR 2025</a>). Current reasoning models are tuned for their default sampling settings, so consistency comes from structure, pinning, and measurement (Layer C)</td>
                 </tr>
                 <tr>
-                  <td><b>"We don't know what data it was trained on."</b></td>
+                  <td><b>We don't know what data it was trained on.</b></td>
                   <td><b>Training-Data Provenance</b></td>
+                  <td>A</td>
                   <td>Legal</td>
                   <td><b>Liability:</b> IP, licensing, and privacy exposure</td>
                   <td>Model cards and data statements (source categories, knowledge cut-off, filtering), published bias and safety evaluations, licensing terms, and IP / copyright indemnification; fully open models with published training corpora (such as <a href="https://allenai.org/olmo" target="_blank" rel="noopener">AI2 OLMo</a>) when the customer requires line-level data disclosure</td>
                 </tr>
                 <tr>
-                  <td><b>"We can't look inside the model."</b></td>
+                  <td><b>We can't look inside the model.</b></td>
                   <td><b>Model Weights</b></td>
+                  <td>Option 4</td>
                   <td>Model-risk and validation teams; security; sovereignty-bound customers</td>
                   <td><b>Regulatory scrutiny:</b> independent validation; lock-in</td>
-                  <td>Open-weight models (such as Gemma or Llama) that the customer can download, inspect, fine-tune, and self-host at a pinned checksum; per-decision explanations come from the system layers around the weights (Section 3)</td>
+                  <td>Open-weight models (such as Gemma or Llama) that the customer can download, inspect, fine-tune, and self-host at a pinned checksum; per-decision explanations come from the system layers around the weights</td>
                 </tr>
                 <tr>
-                  <td><b>"We don't know where our data goes."</b></td>
+                  <td><b>We don't know where our data goes.</b></td>
                   <td><b>Data Governance</b></td>
+                  <td>A</td>
                   <td>Security, privacy office</td>
                   <td><b>Confidential data exposure:</b> leaks into training runs or across users</td>
                   <td>Contractual zero-training, regional residency, encryption, and retention bounds</td>
                 </tr>
                 <tr>
-                  <td><b>"We can't tell when it is wrong."</b></td>
+                  <td><b>We can't tell when it is wrong.</b></td>
                   <td><b>Reliability</b></td>
+                  <td>B, D, G</td>
                   <td>Business owners, operations</td>
                   <td><b>Liability and reputational harm:</b> fabricated or off-policy answers</td>
                   <td>Groundedness checks, calibrated abstention (the system declines to answer when checkable signals, such as quotes found and criteria resolved, fall below a threshold tuned on the golden set), and known failure rates</td>
                 </tr>
                 <tr>
-                  <td><b>"We can't audit a past decision."</b></td>
+                  <td><b>We can't audit a past decision.</b></td>
                   <td><b>Accountability</b></td>
+                  <td>D, E</td>
                   <td>Compliance, internal audit</td>
                   <td><b>Regulatory scrutiny:</b> an examiner asks how a decision was reached (Table 4)</td>
                   <td>Immutable logs and step traces capable of reconstructing any historical run</td>
                 </tr>
                 <tr>
-                  <td><b>"You will update the model under us."</b></td>
+                  <td><b>You will update the model under us.</b></td>
                   <td><b>Version Stability</b></td>
+                  <td>F</td>
                   <td>Engineering, platform owners</td>
                   <td><b>Lock-in:</b> vendor changes behavior, terms, or pricing</td>
                   <td>Strict model version pinning, regression-gated customer cutovers, and a planned migration calendar, because pinned API versions are retired on the provider's schedule</td>
                 </tr>
                 <tr>
-                  <td><b>"We have no way to measure it."</b></td>
+                  <td><b>We have no way to measure it.</b></td>
                   <td><b>Quality</b></td>
+                  <td>F</td>
                   <td>Executive sponsor</td>
                   <td><b>Career risk:</b> the internal champion owns an opaque failure</td>
                   <td>Agreed numerical metrics over a golden set built with their experts</td>
@@ -1159,213 +1168,156 @@
         </div>
 
         <p>
-          The risks in the fourth column decide whether a project moves forward. Most are business risks: liability, regulatory scrutiny (<em>Table 4</em> lists the frameworks), confidential data exposure, reputational harm, and lock-in. One is personal: the internal champion who backs the project carries the blame if an opaque failure embarrasses their team, which is why measurable quality matters so much to the sponsor.
-        </p>
-
-        <p>
           That gives us the governing boundary: <strong>the model's weights and latent activations remain opaque, while the surrounding system makes inputs, sources, limits, evaluations, and history transparent</strong> (<em>Figure 2</em>).
         </p>
 
 <div class="diagram-frame" id="fig-q1">
-  <svg viewBox="0 0 920 638" role="img" aria-label="Separating irreducible opacity inside model weights from seven transparent system layers around the model, preceded by stakeholder diagnosis and backed by the transparency-versus-flexibility spectrum">
-    
+  <svg viewBox="0 0 920 606" role="img" aria-label="The model stays opaque; trust comes from checks around it, lettered in the order a request meets them. Inside the customer's data perimeter, a request is screened (A), grounded in their sources (B), handled by the opaque model, checked in code (C), and routed by risk (D), with every step logged (E). Evaluation and pinning gate every change (F), and the rollout stage sets how much is automated (G)">
   <defs>
-    <marker id="arr-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <marker id="arr-q1l-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:var(--ink)"/>
     </marker>
-    <marker id="arr-good" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <marker id="arr-q1l-good" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:var(--good)"/>
-    </marker>
-    <marker id="arr-cyan" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:var(--cyan)"/>
-    </marker>
-    <marker id="arr-stop" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:var(--stop)"/>
-    </marker>
-    <marker id="arr-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:var(--amber)"/>
     </marker>
   </defs>
 
-    <rect x="14" y="14" width="892" height="610" rx="14" style="fill:var(--panel-2);stroke:var(--good);stroke-width:2"/>
-    <text class="zl" x="34" y="42" style="fill:var(--good)">OPENING THE BLACK BOX · OPAQUE WEIGHTS INSIDE, TRANSPARENT ENGINEERED SYSTEM AROUND IT</text>
+    <rect x="14" y="14" width="892" height="578" rx="14" style="fill:var(--panel-2);stroke:var(--line);stroke-width:1.75"/>
+    <text class="zl" x="34" y="42">THE MODEL STAYS OPAQUE · TRUST COMES FROM CHECKS AROUND IT</text>
 
-    <!-- Step 1 Top Bar: Diagnose Stakeholder Meaning & Underlying Fear -->
-    <rect class="b-store" x="32" y="56" width="856" height="78" rx="9"/>
-    <text class="t-m-c" x="50" y="75" style="fill:var(--amber)">1 · DIAGNOSE FIRST: CLARIFY WHICH "BLACK BOX" CONCERN &amp; BUSINESS RISK APPLIES</text>
-    <text class="t-s" x="50" y="94"><tspan style="font-weight:700;fill:var(--ink)">Concerns:</tspan> Explainability · Predictability · Training-Data Provenance · Model Weights · Data Governance ·</text>
-    <text class="t-s" x="50" y="111">Reliability · Accountability · Version Stability · Quality</text>
-    <text class="t-s" x="50" y="128"><tspan style="font-weight:700;fill:var(--ink)">Underlying Risks:</tspan> Liability · Regulatory Scrutiny · Confidential Data Exposure · Reputational Harm · Lock-In · Career Risk</text>
+    <!-- A: data perimeter -->
+    <rect x="34" y="58" width="852" height="372" rx="12" style="fill:none;stroke:var(--cyan);stroke-width:1.8;stroke-dasharray:7 5"/>
+    <text class="t-m-c" x="50" y="84">A · DATA PERIMETER</text>
 
-    <line x1="460" y1="134" x2="460" y2="154" class="flow-g" marker-end="url(#arr-good)"/>
+    <!-- Request path, in order -->
+    <rect class="node-dim" x="350" y="70" width="120" height="26" rx="13"/>
+    <text class="t-s t-c" x="410" y="88">request</text>
+    <line class="flow" x1="410" y1="96" x2="410" y2="112" marker-end="url(#arr-q1l-ink)"/>
 
-    <!-- Outer Transparent System Shell -->
-    <rect x="32" y="158" width="856" height="364" rx="12" style="fill:var(--panel);stroke:var(--good);stroke-width:2.2"/>
-    <text class="t-m-g" x="50" y="182">2 · TRANSPARENT SYSTEM SHELL · SEVEN AUDITED LAYERS AROUND AN HONESTLY OPAQUE CORE</text>
+    <rect class="node-cyan" x="220" y="116" width="380" height="42" rx="9"/>
+    <text class="t-b t-c" x="410" y="142">A · Screen input</text>
+    <line class="flow" x1="410" y1="158" x2="410" y2="174" marker-end="url(#arr-q1l-ink)"/>
 
-    <!-- Row 1 around Core: A, B, F -->
-    <rect class="b-code" x="48" y="196" width="256" height="92" rx="8"/>
-    <text class="t-m-g" x="64" y="218">A · EVIDENCE GROUNDING</text>
-    <text class="t-b" x="64" y="240">RAG + Verified Citations</text>
-    <text class="t-s" x="64" y="261">Clickable spans, structured JSON</text>
-    <text class="t-s" x="64" y="279">&amp; explicit "not found" abstention</text>
+    <rect class="node-cyan" x="220" y="178" width="380" height="42" rx="9"/>
+    <text class="t-b t-c" x="410" y="204">B · Ground in their sources</text>
+    <line class="flow" x1="410" y1="220" x2="410" y2="236" marker-end="url(#arr-q1l-ink)"/>
 
-    <rect class="b-code" x="320" y="196" width="280" height="92" rx="8"/>
-    <text class="t-m-g" x="336" y="218">B · CO-OWNED EVALUATION</text>
-    <text class="t-b" x="336" y="240">SME Golden Set &amp; Candor</text>
-    <text class="t-s" x="336" y="261">Regression CI on every change;</text>
-    <text class="t-s" x="336" y="279">share exact failure slices openly</text>
+    <rect class="node-violet" x="220" y="240" width="380" height="42" rx="9" style="stroke-dasharray:6 4"/>
+    <text class="t-b t-c" x="410" y="266">Model (opaque)</text>
+    <line class="flow" x1="410" y1="282" x2="410" y2="298" marker-end="url(#arr-q1l-ink)"/>
 
-    <rect class="node-cyan" x="616" y="196" width="256" height="92" rx="8"/>
-    <text class="t-m-c" x="632" y="218">F · DATA &amp; MODEL PROVENANCE</text>
-    <text class="t-b" x="632" y="240">Zero-Training &amp; Perimeter</text>
-    <text class="t-s" x="632" y="261">Model cards, VPC-SC, CMEK,</text>
-    <text class="t-s" x="632" y="279">residency, ZDR &amp; SOC 2 / HIPAA</text>
+    <rect class="node-cyan" x="220" y="302" width="380" height="42" rx="9"/>
+    <text class="t-b t-c" x="410" y="328">C · Check outputs in code</text>
+    <line class="flow" x1="410" y1="344" x2="410" y2="360" marker-end="url(#arr-q1l-ink)"/>
 
-    <!-- Middle Row: D (Left) -> Opaque Core (Center) -> E (Right) -->
-    <rect class="b-code" x="48" y="302" width="256" height="100" rx="8"/>
-    <text class="t-m-g" x="64" y="324">D · GUARDRAILS &amp; PINNING</text>
-    <text class="t-b" x="64" y="346">Code Rules &amp; Version Lock</text>
-    <text class="t-s" x="64" y="367">Model Armor PII/injection filters,</text>
-    <text class="t-s" x="64" y="386">code policy gates &amp; pinned versions</text>
+    <rect class="node-cyan" x="220" y="364" width="380" height="42" rx="9"/>
+    <text class="t-b t-c" x="410" y="390">D · Route by risk</text>
 
-    <line x1="304" y1="352" x2="322" y2="352" class="flow" marker-end="url(#arr-ink)"/>
+    <!-- E: logs alongside every step -->
+    <rect class="node-cyan" x="640" y="116" width="226" height="290" rx="9"/>
+    <text class="t-b t-c" x="753" y="256">E · Log every step</text>
+    <text class="t-s t-c" x="753" y="280">replayable months later</text>
 
-    <!-- Candid Opaque Core -->
-    <rect class="b-model" x="326" y="302" width="268" height="100" rx="9" style="stroke-dasharray:6 4"/>
-    <text class="t-m-v" x="460" y="325" text-anchor="middle">CANDID OPAQUE MODEL CORE</text>
-    <text class="t-b" x="460" y="348" text-anchor="middle">Billions of Continuous Weights</text>
-    <text class="t-s" x="460" y="369" text-anchor="middle">Distributed representations;</text>
-    <text class="t-s" x="460" y="388" text-anchor="middle">summaries monitored as evidence</text>
+    <!-- Output -->
+    <line class="flow" x1="410" y1="406" x2="410" y2="446" marker-end="url(#arr-q1l-ink)"/>
+    <rect class="node-card" x="220" y="450" width="380" height="42" rx="9"/>
+    <text class="t-b t-c" x="410" y="476">Answer with citations</text>
 
-    <line x1="594" y1="352" x2="612" y2="352" class="flow-g" marker-end="url(#arr-good)"/>
+    <!-- F and G: controls on every change -->
+    <rect class="node-good" x="34" y="516" width="418" height="56" rx="9"/>
+    <text class="t-b t-c" x="243" y="539">F · Evaluate and pin</text>
+    <text class="t-s t-c" x="243" y="560">golden set gates every change</text>
+    <path d="M 196 516 V 261 H 216" style="fill:none;stroke:var(--good);stroke-width:2.2" marker-end="url(#arr-q1l-good)"/>
 
-    <rect class="node-bad" x="616" y="302" width="256" height="100" rx="8"/>
-    <text class="t-m-r" x="632" y="324">E · ACCOUNTABLE HITL</text>
-    <text class="t-b" x="632" y="346">Risk-Matched Sign-Off</text>
-    <text class="t-s" x="632" y="367">Confidence routing, dry-run</text>
-    <text class="t-s" x="632" y="386">approval &amp; single RACI owner</text>
-
-    <!-- Bottom Row inside Shell: C (Audit) & G (Graduated Rollout) -->
-    <rect class="b-store" x="48" y="416" width="404" height="90" rx="8"/>
-    <text class="t-m-c" x="64" y="438" style="fill:var(--amber)">C · FULL AUDITABILITY &amp; RECONSTRUCTION</text>
-    <text class="t-b" x="64" y="460">Logs, Traces &amp; Drift Dashboards</text>
-    <text class="t-s" x="64" y="481">Prompts, chunks, tool calls, thought summaries &amp; edits</text>
-
-    <rect class="b-code" x="468" y="416" width="404" height="90" rx="8"/>
-    <text class="t-m-g" x="484" y="438">G · GRADUATED ROLLOUT &amp; KILL SWITCH</text>
-    <text class="t-b" x="484" y="460">Pilot → Shadow → Assist → Scoped Auto</text>
-    <text class="t-s" x="484" y="481">Low-risk wedge first + instant downgrade toggle</text>
-
-    <!-- Bottom Spectrum Bar -->
-    <rect class="node-card" x="32" y="536" width="856" height="72" rx="9"/>
-    <text class="t-m-c" x="50" y="558">3 · SIX ALTERNATIVES (TRADING STRUCTURAL TRANSPARENCY AGAINST LANGUAGE FLEXIBILITY)</text>
-    <text class="t-b" x="50" y="582">Rules  ·  Tabular ML + SHAP  ·  Hybrid (LLM Extracts, Code Decides)  ·  Pinned Weights  ·  Constrained  ·  Search</text>
+    <rect class="node-good" x="468" y="516" width="418" height="56" rx="9"/>
+    <text class="t-b t-c" x="677" y="539">G · Roll out gradually</text>
+    <text class="t-s t-c" x="677" y="560">shadow → auto, kill switch</text>
+    <path d="M 620 516 V 385 H 604" style="fill:none;stroke:var(--good);stroke-width:2.2" marker-end="url(#arr-q1l-good)"/>
   </svg>
   <div class="fig-caption">
-    <span>Figure 2 — Addressing the "black box" objection: diagnose which of the nine concerns and six business risks applies, stay candid about weight and activation opacity, wrap the model in seven transparent system layers (A–G), and choose the right alternative for each high-stakes step.</span>
+    <span>Figure 2 — The model stays opaque; trust comes from checks around it, lettered in the order a request meets them. Inside the customer's data perimeter, each request is screened (A), grounded in their sources (B), handled by the model, checked in code (C), and routed by risk (D), with every step logged (E). Evaluation and pinning gate every change (F), and the rollout stage sets how much is automated (G).</span>
     <div class="legend-items">
-      <span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> Opaque weight core</span>
-      <span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good)"></i> Verification &amp; rollout gates</span>
-      <span><i class="swatch-dot" style="background:var(--cyan-soft);border-color:var(--cyan)"></i> Data governance</span>
-      <span><i class="swatch-dot" style="background:var(--amber-soft);border-color:var(--amber)"></i> Diagnosis &amp; audit logs</span>
-      <span><i class="swatch-dot" style="background:var(--stop-soft);border-color:var(--stop)"></i> Human sign-off</span>
+      <span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> Opaque model</span>
+      <span><i class="swatch-dot" style="background:var(--cyan-soft);border-color:var(--cyan)"></i> Checks on every request</span>
+      <span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good)"></i> Controls on every change</span>
     </div>
   </div>
 </div>
 
-
-        <h2 id="sec-3">3. Seven System Layers Around the Model</h2>
         <p>
-          The nine concerns in <em>Table 1</em> are covered by seven engineering layers around the model (<em>Table 3</em> maps each concern to its layer, the evidence a customer receives, and the Google Cloud service that produces it):
+          The seven layers in detail, in the order a request meets them (<em>Figure 2</em>). <em>Table 1</em> shows which concern each one answers; <em>Table 3</em> lists what the customer receives from each and the Google Cloud service behind it:
         </p>
         <ul>
-          <li><strong>A · Ground Outputs in Evidence (Explainability):</strong> Pair retrieval with clickable inline citations linked to the customer's own documents, return structured JSON (<code>verbatim_quote</code>, <code>sources</code>, <code>assumptions</code>, <code>answer</code>), verify in server code that cited passages genuinely support the claim, and return an explicit <em>"not found in your documents"</em> response whenever evidence is absent (<a href="ep03_q4_modern_rag_pairings.html">Question 04</a> covers retrieval and citation design in depth).</li>
-          <li><strong>B · Measure It Openly with Customer Experts (Evaluation):</strong> Co-create a <strong>golden set</strong> of 100 to 300 real historical cases alongside the customer's domain specialists; track accuracy, groundedness, hallucination rate, refusal rate, latency, and cost; rerun the set like a regression suite on every prompt, retrieval, or model change; and share the failure breakdown openly (<em>"94% pass rate on your golden set; the remaining 6% fall into these boundary categories, which route to review"</em>). Slice results by the segments that matter for fairness and coverage (region, product line, and protected attributes where legally permitted) so a high overall pass rate cannot hide a failing group. After launch, sample a fixed share of production cases each week for SME review so the golden set keeps pace with real traffic.</li>
-          <li><strong>C · Observe Every Step (Auditability):</strong> Log every interaction (input, retrieved chunks, prompt version, pinned model version, thought summaries as supporting evidence, output, and reviewer feedback), record step-by-step traces across every tool call so any decision can be reconstructed months later, and expose live drift and quality dashboards to operators. Treat provider errors as part of observability: isolate HTTP 429 and timeout faults into retry queues with backoff, and record each retry in the trace so a reconstructed run shows which calls failed and why.</li>
-          <li><strong>D · Enforce Deterministic Guardrails and Version Pinning (Control &amp; Stability):</strong> Screen inputs and outputs for PII, toxicity, off-topic asks, and prompt injection (Episode 01 covers data boundaries and prompt-injection defenses for agents that reach databases), and enforce permissions, dollar caps, and business rules in application code (<a href="https://www.anthropic.com/research/building-effective-agents" target="_blank" rel="noopener">Anthropic, Dec 2024</a>).
-            <p style="margin:8px 0 0;">Constrain outputs where repeatability matters (structured output schemas, enumerated values, and a pinned thinking level) while keeping sampling parameters at the defaults current reasoning models are tuned for (<a href="https://ai.google.dev/gemini-api/docs/gemini-3" target="_blank" rel="noopener">Google, 2026</a>). No decoding setting makes a hosted model repeatable: even greedy decoding on shared inference servers varies with the batch a request lands in (in one study, 1,000 identical requests to an open-weight model produced 80 distinct outputs; <a href="https://thinkingmachines.ai/blog/defeating-nondeterminism-in-llm-inference/" target="_blank" rel="noopener">He et al., Sep 2025</a>). Promise measured consistency (<code>pass^k</code>), and put calculations, thresholds, and final decisions in code.</p>
+          <li><strong>A · Secure the Data Perimeter and Document Provenance (Data Governance):</strong> Keep customer data inside enforceable boundaries: contractual zero-training on customer data, regional residency, VPC perimeters, customer-managed encryption keys (<code>CMEK</code>), and explicit retention bounds. Screen every request at the boundary for PII, toxicity, off-topic asks, and prompt injection (Episode 01 covers data boundaries and prompt-injection defenses for agents that reach databases). Document what the customer is running: model cards (intended scope, limitations, benchmark results) and compliance certifications (<code>SOC 2</code>, <code>ISO 27001 / 42001</code>, <code>HIPAA BAA</code>).</li>
+          <li><strong>B · Ground Outputs in Their Sources (Explainability):</strong> Pair retrieval with clickable inline citations linked to the customer's own documents, return structured JSON (<code>verbatim_quote</code>, <code>sources</code>, <code>assumptions</code>, <code>answer</code>), and return an explicit <em>"not found in your documents"</em> response whenever evidence is absent (<a href="ep03_q4_modern_rag_pairings.html">Question 04</a> covers retrieval and citation design in depth).</li>
+          <li><strong>C · Check Every Output in Code (Control):</strong> Verify in server code that cited passages genuinely support each claim, screen outputs for PII and off-policy content, and enforce permissions, dollar caps, and business rules in application code (<a href="https://www.anthropic.com/research/building-effective-agents" target="_blank" rel="noopener">Anthropic, Dec 2024</a>). Constrain outputs where repeatability matters (structured output schemas, enumerated values, and a pinned thinking level) while keeping sampling parameters at the defaults current reasoning models are tuned for (<a href="https://ai.google.dev/gemini-api/docs/gemini-3" target="_blank" rel="noopener">Google, 2026</a>). No decoding setting makes a hosted model repeatable: even greedy decoding on shared inference servers varies with the batch a request lands in (in one study, 1,000 identical requests to an open-weight model produced 80 distinct outputs; <a href="https://thinkingmachines.ai/blog/defeating-nondeterminism-in-llm-inference/" target="_blank" rel="noopener">He et al., Sep 2025</a>). Promise measured consistency (<code>pass^k</code>), and put calculations, thresholds, and final decisions in code.</li>
+          <li><strong>D · Route by Risk to Accountable Humans (Accountability):</strong> Match autonomy to error cost by automating low-risk tasks while routing uncertain or high-impact cases via calibrated routing thresholds and dry-run previews to named human reviewers with clear sign-off ownership (<code>RACI</code>). Calibrated thresholds need a calibrated signal. A model's self-reported confidence ("I am 95% sure") tends to be overconfident (<a href="https://arxiv.org/abs/2306.13063" target="_blank" rel="noopener">Xiong et al., ICLR 2024</a>), so route on evidence the system can check: whether every cited quote was found in the source, whether every rule criterion resolved, agreement across <code>k</code> independent samples (<a href="https://arxiv.org/abs/2203.11171" target="_blank" rel="noopener">Wang et al., ICLR 2023</a>), and token log-probabilities where the API exposes them. Tune the routing threshold on the golden set to hit a target precision for auto-approved cases (for example, at least 99% agreement with SME labels), and send everything below it to review. Guard against rubber-stamping: show reviewers the evidence before the model's recommendation, track each reviewer's override rate, and occasionally insert known-bad cases to confirm reviews are real.</li>
+          <li><strong>E · Log Every Step (Auditability):</strong> Log every interaction (input, retrieved chunks, prompt version, pinned model version, thought summaries as supporting evidence, output, and reviewer feedback), record step-by-step traces across every tool call so any decision can be reconstructed months later, and expose live drift and quality dashboards to operators. Treat provider errors as part of observability: isolate HTTP 429 and timeout faults into retry queues with backoff, and record each retry in the trace so a reconstructed run shows which calls failed and why.</li>
+          <li><strong>F · Evaluate and Pin with Customer Experts (Quality and Stability):</strong> Co-create a <strong>golden set</strong> of 100 to 300 real historical cases alongside the customer's domain specialists; track accuracy, groundedness, hallucination rate, refusal rate, latency, and cost; rerun the set like a regression suite on every prompt, retrieval, or model change; and share the failure breakdown openly (<em>"94% pass rate on your golden set; the remaining 6% fall into these boundary categories, which route to review"</em>). Slice results by the segments that matter for fairness and coverage (region, product line, and protected attributes where legally permitted) so a high overall pass rate cannot hide a failing group. After launch, sample a fixed share of production cases each week for SME review so the golden set keeps pace with real traffic.
             <p style="margin:8px 0 0;">If you fine-tune or run reinforcement learning, keep the reasoning trace out of the reward signal so it stays useful for monitoring (<a href="https://arxiv.org/abs/2503.11926" target="_blank" rel="noopener">Baker et al., Mar 2025</a>). <strong>Pin exact model versions</strong> so upgrades occur only when the customer's golden set passes. Pinning is temporary: providers retire API model versions on a published schedule, so maintain a migration calendar and run each successor through the customer's golden set before cutover. Self-hosted open weights (Option 4) remove forced retirement altogether.</p>
           </li>
-          <li><strong>E · Keep Accountable Humans in the Loop (Accountability):</strong> Match autonomy to error cost by automating low-risk tasks while routing uncertain or high-impact cases via calibrated routing thresholds and dry-run previews to named human reviewers with clear sign-off ownership (<code>RACI</code>). Calibrated thresholds need a calibrated signal. A model's self-reported confidence ("I am 95% sure") tends to be overconfident (<a href="https://arxiv.org/abs/2306.13063" target="_blank" rel="noopener">Xiong et al., ICLR 2024</a>), so route on evidence the system can check: whether every cited quote was found in the source, whether every rule criterion resolved, agreement across <code>k</code> independent samples (<a href="https://arxiv.org/abs/2203.11171" target="_blank" rel="noopener">Wang et al., ICLR 2023</a>), and token log-probabilities where the API exposes them. Tune the routing threshold on the golden set to hit a target precision for auto-approved cases (for example, at least 99% agreement with SME labels), and send everything below it to review. Guard against rubber-stamping: show reviewers the evidence before the model's recommendation, track each reviewer's override rate, and occasionally insert known-bad cases to confirm reviews are real.</li>
-          <li><strong>F · Document Model and Data Provenance (Governance):</strong> Provide model cards (intended scope, limitations, benchmark results), compliance certifications (<code>SOC 2</code>, <code>ISO 27001 / 42001</code>, <code>HIPAA BAA</code>), and enforceable cloud data guarantees: contractual zero-training on customer data, regional residency, VPC perimeters, customer-managed encryption keys (<code>CMEK</code>), and explicit retention bounds.</li>
           <li><strong>G · Roll Out Gradually (Earned Trust):</strong> Start on a low-risk, high-visibility wedge and earn promotion across stages: <code>Scoped Pilot → Shadow Mode</code> (running silently beside humans to compare outcomes) <code>→ Assisted Copilot → Partial Scoped Automation</code>, backed by an instant operational kill switch (<a href="https://martinfowler.com/articles/feature-toggles.html" target="_blank" rel="noopener">Hodgson, Oct 2017</a>).</li>
         </ul>
 
 
         <div class="nine-q-wrap">
-          <div class="nine-q-head">Table 3 · Concerns, Layers, Evidence, and Google Cloud Services</div>
+          <div class="nine-q-head">Table 3 · What Each Layer Gives the Customer, and the Google Cloud Service Behind It</div>
           <div class="tbl-wrap">
             <table>
               <thead>
                 <tr>
-                  <th>Concern (Table 1)</th>
                   <th>Layer</th>
-                  <th>Evidence the Customer Receives</th>
+                  <th>What the Customer Receives</th>
                   <th>Google Cloud Service</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td><b>Explainability</b></td>
-                  <td>A</td>
-                  <td>Verbatim source quotes with links; structured criteria per claim</td>
+                  <td><b>A · Data perimeter and provenance</b></td>
+                  <td>Zero-training terms, residency region, key ownership; input-screening results; model card and certifications</td>
+                  <td><code>VPC Service Controls</code>, <code>CMEK</code> (<code>Cloud KMS</code>), <code>Assured Workloads</code> and regional endpoints; <code>Model Armor</code>; published model cards</td>
+                </tr>
+                <tr>
+                  <td><b>B · Grounding</b></td>
+                  <td>Verbatim source quotes with links; "not found" when evidence is missing</td>
                   <td><code>RAG Engine</code> grounding; structured output schemas</td>
                 </tr>
                 <tr>
-                  <td><b>Predictability</b></td>
-                  <td>B, D</td>
-                  <td><code>pass^k</code> results per test case; fixed output schemas</td>
-                  <td><code>Agent Platform</code> evaluation service</td>
+                  <td><b>C · Output checks in code</b></td>
+                  <td>Quote-verification results, rule checks, schema validation</td>
+                  <td><code>Model Armor</code> output screening; application code with structured output schemas</td>
                 </tr>
                 <tr>
-                  <td><b>Training-Data Provenance</b></td>
-                  <td>F</td>
-                  <td>Model card, data statements, indemnification terms</td>
-                  <td>Published model cards; <code>Model Garden</code> for fully open models</td>
+                  <td><b>D · Risk routing and human review</b></td>
+                  <td>Named reviewer sign-off; the routing threshold and its measured precision</td>
+                  <td>The customer's review queue, with sign-offs logged to <code>Cloud Logging</code></td>
                 </tr>
                 <tr>
-                  <td><b>Model Weights</b></td>
-                  <td>Option 4</td>
-                  <td>Checksum of the self-hosted checkpoint</td>
-                  <td><code>Model Garden</code> open weights on customer-controlled infrastructure</td>
-                </tr>
-                <tr>
-                  <td><b>Data Governance</b></td>
-                  <td>F</td>
-                  <td>Zero-training terms, residency region, key ownership</td>
-                  <td><code>VPC Service Controls</code>, <code>CMEK</code> (<code>Cloud KMS</code>), <code>Assured Workloads</code> &amp; regional endpoints</td>
-                </tr>
-                <tr>
-                  <td><b>Reliability</b></td>
-                  <td>A, E</td>
-                  <td>Groundedness scores, abstention rate, known failure slices</td>
-                  <td><code>Agent Platform</code> evaluation service; <code>Model Armor</code></td>
-                </tr>
-                <tr>
-                  <td><b>Accountability</b></td>
-                  <td>C, E</td>
-                  <td>Trace ID that replays any decision; named reviewer sign-off</td>
+                  <td><b>E · Logs and traces</b></td>
+                  <td>A trace ID that replays any decision</td>
                   <td><code>Cloud Logging</code>, <code>Cloud Trace</code></td>
                 </tr>
                 <tr>
-                  <td><b>Version Stability</b></td>
-                  <td>D</td>
-                  <td>Pinned model ID; regression report before each cutover</td>
-                  <td>Pinned model version IDs; evaluation pipeline in CI</td>
+                  <td><b>F · Evaluation and pinning</b></td>
+                  <td>Golden-set results, <code>pass^k</code>, failure slices; pinned model ID and a regression report before each cutover</td>
+                  <td><code>Agent Platform</code> evaluation service; pinned model version IDs; evaluation pipeline in CI</td>
                 </tr>
                 <tr>
-                  <td><b>Quality</b></td>
-                  <td>B</td>
-                  <td>Agreed metrics on the co-owned golden set</td>
-                  <td><code>Agent Platform</code> evaluation service</td>
+                  <td><b>G · Graduated rollout</b></td>
+                  <td>Shadow-mode comparison results; a kill switch</td>
+                  <td><code>Agent Platform</code> evaluation service for shadow comparisons; a feature flag in the serving layer</td>
+                </tr>
+                <tr>
+                  <td><b>Option 4 · Open weights</b></td>
+                  <td>Checksum of the self-hosted checkpoint</td>
+                  <td><code>Model Garden</code> open weights on customer-controlled infrastructure</td>
                 </tr>
               </tbody>
             </table>
           </div>
         </div>
 
-        <h2 id="sec-4">4. Scoping Questions and the Six Alternatives</h2>
+        <h2 id="sec-3">3. Scoping Questions and the Six Alternatives</h2>
         <p>
           How far we go on those controls depends on seven questions we align on with the customer:
         </p>
@@ -1524,12 +1476,12 @@
                 <tr>
                   <td><b><a href="https://eur-lex.europa.eu/eli/reg/2024/1689/oj" target="_blank" rel="noopener">EU AI Act</a> (high-risk systems)</b></td>
                   <td>Automatic event logging (Art. 12), transparency to deployers (Art. 13), human oversight (Art. 14), technical documentation (Art. 11, Annex IV), and a right to an explanation of individual decisions (Art. 86). Under the Digital Omnibus, obligations for Annex III systems apply from December 2, 2027, and for Annex I products from August 2, 2028</td>
-                  <td>C, E, F, A</td>
+                  <td>A, B, D, E</td>
                 </tr>
                 <tr>
                   <td><b><a href="https://eur-lex.europa.eu/eli/reg/2016/679/oj" target="_blank" rel="noopener">GDPR</a></b></td>
                   <td>Safeguards for solely automated decisions with legal or similarly significant effects (Art. 22), and meaningful information about the logic involved (Arts. 13–15)</td>
-                  <td>A, E, Option 3</td>
+                  <td>B, D, Option 3</td>
                 </tr>
                 <tr>
                   <td><b><a href="https://www.federalreserve.gov/supervisionreg/srletters/sr2602.htm" target="_blank" rel="noopener">SR 11-7 / SR 26-2</a> (U.S. banking model risk)</b></td>
@@ -1544,7 +1496,7 @@
                 <tr>
                   <td><b><a href="https://www.cms.gov/newsroom/fact-sheets/cms-interoperability-and-prior-authorization-final-rule-cms-0057-f" target="_blank" rel="noopener">CMS Prior Authorization Rule</a> (CMS-0057-F)</b></td>
                   <td>A specific reason for every denied prior-authorization request</td>
-                  <td>A, Option 3 (Section 5)</td>
+                  <td>B, C, Option 3</td>
                 </tr>
               </tbody>
             </table>
@@ -1555,18 +1507,18 @@
         </p>
 
         <p>
-          <strong>The Cost of Trust.</strong> Each layer has a price: citation verification adds a retrieval and a check to every answer, <code>k</code>-sample agreement multiplies inference cost by <code>k</code>, and human review adds minutes of expert time per routed case. Matching autonomy to error cost (Layer E) is what keeps that price bounded: low-risk, high-volume cases run fully automated with sampled audits, while the expensive controls concentrate on the small share of decisions where a mistake is costly.
+          <strong>The Cost of Trust.</strong> Each layer has a price: citation verification adds a retrieval and a check to every answer, <code>k</code>-sample agreement multiplies inference cost by <code>k</code>, and human review adds minutes of expert time per routed case. Matching autonomy to error cost (Layer D) is what keeps that price bounded: low-risk, high-volume cases run fully automated with sampled audits, while the expensive controls concentrate on the small share of decisions where a mistake is costly.
         </p>
 
-        <h2 id="sec-5">5. Worked Example: Explaining a Prior-Authorization Decision</h2>
+        <h2 id="sec-4">4. Worked Example: Explaining a Prior-Authorization Decision</h2>
         <p>
           A health plan's compliance lead asks the interview question in its sharpest form: <em>"If your assistant denies a lumbar MRI, can we show the member and the regulator exactly why?"</em> Since 2026, the CMS prior-authorization rule has required a specific reason for every denial, so this is a hard requirement.
         </p>
         <p>
-          <strong>Diagnose first.</strong> The concerns are Explainability and Accountability (<em>Table 1</em>); the risks are Regulatory Scrutiny and Legal Liability. That points to Layers A, C, and E, and to Option 3 (Hybrid) for the decision itself.
+          <strong>Diagnose first.</strong> The concerns are Explainability and Accountability (<em>Table 1</em>); the risks are Regulatory Scrutiny and Legal Liability. That points to Layers B, C, D, and E, and to Option 3 (Hybrid) for the decision itself.
         </p>
         <p>
-          <strong>The risky design.</strong> The model reads the chart and the policy, returns <code>DENY</code>, and its thinking reads <em>"patient only tried ibuprofen for 3 weeks."</em> The system stores that text as the denial reason. Two things are wrong. First, the trace is unverified as proof of what drove the answer (Section 1). Second, the decision itself is wrong: the policy approves the MRI when either (a) six weeks of supervised physical therapy failed or (b) a progressive neurological deficit is documented, and nobody checked (b).
+          <strong>The risky design.</strong> The model reads the chart and the policy, returns <code>DENY</code>, and its thinking reads <em>"patient only tried ibuprofen for 3 weeks."</em> The system stores that text as the denial reason. Two things are wrong. First, the trace is unverified as proof of what drove the answer. Second, the decision itself is wrong: the policy approves the MRI when either (a) six weeks of supervised physical therapy failed or (b) a progressive neurological deficit is documented, and nobody checked (b).
         </p>
         <p>
           <strong>The verifiable design.</strong> The model's only job is extraction. It returns structured facts, each with a verbatim quote from the chart:
@@ -1714,19 +1666,19 @@
         </div>
 
         <p>
-          <strong>What the auditor receives.</strong> The verified facts and their source quotes, the policy rule and its version, the pinned model version, a trace ID that replays the run (Layer C), and the reviewer's sign-off if the case was routed (Layer E). The model's thinking summary is stored beside them as supporting evidence.
+          <strong>What the auditor receives.</strong> The verified facts and their source quotes, the policy rule and its version, the pinned model version, a trace ID that replays the run (Layer E), and the reviewer's sign-off if the case was routed (Layer D). The model's thinking summary is stored beside them as supporting evidence.
         </p>
         <p>
           <strong>Why it matters.</strong> The verifiable design does more than explain the decision; it changed it. A plausible-sounding trace would have produced a wrongful denial. Code evaluating the actual rule produced a request for the missing evidence. <a href="ep03_q5_domain_specific_agent.html">Question 05</a> builds the full policy agent around this pattern.
         </p>
 
-        <h2 id="sec-6">6. Summary: Putting It Together in One Answer</h2>
+        <h2 id="sec-5">5. Summary: Putting It Together in One Answer</h2>
         <p>A two-minute spoken answer follows five beats:</p>
         <ul>
           <li><strong>Clarify (about 15 seconds).</strong> <em>"Before proposing anything, I'd find out who's raising the concern and what decision the system makes. A compliance lead asking 'can we audit a denial' needs something different from an engineer asking 'why does it answer differently each time.'"</em> (<em>Table 1</em>)</li>
-          <li><strong>Be candid (about 10 seconds).</strong> <em>"I won't promise to explain the model's internals. Nobody can do that reliably today, and its reasoning text isn't proof. What I'll promise is that every output can be checked."</em> (Section 1)</li>
-          <li><strong>Make trust checkable (about 40 seconds).</strong> <em>"Answers cite their own documents, and code confirms each quote exists. We build a golden set of real cases with their experts and agree on the pass bar before we build. Every run is logged so any decision can be replayed. Where a decision carries real risk, the model extracts facts and code applies their written rules."</em> (Section 3, Section 5)</li>
-          <li><strong>Prove it (about 30 seconds).</strong> <em>"We run in shadow mode next to their team and compare outcomes case by case. We share the failures openly and route anything below the confidence bar to a named reviewer. We automate a slice only when the numbers clear the bar, and keep a kill switch."</em> (Layers B, E, and G)</li>
+          <li><strong>Be candid (about 10 seconds).</strong> <em>"I won't promise to explain the model's internals. Nobody can do that reliably today, and its reasoning text isn't proof. What I'll promise is that every output can be checked."</em></li>
+          <li><strong>Make trust checkable (about 40 seconds).</strong> <em>"Answers cite their own documents, and code confirms each quote exists. We build a golden set of real cases with their experts and agree on the pass bar before we build. Every run is logged so any decision can be replayed. Where a decision carries real risk, the model extracts facts and code applies their written rules."</em></li>
+          <li><strong>Prove it (about 30 seconds).</strong> <em>"We run in shadow mode next to their team and compare outcomes case by case. We share the failures openly and route anything below the confidence bar to a named reviewer. We automate a slice only when the numbers clear the bar, and keep a kill switch."</em> (Layers D, F, and G)</li>
           <li><strong>Close on ownership (about 10 seconds).</strong> <em>"I'd own that evaluation and rollout with them, so the trust comes from numbers they've watched improve, not from our claims."</em></li>
         </ul>
         <p>
