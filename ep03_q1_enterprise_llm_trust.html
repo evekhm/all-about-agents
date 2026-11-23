@@ -890,7 +890,7 @@
       <div class="post-prose">
         <p>My goal with this question is to answer one of the most common questions in enterprise AI system-design interviews: how to make a language model trustworthy to a skeptical customer. We start inside the model—what reasoning traces exist, what granularity each reaches, and why open weights still require multi-step instrumentation—before stepping outside to the nine stakeholder concerns, seven transparent system layers, and six architectural alternatives.</p>
         <div class="closes" style="margin:14px 0 16px;">
-          <span><b>The 30-second answer:</b> Every LLM, open or closed, is opaque at the level of its weights and activations, and its reasoning traces are unverified as proof of why it answered. Trust comes from building an engineered system around the model so we can control and verify it even while its internals stay opaque. Ground every answer in cited sources, and measure quality and consistency on a golden set. Log every step so any decision can be replayed, and enforce deterministic code guardrails with pinned model versions. Let code make high-stakes decisions on verified facts, route uncertain cases to human review, and roll out gradually from shadow mode to automation behind an instant kill switch.</span>
+          <span><b>The short answer:</b> First I'd ask what "black box" means to them: why it said something, whether it will change under them, or where their data goes. Each has a different fix. I'd be upfront that nobody can fully explain a model's internals, so I don't ask them to trust the model; I give them ways to check it. Every answer cites their documents, a golden set built from their own historical cases sets the bar, and for risky decisions the model extracts facts while code applies their rules. We start in shadow mode beside their team and automate only when the numbers clear that bar.</span>
         </div>
         <p><strong>What we will walk through step by step:</strong></p>
         <ol>
@@ -918,7 +918,7 @@
           You can read what a model writes while it reasons, but not reliably why it reached its answer. This section explains where reasoning actually happens, what each kind of trace shows, and what each one can prove.
         </p>
         <p>
-          <strong>Weights and activations.</strong> A model works with two kinds of numbers. <strong>Weights</strong> are the billions of values learned during training. They are fixed, identical for every request, and hold the model's knowledge with no human-readable <code>if-then</code> rules. <strong>Activations</strong> are the numbers the model computes from those weights and your input while it handles one request: its working state, which exists only during that request. In the formula <code>y = 2x + 3</code>, the <code>2</code> and the <code>3</code> play the role of weights; with <code>x = 5</code>, the intermediate <code>10</code> and the result <code>13</code> play the role of activations. This is the same for every LLM, whether it runs behind a proprietary API or on open weights. The difference is only who can see the numbers.
+          <strong>Weights and activations.</strong> A model works with two kinds of numbers. <strong>Weights</strong> are the billions of values learned during training. They are fixed and identical for every request. The model's knowledge is spread across all of them at once, so there is no rule or line you can point to and read. <strong>Activations</strong> are the numbers the model computes from those weights and your input while it handles one request: its working state, which exists only during that request. In the formula <code>y = 2x + 3</code>, the <code>2</code> and the <code>3</code> play the role of weights; with <code>x = 5</code>, the intermediate <code>10</code> and the result <code>13</code> play the role of activations. This is the same for every LLM, whether it runs behind a proprietary API or on open weights. The difference is only who can see the numbers.
         </p>
         <p>
           <strong>One token at a time.</strong> A model writes its answer one token, a word or part of a word, at a time. For each token it runs one forward pass: the input and everything written so far flow up through every layer, each layer computes new activations, and the last layer turns them into probabilities for the next token. One token is sampled, and the rest of that pass's activations are discarded. Each layer's keys and values are cached for speed, but they can be rebuilt from the tokens. The new token is appended to the input, and the next pass begins. <em>Figure 1</em> shows four steps of this loop on the prior-authorization case from Section 5.
@@ -1031,17 +1031,17 @@
     <text class="t-s" x="56" y="530"><tspan style="font-weight:700;fill:var(--ink)">Open weights:</tspan> raw tokens, plus activations recorded with forward-pass hooks and decoded with SAEs</text>
   </svg>
   <div class="fig-caption">
-    <span>Figure 1 — One forward pass per token: activations are computed through every layer and discarded once the next token is sampled, and only the written token is fed back as the next input. Later passes reuse earlier tokens' cached keys and values (KV cache), but those are recomputable from the tokens, so the written trace is the only state carried between steps. A separate pass condenses the raw trace into a thought summary.</span>
+    <span>Figure 1 — One forward pass per token: activations are computed through every layer and discarded once the next token is sampled, and only the generated token is fed back as the next input. To save time, the model keeps some numbers from earlier tokens instead of recalculating them (the KV cache). Rerunning the same text would produce exactly the same numbers, so the cache is a shortcut, not hidden memory: the text so far (the prompt plus everything the model has generated) is the only information carried from one step to the next. A separate pass condenses the raw trace into a thought summary.</span>
     <div class="legend-items">
       <span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> Latent activations (computed, then discarded)</span>
-      <span><i class="swatch-dot" style="background:var(--cyan-soft);border-color:var(--cyan)"></i> Written tokens (fed back as input)</span>
+      <span><i class="swatch-dot" style="background:var(--cyan-soft);border-color:var(--cyan)"></i> Generated tokens (fed back as input)</span>
       <span><i class="swatch-dot" style="background:var(--amber-soft);border-color:var(--amber)"></i> Thought summary</span>
     </div>
   </div>
 </div>
 
         <p>
-          <strong>What this means.</strong> Everything the model weighs while choosing a token lives in activations that are never written down. The only thing carried from one step to the next is the written token. The written reasoning is the model's notepad, not a recording of its thinking.
+          <strong>What this means.</strong> Everything the model weighs while choosing a token lives in activations that are never written down. The only thing carried from one step to the next is the text so far: the prompt plus every token the model has generated. That generated text is the model's notepad, not a recording of its thinking.
         </p>
         <p>
           <strong>Three things you can look at</strong> (the three levels in <em>Figure 1</em>):
@@ -1057,7 +1057,7 @@
         </div>
 
         <p>
-          <strong>The practical rule:</strong> save reasoning traces (raw thinking tokens or thought summaries) in your audit logs so engineers can debug and monitor the model, and base any customer-facing or regulatory justification on artifacts that code can verify, such as exact source quotes, database records, and explicit rule checks. Research models that reason directly in continuous latent space (<a href="https://arxiv.org/abs/2412.06769" target="_blank" rel="noopener">Hao et al., Dec 2024</a>) skip written tokens altogether, which would remove Level 2 entirely.
+          <strong>The practical rule:</strong> save reasoning traces (raw thinking tokens or thought summaries) in your audit logs so engineers can debug and monitor the model, and base any customer-facing or regulatory justification on artifacts that code can verify, such as exact source quotes, database records, and explicit rule checks. Research models that reason directly in continuous latent space (<a href="https://arxiv.org/abs/2412.06769" target="_blank" rel="noopener">Hao et al., Dec 2024</a>) skip generated tokens altogether, which would remove Level 2 entirely.
         </p>
         <p>
           <strong>What it takes to look inside (Level 3).</strong> Downloading open weights does not explain anything by itself: the checkpoint is a static archive of trained numbers. Explaining one prompt takes three engineering steps:
@@ -1719,9 +1719,14 @@
         </p>
 
         <h2 id="sec-6">6. Summary: Putting It Together in One Answer</h2>
-        <p>
-          <em>"Every LLM is opaque at the weight and activation level, so we treat reasoning traces as debugging evidence and build trust in the surrounding system. We first identify which of the nine concerns and six risks drives the customer's objection. Then we wrap the model in seven layers: cited grounding, a co-owned golden set, replayable audit logs, code guardrails and version pinning, risk-matched human review, contractual data governance, and a shadow-to-automation rollout with a kill switch. For high-stakes steps, we choose the right one of our six alternatives so deterministic rules or classical ML make final calls on verified facts."</em>
-        </p>
+        <p>A two-minute spoken answer follows five beats:</p>
+        <ul>
+          <li><strong>Clarify (about 15 seconds).</strong> <em>"Before proposing anything, I'd find out who's raising the concern and what decision the system makes. A compliance lead asking 'can we audit a denial' needs something different from an engineer asking 'why does it answer differently each time.'"</em> (<em>Table 1</em>)</li>
+          <li><strong>Be candid (about 10 seconds).</strong> <em>"I won't promise to explain the model's internals. Nobody can do that reliably today, and its reasoning text isn't proof. What I'll promise is that every output can be checked."</em> (Section 1)</li>
+          <li><strong>Make trust checkable (about 40 seconds).</strong> <em>"Answers cite their own documents, and code confirms each quote exists. We build a golden set of real cases with their experts and agree on the pass bar before we build. Every run is logged so any decision can be replayed. Where a decision carries real risk, the model extracts facts and code applies their written rules."</em> (Section 3, Section 5)</li>
+          <li><strong>Prove it (about 30 seconds).</strong> <em>"We run in shadow mode next to their team and compare outcomes case by case. We share the failures openly and route anything below the confidence bar to a named reviewer. We automate a slice only when the numbers clear the bar, and keep a kill switch."</em> (Layers B, E, and G)</li>
+          <li><strong>Close on ownership (about 10 seconds).</strong> <em>"I'd own that evaluation and rollout with them, so the trust comes from numbers they've watched improve, not from our claims."</em></li>
+        </ul>
         <p>
           On Google Cloud's <strong>Gemini Enterprise Agent Platform</strong> (<strong>Agent Platform</strong>), those layers map directly to <code>RAG Engine</code> grounding over customer data stores, the Agent Platform evaluation service, <code>Cloud Logging</code> and <code>Cloud Trace</code>, <code>Model Armor</code> input/output screening, <code>VPC Service Controls</code> and <code>CMEK</code> for perimeter and key ownership, and explicit model version pinning.
         </p>
