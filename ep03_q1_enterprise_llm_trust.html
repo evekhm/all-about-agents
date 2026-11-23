@@ -1081,7 +1081,7 @@
           <li><strong>Trace how features influence each other.</strong> Link the active features across layers into an <strong>attribution graph</strong> showing which ones pushed the final token up or down. This is an expensive, research-grade investigation that still captures only part of the computation.</li>
         </ol>
         <p>
-          <strong>The way out: separate reading from deciding.</strong> Have the model extract structured facts (with exact source quotes) into a checklist, and let deterministic code apply the rules to those facts (<a href="https://arxiv.org/abs/2301.13379" target="_blank" rel="noopener">Lyu et al., Jan 2023</a>). Because code executes the rules directly on the recorded facts, the audit trail shows what truly produced the answer. This is <a href="#table-3-option-3">Option 3 (Hybrid) in <em>Table 3</em></a>; <a href="#fig-q1-worked"><em>Figure 4</em></a> walks through it on a real prior-authorization request.
+          <strong>The way out: separate reading from deciding.</strong> Have the model extract structured facts (with exact source quotes) into a checklist, and let deterministic code apply the rules to those facts (<a href="https://arxiv.org/abs/2301.13379" target="_blank" rel="noopener">Lyu et al., Jan 2023</a>). Because code executes the rules directly on the recorded facts, the audit trail shows what truly produced the answer. This is <a href="#table-3-option-3">Option 3 (Hybrid) in <em>Table 3</em></a>; <a href="#fig-q1-worked"><em>Figure 5</em></a> walks through it on a real prior-authorization request.
         </p>
 
         <h2 id="sec-2">2. From "Black Box" to a Checkable System</h2>
@@ -1191,7 +1191,7 @@
         </div>
 
         <p>
-          That gives us the governing boundary: <strong>the model's weights and latent activations remain opaque, while the surrounding system makes inputs, sources, limits, evaluations, and history transparent</strong> (<em>Figure 2</em>).
+          That gives us the governing boundary: <strong>the model's weights and latent activations remain opaque, while the surrounding system makes inputs, sources, limits, evaluations, and history transparent</strong>.
         </p>
 
 <div class="diagram-frame" id="fig-q1">
@@ -1356,6 +1356,209 @@
           </div>
         </div>
 
+<div class="diagram-frame" id="fig-q1-gcp">
+  <svg viewBox="0 0 920 622" role="img" aria-label="The same seven layers on Google Cloud, lettered A to G in request-flow order. Inside a VPC Service Controls, CMEK (Cloud KMS), and Assured Workloads perimeter, a request is screened by Model Armor (A), grounded with RAG Engine on Agent Platform (B), handled by Gemini on Agent Platform or open weights from Model Garden, checked by Model Armor and your service on Cloud Run with structured output schemas (C), and routed by risk to your review queue with sign-offs logged to Cloud Logging (D), while Cloud Logging and Cloud Trace record every step (E). The Agent Platform evaluation service and pinned model version IDs gate every change (F), and shadow comparisons with a feature-flag kill switch govern graduated rollout (G).">
+  <defs>
+    <marker id="arr-q1g-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:var(--ink)"/>
+    </marker>
+    <marker id="arr-q1g-good" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:var(--good)"/>
+    </marker>
+    <symbol id="icon-gcp-vpc" viewBox="0 0 32 32" data-source="vpc_service_controls.svg" data-digest="1c69dab586f3281d">
+    <defs />
+    <rect x="21.33" y="2.67" width="8" height="8" fill="#aecbfa" />
+    <rect x="25.33" y="2.67" width="4" height="8" fill="#669df6" />
+    <rect x="21.33" y="21.33" width="8" height="8" fill="#aecbfa" />
+    <rect x="25.33" y="21.33" width="4" height="8" fill="#669df6" />
+    <rect x="2.67" y="2.67" width="8" height="8" fill="#aecbfa" />
+    <rect x="6.67" y="2.67" width="4" height="8" fill="#669df6" />
+    <rect x="2.67" y="21.33" width="8" height="8" fill="#aecbfa" />
+    <rect x="6.67" y="21.33" width="4" height="8" fill="#669df6" />
+    <rect x="10.67" y="5.33" width="10.67" height="2.67" fill="#669df6" />
+    <rect x="10.67" y="24" width="10.67" height="2.67" fill="#669df6" />
+    <rect x="24" y="10.67" width="2.67" height="10.67" fill="#669df6" />
+    <rect x="5.33" y="10.67" width="2.67" height="10.67" fill="#669df6" />
+    <rect x="5.33" y="10.67" width="2.67" height="2.67" fill="#4285f4" />
+    <rect x="24" y="10.67" width="2.67" height="2.67" fill="#4285f4" />
+    <rect x="10.67" y="5.33" width="2.67" height="2.67" fill="#4285f4" />
+    <rect x="10.67" y="24" width="2.67" height="2.67" fill="#4285f4" />
+  </symbol>
+  <symbol id="icon-gcp-kms" viewBox="0 0 32 32" data-source="cloud_kms.svg" data-digest="8b9eee8fd737d273">
+    <defs />
+    <path d="M15.09,22.74H13.26v1.87h1.83v.84H17V16.24a4.62,4.62,0,0,0,3.57-4.45,4.56,4.56,0,1,0-5.47,4.47v2.83H12.35V21h2.74ZM16,2.67,27,7.23v7.5C27,21.49,22.28,27.8,16,29.33,9.72,27.8,5.05,21.49,5.05,14.73V7.23Zm0,6.61a2.51,2.51,0,1,1-2.32,1.55A2.51,2.51,0,0,1,16,9.28Z" fill="#669df6" fill-rule="evenodd" />
+    <path d="M16,25.45h1V16.24a4.62,4.62,0,0,0,3.57-4.45A4.56,4.56,0,0,0,16,7.23V2.67L27,7.23v7.5C27,21.49,22.28,27.8,16,29.33V25.45ZM16,9.28a2.51,2.51,0,0,1,1,4.83,1.58,1.58,0,0,1-1,.2Z" fill-rule="evenodd" fill="#4285f4" />
+  </symbol>
+  <symbol id="icon-gcp-aw" viewBox="0 0 512 512" data-source="assured_workloads.svg" data-digest="821d131bdb90df0c">
+    <defs />
+    <path d="M162.69,394.09v-196h39.82v196Zm-79.95,0v-196h38.54v196Zm161.18,0v-196h38.22v196Zm116.58-196v91.07l-36.95,17.07V198.12Z" fill="#4285f4" />
+    <path d="M366.43,374.62l-9.26,9.46,26.61,27.4,12.55-12.92,4-4.13v63.5l-4,6v0l-1.1-.29-.13,0a78.72,78.72,0,0,1-21.51-9.5l-.41-.25-.2-.13c-24.3-15.56-41.32-43.92-44-74.66V379l-.06-.79-.06-.84s0-.08,0-.11l0-.41,0-.69,0-.54c0-.29,0-.57,0-.86v-.27l0-1.06c0-.11,0-.21,0-.32,0-.31,0-.63,0-.94v-48l67.66-31.06h0l4,8v74.35l-4,4.13-12.55,12.9Z" fill="#aecbfa" />
+    <path d="M396.34,293.1h0v86.48l4-4.13,27.54-28.31,9.2,9.47-36.74,37.82-4,4.13v65.36h0l1.08-.27.13,0a78.83,78.83,0,0,0,21.51-9.49l.41-.26.2-.13c24.3-15.56,41.32-43.91,44-74.65V379l.06-.78.06-.84s0-.08,0-.12l0-.41,0-.68,0-.55,0-.85a.81.81,0,0,0,0-.16v-.12l0-1.06c0-.1,0-.21,0-.31,0-.32,0-.63,0-.94v-48Z" fill="#669df6" />
+    <path d="M319.43,415.91H221.58v-34.7l89-.29v1.43A112.54,112.54,0,0,0,319.43,415.91Z" fill="#669df6" />
+    <path d="M197.73,139.06a23.93,23.93,0,0,0,23.89,24v41.7H48V169.9L221.62,48v67.1A23.93,23.93,0,0,0,197.73,139.06Z" fill="#aecbfa" />
+    <path d="M395.22,169.9v34.83H221.62V163a24,24,0,0,0,0-47.94V48Z" fill="#669df6" />
+    <polygon points="221.62 381.13 221.62 415.98 47.97 415.98 47.97 381.45 221.62 381.13" fill="#aecbfa" />
+  </symbol>
+  <symbol id="icon-gcp-armor" viewBox="0 0 32 32" data-source="cloud_armor.svg" data-digest="064b5693f4a94c8e">
+    <defs />
+    <polygon points="13.01 27.47 11.62 26.07 18.9 18.76 20.29 20.16 13.01 27.47" fill="#aecbfa" />
+    <polygon points="9.37 24.42 7.98 23.02 17.79 13.18 19.18 14.57 9.37 24.42" fill="#aecbfa" />
+    <polygon points="7.12 19.97 5.73 18.57 12.23 12.04 13.62 13.44 7.12 19.97" fill="#aecbfa" />
+    <path d="M16,4.82l9,4V14.9c0,5.72-3.87,11-9,12.41C10.83,25.9,7,20.62,7,14.9V8.85l9-4m0-2.15L5,7.57V14.9c0,6.69,4.64,12.88,10.8,14.38l.21,0,.2,0C22.36,27.78,27,21.59,27,14.9V7.57L16,2.67Z" fill="#669df6" />
+    <circle cx="19.58" cy="19.49" r="1.89" fill="#669df6" />
+    <circle cx="18.47" cy="13.93" r="1.89" fill="#669df6" />
+    <circle cx="12.92" cy="12.8" r="1.89" fill="#669df6" />
+  </symbol>
+  <symbol id="icon-gcp-gemini" viewBox="0 0 512 512" data-source="gemini.svg" data-digest="faf217c277a7c1c4">
+    <path d="M256,464c0-28.77-5.55-55.81-16.64-81.12-10.75-25.31-25.48-47.32-44.2-66.04-18.72-18.72-40.73-33.45-66.04-44.2-25.31-11.09-52.35-16.64-81.12-16.64,28.77,0,55.81-5.37,81.12-16.12,25.31-11.09,47.32-26,66.04-44.72,18.72-18.72,33.45-40.73,44.2-66.04,11.09-25.31,16.64-52.35,16.64-81.12,0,28.77,5.37,55.81,16.12,81.12,11.09,25.31,26,47.32,44.72,66.04,18.72,18.72,40.73,33.63,66.04,44.72,25.31,10.75,52.35,16.12,81.12,16.12-28.77,0-55.81,5.55-81.12,16.64-25.31,10.75-47.32,25.48-66.04,44.2-18.72,18.72-33.63,40.73-44.72,66.04-10.75,25.3-16.12,52.35-16.12,81.12Z" fill="#4285f4" />
+  </symbol>
+  <symbol id="icon-gcp-ap" viewBox="0 0 512 512" data-source="agent_platform.svg" data-digest="819f8bc9fd4328c8">
+    <path d="M128,244.99c-8.84,0-16-7.16-16-16v-95.97c0-8.84,7.16-16,16-16s16,7.16,16,16v95.97c0,8.84-7.16,16-16,16Z" fill="#ea4335" />
+    <path d="M256,458c-2.98,0-5.97-.83-8.59-2.5l-186-122c-7.46-4.74-9.65-14.63-4.91-22.09,4.75-7.46,14.64-9.65,22.09-4.91l177.41,116.53,177.41-116.53c7.45-4.74,17.34-2.55,22.09,4.91,4.74,7.46,2.55,17.34-4.91,22.09l-186,122c-2.62,1.67-5.61,2.5-8.59,2.5Z" fill="#fbbc04" />
+    <path d="M256,388.03c-8.84,0-16-7.16-16-16v-73.06c0-8.84,7.16-16,16-16s16,7.16,16,16v73.06c0,8.84-7.16,16-16,16Z" fill="#34a853" />
+    <circle cx="128" cy="70" r="16" fill="#ea4335" />
+    <circle cx="128" cy="292" r="16" fill="#ea4335" />
+    <path d="M384.23,308.01c-8.82,0-15.98-7.14-16-15.97l-.23-94.01c-.02-8.84,7.13-16.02,15.97-16.03h.04c8.82,0,15.98,7.14,16,15.97l.23,94.01c.02,8.84-7.13,16.02-15.97,16.03h-.04Z" fill="#4285f4" />
+    <circle cx="384" cy="70" r="16" fill="#4285f4" />
+    <circle cx="384" cy="134" r="16" fill="#4285f4" />
+    <path d="M320,220.36c-8.84,0-16-7.16-16-16v-103.02c0-8.84,7.16-16,16-16s16,7.16,16,16v103.02c0,8.84-7.16,16-16,16Z" fill="#fbbc04" />
+    <circle cx="256" cy="171" r="16" fill="#34a853" />
+    <circle cx="256" cy="235" r="16" fill="#34a853" />
+    <circle cx="320" cy="265" r="16" fill="#fbbc04" />
+    <circle cx="320" cy="329" r="16" fill="#fbbc04" />
+    <path d="M192,217.36c-8.84,0-16-7.16-16-16v-100.02c0-8.84,7.16-16,16-16s16,7.16,16,16v100.02c0,8.84-7.16,16-16,16Z" fill="#fbbc04" />
+    <circle cx="192" cy="265" r="16" fill="#fbbc04" />
+    <circle cx="192" cy="329" r="16" fill="#fbbc04" />
+  </symbol>
+  <symbol id="icon-gcp-run" viewBox="0 0 512 512" data-source="cloud_run.svg" data-digest="81de451d5840a679">
+    <defs />
+    <path d="M144.4,272c-6.4,0-12.4-3.8-14.9-10.1L55.4,75.9c-3.3-8.2.7-17.5,8.9-20.8,8.2-3.3,17.5.7,20.8,8.9l74.2,186c3.3,8.2-.7,17.5-8.9,20.8-1.9.8-3.9,1.1-5.9,1.1h-.1Z" fill="#fbbc04" />
+    <path d="M256,272c-6.4,0-12.4-3.8-14.9-10.1l-74.1-186c-2.6-6.6-.6-14.1,5-18.5s13.4-4.5,19.2-.4l260.1,186c7.2,5.1,8.9,15.1,3.7,22.3s-15.1,8.9-22.3,3.7L216.9,114.7l54,135.3c3.3,8.2-.7,17.5-8.9,20.8-1.9.8-4,1.1-5.9,1.1h-.1Z" fill="#ea4335" />
+    <path d="M127.2,256l-72,180c-3.3,8.2.7,17.5,8.9,20.8,3.1,1.2,4,1.1,5.9,1.1,6.3,0,12.4-3.8,14.9-10.1l74.4-186c.8-2,1.1-4,1.1-5.9h-33.2Z" fill="#34a853" />
+    <path d="M414.5,256l-197.7,141.2,54.1-135.3c.8-2,1.1-4,1.1-5.9h-33.2l-72,180c-2.6,6.6-.6,14.1,5,18.5,2.9,2.3,6.4,3.4,9.9,3.4s6.5-1,9.3-3l260.4-186c4.4-3.1,6.7-8,6.7-13h-43.6Z" fill="#4285f4" />
+  </symbol>
+  <symbol id="icon-gcp-log" viewBox="0 0 32 32" data-source="cloud_logging.svg" data-digest="42d99603b67118b9">
+    <defs />
+    <rect x="8" y="14.67" width="5.33" height="2.67" fill="#4285f4" />
+    <rect x="5.33" y="24" width="8" height="2.67" fill="#4285f4" />
+    <g data-name="colored-32/logs">
+      <rect width="32" height="32" fill="none" />
+      <g>
+        <polygon id="icon-gcp-log-Fill-3" points="5.33 24 8 24 8 8 5.33 8 5.33 24" fill="#4285f4" />
+        <polygon id="icon-gcp-log-Fill-4" points="12 9.33 29.33 9.33 29.33 4 12 4 12 9.33" fill="#669df6" />
+        <polygon id="icon-gcp-log-Fill-4-2" data-name="Fill-4" points="12 18.67 29.33 18.67 29.33 13.33 12 13.33 12 18.67" fill="#669df6" />
+        <polygon id="icon-gcp-log-Fill-4-3" data-name="Fill-4" points="12 28 29.33 28 29.33 22.67 12 22.67 12 28" fill="#669df6" />
+        <polygon id="icon-gcp-log-Fill-7" points="2.67 10.67 10.67 10.67 10.67 2.67 2.67 2.67 2.67 10.67" fill="#aecbfa" />
+      </g>
+    </g>
+  </symbol>
+  <symbol id="icon-gcp-trace" viewBox="0 0 32 32" data-source="cloud_trace.svg" data-digest="b274bbeb73ba8c02">
+    <defs />
+    <g data-name="colored-32/traces">
+      <rect width="32" height="32" fill="none" />
+      <g>
+        <polygon id="icon-gcp-trace-Fill-1" points="16 18.67 29.33 18.67 29.33 13.33 16 13.33 16 18.67" fill="#4285f4" />
+      </g>
+      <g data-name="Shape">
+        <polygon id="icon-gcp-trace-Fill-1-2" data-name="Fill-1" points="16 29.33 29.33 29.33 29.33 24 16 24 16 29.33" fill="#4285f4" />
+      </g>
+      <g data-name="Shape">
+        <polygon id="icon-gcp-trace-Fill-1-3" data-name="Fill-1" points="10.67 29.33 16 29.33 16 24 10.67 24 10.67 29.33" fill="#669df6" />
+      </g>
+    </g>
+    <rect x="2.67" y="2.67" width="8" height="5.33" fill="#669df6" />
+    <rect x="2.67" y="13.33" width="13.33" height="5.33" fill="#669df6" />
+  </symbol>
+  </defs>
+
+    <rect x="14" y="14" width="892" height="594" rx="14" style="fill:var(--panel-2);stroke:var(--line);stroke-width:1.75"/>
+    <text class="zl" x="34" y="42">THE SAME LAYERS ON GOOGLE CLOUD</text>
+
+    <!-- A: data perimeter -->
+    <rect x="34" y="58" width="852" height="390" rx="12" style="fill:none;stroke:var(--cyan);stroke-width:1.8;stroke-dasharray:7 5"/>
+    <text class="t-m-c" x="50" y="83">A · DATA PERIMETER:</text>
+    <use href="#icon-gcp-vpc" x="196" y="67" width="20" height="20"/>
+    <use href="#icon-gcp-kms" x="220" y="67" width="20" height="20"/>
+    <use href="#icon-gcp-aw" x="244" y="67" width="20" height="20"/>
+    <text class="t-s" x="272" y="82">VPC Service Controls · CMEK (Cloud KMS) · Assured Workloads</text>
+
+    <!-- Request path, in order -->
+    <rect class="node-dim" x="350" y="96" width="120" height="24" rx="12"/>
+    <text class="t-s t-c" x="410" y="112">request</text>
+    <line class="flow" x1="410" y1="120" x2="410" y2="134" marker-end="url(#arr-q1g-ink)"/>
+
+    <!-- A: Screen input -->
+    <rect class="node-cyan" x="200" y="138" width="420" height="44" rx="9"/>
+    <use href="#icon-gcp-armor" x="216" y="148" width="24" height="24"/>
+    <text class="t-b" x="250" y="157">A · Model Armor</text>
+    <text class="t-s" x="250" y="174">screen input for PII, toxicity, prompt injection</text>
+    <line class="flow" x1="410" y1="182" x2="410" y2="196" marker-end="url(#arr-q1g-ink)"/>
+
+    <!-- B: Ground in their sources -->
+    <rect class="node-cyan" x="200" y="200" width="420" height="44" rx="9"/>
+    <use href="#icon-gcp-ap" x="216" y="210" width="24" height="24"/>
+    <text class="t-b" x="250" y="219">B · RAG Engine (Agent Platform)</text>
+    <text class="t-s" x="250" y="236">ground in their documents with citations</text>
+    <line class="flow" x1="410" y1="244" x2="410" y2="258" marker-end="url(#arr-q1g-ink)"/>
+
+    <!-- Model -->
+    <rect class="node-violet" x="200" y="262" width="420" height="44" rx="9" style="stroke-dasharray:6 4"/>
+    <use href="#icon-gcp-gemini" x="212" y="272" width="22" height="22"/>
+    <use href="#icon-gcp-ap" x="236" y="272" width="22" height="22"/>
+    <text class="t-b" x="268" y="281">Gemini on Agent Platform</text>
+    <text class="t-s" x="268" y="298">or open weights from Model Garden</text>
+    <line class="flow" x1="410" y1="306" x2="410" y2="320" marker-end="url(#arr-q1g-ink)"/>
+
+    <!-- C: Check outputs in code -->
+    <rect class="node-cyan" x="200" y="324" width="420" height="44" rx="9"/>
+    <use href="#icon-gcp-armor" x="212" y="334" width="22" height="22"/>
+    <use href="#icon-gcp-run" x="236" y="334" width="22" height="22"/>
+    <text class="t-b" x="268" y="343">C · Model Armor + Cloud Run</text>
+    <text class="t-s" x="268" y="360">output screening + structured schemas &amp; rules</text>
+    <line class="flow" x1="410" y1="368" x2="410" y2="382" marker-end="url(#arr-q1g-ink)"/>
+
+    <!-- D: Route by risk -->
+    <rect class="node-cyan" x="200" y="386" width="420" height="44" rx="9"/>
+    <use href="#icon-gcp-log" x="216" y="396" width="24" height="24"/>
+    <text class="t-b" x="250" y="405">D · Your review queue</text>
+    <text class="t-s" x="250" y="422">sign-offs logged to Cloud Logging</text>
+
+    <!-- E: Log every step -->
+    <rect class="node-cyan" x="640" y="138" width="226" height="292" rx="9"/>
+    <use href="#icon-gcp-log" x="723" y="236" width="26" height="26"/>
+    <use href="#icon-gcp-trace" x="757" y="236" width="26" height="26"/>
+    <text class="t-b t-c" x="753" y="284">E · Cloud Logging,</text>
+    <text class="t-b t-c" x="753" y="303">Cloud Trace</text>
+    <text class="t-s t-c" x="753" y="325">replayable months later</text>
+
+    <!-- Output -->
+    <line class="flow" x1="410" y1="430" x2="410" y2="464" marker-end="url(#arr-q1g-ink)"/>
+    <rect class="node-card" x="200" y="468" width="420" height="40" rx="9"/>
+    <text class="t-b t-c" x="410" y="493">Answer with citations</text>
+
+    <!-- F and G: controls on every change -->
+    <rect class="node-good" x="34" y="530" width="418" height="58" rx="9"/>
+    <use href="#icon-gcp-ap" x="50" y="546" width="26" height="26"/>
+    <text class="t-b" x="86" y="553">F · Agent Platform evaluation service</text>
+    <text class="t-s" x="86" y="573">golden set + pinned model version IDs</text>
+    <path d="M 180 530 V 284 H 196" style="fill:none;stroke:var(--good);stroke-width:2.2" marker-end="url(#arr-q1g-good)"/>
+
+    <rect class="node-good" x="468" y="530" width="418" height="58" rx="9"/>
+    <use href="#icon-gcp-ap" x="484" y="546" width="26" height="26"/>
+    <text class="t-b" x="520" y="553">G · Evaluation service + feature flag</text>
+    <text class="t-s" x="520" y="573">shadow comparisons · instant kill switch</text>
+    <path d="M 634 530 V 408 H 624" style="fill:none;stroke:var(--good);stroke-width:2.2" marker-end="url(#arr-q1g-good)"/>
+  </svg>
+  <div class="fig-caption">
+    <span>Figure 3 — The same seven layers on Google Cloud. Each request is screened by Model Armor, grounded with RAG Engine, handled by Gemini, checked in your own service, and routed by risk, inside a VPC Service Controls and CMEK perimeter, with every step in Cloud Logging and Cloud Trace. The Agent Platform evaluation service gates every change and supports shadow-mode rollout.</span>
+    <div class="legend-items">
+      <span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> Opaque model</span>
+      <span><i class="swatch-dot" style="background:var(--cyan-soft);border-color:var(--cyan)"></i> Checks on every request</span>
+      <span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good)"></i> Controls on every change</span>
+    </div>
+  </div>
+</div>
+
         <h2 id="sec-3">3. Choosing How Much the Model Decides</h2>
         <p>
           The layers in Section 2 wrap any model. The second lever is how much of each decision the model makes at all. A model that only reads documents and extracts facts needs far less trust than one that decides, so the most effective control is often architectural: give the model the language work, and give the decision to something a person can inspect. Which split is right depends on the customer's answers to a few scoping questions.
@@ -1377,7 +1580,7 @@
 
         <h3>Six ways to split the work between model and code</h3>
         <p>
-          Every design choice for a decision step trades two things: <strong>transparency</strong>, meaning how much of the logic a person can inspect, and <strong>language flexibility</strong>, meaning how much unstructured text the step can handle. <em>Table 3</em> describes six options in plain terms, and <em>Figure 3</em> places them on those two axes.
+          Every design choice for a decision step trades two things: <strong>transparency</strong>, meaning how much of the logic a person can inspect, and <strong>language flexibility</strong>, meaning how much unstructured text the step can handle. <em>Table 3</em> describes six options in plain terms, and <em>Figure 4</em> places them on those two axes.
         </p>
 
         <div class="nine-q-wrap">
@@ -1508,7 +1711,7 @@
     <text class="t-s t-e" x="810" y="421">baseline, for contrast</text>
   </svg>
   <div class="fig-caption">
-    <span>Figure 3 — The six options are not a straight trade-off. Rules, pure search, and classical ML are transparent but need structured input or refuse to synthesize; pinned open weights handle open-ended language but stay neural inside. The hybrid option reaches the high-stakes sweet spot: the model handles the language, and code makes the decision on verified facts. Positions are qualitative.</span>
+    <span>Figure 4 — The six options are not a straight trade-off. Rules, pure search, and classical ML are transparent but need structured input or refuse to synthesize; pinned open weights handle open-ended language but stay neural inside. The hybrid option reaches the high-stakes sweet spot: the model handles the language, and code makes the decision on verified facts. Positions are qualitative.</span>
     <div class="legend-items">
       <span><i class="swatch-dot" style="background:var(--cyan-soft);border-color:var(--cyan)"></i> Option (numbered as in Table 3)</span>
       <span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good)"></i> Recommended for high-stakes decisions</span>
@@ -1518,7 +1721,7 @@
 </div>
 
         <p>
-          <strong>How to read Figure 3.</strong> The vertical axis is how much of the logic a person can inspect; the horizontal axis is how much unstructured language the option can handle. Most options sit in one of two corners. Rules, search, and classical ML (top left) are inspectable but need structured input or refuse to synthesize. Pinned open weights and an unconstrained LLM (bottom right) handle any language but stay neural inside. Constrained generation sits between them: it narrows what the model may output, not how it reasons. Only the hybrid reaches the top right, because it never asks one component to do both jobs: the model handles the language, and code makes the decision on facts it can check.
+          <strong>How to read Figure 4.</strong> The vertical axis is how much of the logic a person can inspect; the horizontal axis is how much unstructured language the option can handle. Most options sit in one of two corners. Rules, search, and classical ML (top left) are inspectable but need structured input or refuse to synthesize. Pinned open weights and an unconstrained LLM (bottom right) handle any language but stay neural inside. Constrained generation sits between them: it narrows what the model may output, not how it reasons. Only the hybrid reaches the top right, because it never asks one component to do both jobs: the model handles the language, and code makes the decision on facts it can check.
         </p>
 
         <h3>Pick per step, not per system</h3>
@@ -1546,27 +1749,27 @@
                 <tr>
                   <td><b><a href="https://eur-lex.europa.eu/eli/reg/2024/1689/oj" target="_blank" rel="noopener">EU AI Act</a> (high-risk systems)</b></td>
                   <td>Automatic event logging (Art. 12), transparency to deployers (Art. 13), human oversight (Art. 14), technical documentation (Art. 11, Annex IV), and a right to an explanation of individual decisions (Art. 86). Under the Digital Omnibus, obligations for Annex III systems apply from December 2, 2027, and for Annex I products from August 2, 2028</td>
-                  <td>A, B, D, E</td>
+                  <td style="white-space:nowrap"><span class="layer-pill lp-req">A</span> <span class="layer-pill lp-req">B</span> <span class="layer-pill lp-req">D</span> <span class="layer-pill lp-req">E</span></td>
                 </tr>
                 <tr>
                   <td><b><a href="https://eur-lex.europa.eu/eli/reg/2016/679/oj" target="_blank" rel="noopener">GDPR</a></b></td>
                   <td>Safeguards for solely automated decisions with legal or similarly significant effects (Art. 22), and meaningful information about the logic involved (Arts. 13–15)</td>
-                  <td>B, D, Option 3</td>
+                  <td style="white-space:nowrap"><span class="layer-pill lp-req">B</span> <span class="layer-pill lp-req">D</span> <span class="layer-pill lp-chg">Option 3</span></td>
                 </tr>
                 <tr>
                   <td><b><a href="https://www.federalreserve.gov/supervisionreg/srletters/sr2602.htm" target="_blank" rel="noopener">SR 11-7 / SR 26-2</a> (U.S. banking model risk)</b></td>
                   <td>Independent validation with effective challenge, ongoing monitoring, and outcomes analysis, scaled to a model's materiality. Generative and agentic AI fall outside its formal scope, so for LLM systems it serves as the benchmark banks' model-risk teams apply.</td>
-                  <td>E, F</td>
+                  <td style="white-space:nowrap"><span class="layer-pill lp-req">E</span> <span class="layer-pill lp-chg">F</span></td>
                 </tr>
                 <tr>
                   <td><b>HIPAA</b></td>
                   <td>Business associate agreements, minimum-necessary access, and audit controls for systems that touch PHI</td>
-                  <td>A, E</td>
+                  <td style="white-space:nowrap"><span class="layer-pill lp-req">A</span> <span class="layer-pill lp-req">E</span></td>
                 </tr>
                 <tr>
                   <td><b><a href="https://www.cms.gov/newsroom/fact-sheets/cms-interoperability-and-prior-authorization-final-rule-cms-0057-f" target="_blank" rel="noopener">CMS Prior Authorization Rule</a> (CMS-0057-F)</b></td>
                   <td>A specific reason for every denied prior-authorization request</td>
-                  <td>B, C, Option 3</td>
+                  <td style="white-space:nowrap"><span class="layer-pill lp-req">B</span> <span class="layer-pill lp-req">C</span> <span class="layer-pill lp-chg">Option 3</span></td>
                 </tr>
               </tbody>
             </table>
@@ -1607,7 +1810,7 @@
 }</pre>
         </div>
         <p>
-          Code then does everything that needs to be defensible: it confirms each quote exists in the chart, applies the written policy rule, and routes the result (<em>Figure 4</em> and <em>Table 5</em>).
+          Code then does everything that needs to be defensible: it confirms each quote exists in the chart, applies the written policy rule, and routes the result (<em>Figure 5</em> and <em>Table 5</em>).
         </p>
 
 <div class="diagram-frame" id="fig-q1-worked">
@@ -1678,7 +1881,7 @@
     <text class="t-s t-c" x="360" y="460">neuro exam notes · PT log if done</text>
   </svg>
   <div class="fig-caption">
-    <span>Figure 4 — The same chart and the same model produce different outcomes depending on who decides. When the model decides, its thinking becomes the stored reason and criterion (b) is never checked, so the result is a wrongful denial. When the model only extracts quoted facts and code verifies the quotes and applies the policy's OR rule, the open criterion keeps the case alive and the system requests the missing evidence.</span>
+    <span>Figure 5 — The same chart and the same model produce different outcomes depending on who decides. When the model decides, its thinking becomes the stored reason and criterion (b) is never checked, so the result is a wrongful denial. When the model only extracts quoted facts and code verifies the quotes and applies the policy's OR rule, the open criterion keeps the case alive and the system requests the missing evidence.</span>
     <div class="legend-items">
       <span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> Model step</span>
       <span><i class="swatch-dot" style="background:var(--cyan-soft);border-color:var(--cyan)"></i> Code step</span>
