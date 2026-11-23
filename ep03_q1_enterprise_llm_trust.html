@@ -872,6 +872,18 @@
   @media print {
     .t1-map-hint { display: none; }
   }
+  .layer-cards { display: flex; flex-direction: column; gap: 14px; margin: 14px 0 18px; }
+  .layer-card { border: 1px solid var(--line); border-left: 4px solid var(--cyan); border-radius: 10px; background: var(--panel-2); padding: 14px 18px; break-inside: avoid; }
+  .layer-card.lc-chg { border-left-color: var(--good); }
+  .layer-card h3 { margin: 0 0 4px; font-size: 16.5px; color: var(--ink); }
+  .layer-card .lc-summary { margin: 0 0 10px; font-weight: 700; color: var(--ink); }
+  .layer-card .lc-meta { list-style: none; margin: 0 0 10px; padding: 0; font-size: 14.5px; }
+  .layer-card .lc-meta li { margin: 3px 0; }
+  .layer-card .lc-details { margin: 0; font-size: 14.5px; color: var(--ink); }
+  .layer-card .lc-details + .lc-details { margin-top: 8px; }
+  .t-card-full.l-req { border-left: 4px solid var(--cyan); }
+  .t-card-full .lc-lead { margin: 0 0 8px; color: var(--ink); font-weight: 700; font-size: 14.2px; }
+  .t-card-full .t-fix-row p { margin: 6px 0 0; color: var(--ink); }
   </style>
 </head>
 <body>
@@ -1081,7 +1093,7 @@
           <li><strong>Trace how features influence each other.</strong> Link the active features across layers into an <strong>attribution graph</strong> showing which ones pushed the final token up or down. This is an expensive, research-grade investigation that still captures only part of the computation.</li>
         </ol>
         <p>
-          <strong>The way out: separate reading from deciding.</strong> Have the model extract structured facts (with exact source quotes) into a checklist, and let deterministic code apply the rules to those facts (<a href="https://arxiv.org/abs/2301.13379" target="_blank" rel="noopener">Lyu et al., Jan 2023</a>). Because code executes the rules directly on the recorded facts, the audit trail shows what truly produced the answer. This is <a href="#table-3-option-3">Option 3 (Hybrid) in <em>Table 3</em></a>; <a href="#fig-q1-worked"><em>Figure 5</em></a> walks through it on a real prior-authorization request.
+          <strong>The way out: separate reading from deciding.</strong> Have the model extract structured facts (with exact source quotes) into a checklist, and let deterministic code apply the rules to those facts (<a href="https://arxiv.org/abs/2301.13379" target="_blank" rel="noopener">Lyu et al., Jan 2023</a>). Because code executes the rules directly on the recorded facts, the audit trail shows what truly produced the answer. This is <a href="#table-2-option-3">Option 3 (Hybrid) in <em>Table 2</em></a>; <a href="#fig-q1-worked"><em>Figure 5</em></a> walks through it on a real prior-authorization request.
         </p>
 
         <h2 id="sec-2">2. From "Black Box" to a Checkable System</h2>
@@ -1089,7 +1101,7 @@
           In practice, internal model tracing hits a hard ceiling for both deployment models: <strong>proprietary APIs</strong> keep weights and layer activations behind the endpoint while exposing only condensed summaries, and <strong>open-weight models</strong> emit sampled tokens that can omit causal factors while full activation-level circuit tracing remains partial and costly.
         </p>
         <p>
-          Therefore, enterprise trust shifts from inspecting neural activations to engineering <strong>verifiable system controls</strong> around the model. "Black box" maps to nine distinct concerns. Each tends to come from a particular team and sits on a concrete business risk, so who is in the room usually signals which concerns matter first:
+          Therefore, enterprise trust shifts from inspecting neural activations to engineering <strong>verifiable system controls</strong> around the model. "Black box" maps to nine distinct concerns. Each tends to come from a particular team and sits on a concrete business risk, so who is in the room usually signals which concerns matter first. Read the rest of this section in three steps: find the customer's concern and its layer letter in <em>Table 1</em>, see where that layer acts on a request in <em>Figure 2</em>, then read that layer's card below.
         </p>
 
         <div class="nine-q-wrap" id="table-1">
@@ -1109,83 +1121,82 @@
                   <th>Layer</th>
                   <th>Usually Raised By</th>
                   <th>Risk Behind It</th>
-                  <th>What Addresses It</th>
                 </tr>
               </thead>
               <tbody>
-                <tr data-layers="B,C">
-                  <td><b>We don't know why it gave that answer.</b></td>
-                  <td><b>1. Explainability</b></td>
-                  <td style="white-space:nowrap"><span class="layer-pill lp-req">B</span> <span class="layer-pill lp-req">C</span></td>
-                  <td>End users, business owners</td>
-                  <td><b>Liability:</b> a wrong answer reaches a customer, patient, or ledger</td>
-                  <td>Traceable source passages, structured criteria behind every claim, and faithful-by-construction reasoning (the model writes a checklist or program that code executes)</td>
-                </tr>
-                <tr data-layers="C,F">
-                  <td><b>It answers differently every time.</b></td>
-                  <td><b>2. Predictability</b></td>
-                  <td style="white-space:nowrap"><span class="layer-pill lp-req">C</span> <span class="layer-pill lp-chg">F</span></td>
-                  <td>Engineering</td>
-                  <td><b>Reputational harm:</b> inconsistent answers in front of customers</td>
-                  <td>Fixed output schemas and enumerated values, a pinned model version and thinking level, and measured <code>pass^k</code> consistency (the probability that all <code>k</code> i.i.d. trials of a task succeed, averaged across tasks; <a href="https://arxiv.org/abs/2406.12045" target="_blank" rel="noopener">Yao et al., ICLR 2025</a>). Current reasoning models are tuned for their default sampling settings, so consistency comes from structure, pinning, and measurement (Layer C)</td>
-                </tr>
-                <tr data-layers="A">
-                  <td><b>We don't know what data it was trained on.</b></td>
-                  <td><b>3. Training-Data Provenance</b></td>
-                  <td style="white-space:nowrap"><span class="layer-pill lp-req">A</span></td>
-                  <td>Legal</td>
-                  <td><b>Liability:</b> IP, licensing, and privacy exposure</td>
-                  <td>Model cards and data statements (source categories, knowledge cut-off, filtering), published bias and safety evaluations, licensing terms, and IP / copyright indemnification; fully open models with published training corpora (such as <a href="https://allenai.org/olmo" target="_blank" rel="noopener">AI2 OLMo</a>) when the customer requires line-level data disclosure</td>
-                </tr>
-                <tr data-layers="Option 4">
-                  <td><b>We can't look inside the model.</b></td>
-                  <td><b>4. Model Weights</b></td>
-                  <td style="white-space:nowrap"><span class="layer-pill lp-mdl">Option 4</span></td>
-                  <td>Model-risk and validation teams; security; sovereignty-bound customers</td>
-                  <td><b>Regulatory scrutiny:</b> independent validation; lock-in</td>
-                  <td>Open-weight models (such as Gemma or Llama) that the customer can download, inspect, fine-tune, and self-host at a pinned checksum; per-decision explanations come from the system layers around the weights</td>
-                </tr>
-                <tr data-layers="A">
-                  <td><b>We don't know where our data goes.</b></td>
-                  <td><b>5. Data Governance</b></td>
-                  <td style="white-space:nowrap"><span class="layer-pill lp-req">A</span></td>
-                  <td>Security, privacy office</td>
-                  <td><b>Confidential data exposure:</b> leaks into training runs or across users</td>
-                  <td>Contractual zero-training, regional residency, encryption, and retention bounds</td>
-                </tr>
-                <tr data-layers="B,D,G">
-                  <td><b>We can't tell when it is wrong.</b></td>
-                  <td><b>6. Reliability</b></td>
-                  <td style="white-space:nowrap"><span class="layer-pill lp-req">B</span> <span class="layer-pill lp-req">D</span> <span class="layer-pill lp-chg">G</span></td>
-                  <td>Business owners, operations</td>
-                  <td><b>Liability and reputational harm:</b> fabricated or off-policy answers</td>
-                  <td>Groundedness checks, calibrated abstention (the system declines to answer when checkable signals, such as quotes found and criteria resolved, fall below a threshold tuned on the golden set), and known failure rates</td>
-                </tr>
-                <tr data-layers="D,E">
-                  <td><b>We can't audit a past decision.</b></td>
-                  <td><b>7. Accountability</b></td>
-                  <td style="white-space:nowrap"><span class="layer-pill lp-req">D</span> <span class="layer-pill lp-req">E</span></td>
-                  <td>Compliance, internal audit</td>
-                  <td><b>Regulatory scrutiny:</b> an examiner asks how a decision was reached (Table 4)</td>
-                  <td>Immutable logs and step traces capable of reconstructing any historical run</td>
-                </tr>
-                <tr data-layers="F">
-                  <td><b>You will update the model under us.</b></td>
-                  <td><b>8. Version Stability</b></td>
-                  <td style="white-space:nowrap"><span class="layer-pill lp-chg">F</span></td>
-                  <td>Engineering, platform owners</td>
-                  <td><b>Lock-in:</b> vendor changes behavior, terms, or pricing</td>
-                  <td>Strict model version pinning, regression-gated customer cutovers, and a planned migration calendar, because pinned API versions are retired on the provider's schedule</td>
-                </tr>
-                <tr data-layers="F">
-                  <td><b>We have no way to measure it.</b></td>
-                  <td><b>9. Quality</b></td>
-                  <td style="white-space:nowrap"><span class="layer-pill lp-chg">F</span></td>
-                  <td>Executive sponsor</td>
-                  <td><b>Career risk:</b> the internal champion owns an opaque failure</td>
-                  <td>Agreed numerical metrics over a golden set built with their experts</td>
-                </tr>
-              </tbody>
+<tr data-layers="B,C">
+<td><b>We don't know why it gave that answer.</b></td>
+<td><b>1. Explainability</b></td>
+<td style="white-space:nowrap"><span class="layer-pill lp-req">B</span> <span class="layer-pill lp-req">C</span></td>
+<td>End users, business owners</td>
+<td><b>Liability:</b> a wrong answer reaches a customer, patient, or ledger</td>
+
+</tr>
+<tr data-layers="C,F">
+<td><b>It answers differently every time.</b></td>
+<td><b>2. Predictability</b></td>
+<td style="white-space:nowrap"><span class="layer-pill lp-req">C</span> <span class="layer-pill lp-chg">F</span></td>
+<td>Engineering</td>
+<td><b>Reputational harm:</b> inconsistent answers in front of customers</td>
+
+</tr>
+<tr data-layers="A">
+<td><b>We don't know what data it was trained on.</b></td>
+<td><b>3. Training-Data Provenance</b></td>
+<td style="white-space:nowrap"><span class="layer-pill lp-req">A</span></td>
+<td>Legal</td>
+<td><b>Liability:</b> IP, licensing, and privacy exposure</td>
+
+</tr>
+<tr data-layers="Option 4">
+<td><b>We can't look inside the model.</b></td>
+<td><b>4. Model Weights</b></td>
+<td style="white-space:nowrap"><span class="layer-pill lp-mdl">Option 4</span></td>
+<td>Model-risk and validation teams; security; sovereignty-bound customers</td>
+<td><b>Regulatory scrutiny:</b> independent validation; lock-in</td>
+
+</tr>
+<tr data-layers="A">
+<td><b>We don't know where our data goes.</b></td>
+<td><b>5. Data Governance</b></td>
+<td style="white-space:nowrap"><span class="layer-pill lp-req">A</span></td>
+<td>Security, privacy office</td>
+<td><b>Confidential data exposure:</b> leaks into training runs or across users</td>
+
+</tr>
+<tr data-layers="B,D,G">
+<td><b>We can't tell when it is wrong.</b></td>
+<td><b>6. Reliability</b></td>
+<td style="white-space:nowrap"><span class="layer-pill lp-req">B</span> <span class="layer-pill lp-req">D</span> <span class="layer-pill lp-chg">G</span></td>
+<td>Business owners, operations</td>
+<td><b>Liability and reputational harm:</b> fabricated or off-policy answers</td>
+
+</tr>
+<tr data-layers="D,E">
+<td><b>We can't audit a past decision.</b></td>
+<td><b>7. Accountability</b></td>
+<td style="white-space:nowrap"><span class="layer-pill lp-req">D</span> <span class="layer-pill lp-req">E</span></td>
+<td>Compliance, internal audit</td>
+<td><b>Regulatory scrutiny:</b> an examiner asks how a decision was reached (Table 4)</td>
+
+</tr>
+<tr data-layers="F">
+<td><b>You will update the model under us.</b></td>
+<td><b>8. Version Stability</b></td>
+<td style="white-space:nowrap"><span class="layer-pill lp-chg">F</span></td>
+<td>Engineering, platform owners</td>
+<td><b>Lock-in:</b> vendor changes behavior, terms, or pricing</td>
+
+</tr>
+<tr data-layers="F">
+<td><b>We have no way to measure it.</b></td>
+<td><b>9. Quality</b></td>
+<td style="white-space:nowrap"><span class="layer-pill lp-chg">F</span></td>
+<td>Executive sponsor</td>
+<td><b>Career risk:</b> the internal champion owns an opaque failure</td>
+
+</tr>
+</tbody>
             </table>
           </div>
         </div>
@@ -1274,7 +1285,7 @@
     <path d="M 620 516 V 385 H 604" style="fill:none;stroke:var(--good);stroke-width:2.2" marker-end="url(#arr-q1l-good)"/>
   </svg>
   <div class="fig-caption">
-    <span>Figure 2 — The model stays opaque; trust comes from checks around it, lettered in the order a request meets them. Inside the customer's data perimeter, each request is screened (A), grounded in their sources (B), handled by the model, checked in code (C), and routed by risk (D), with every step logged (E). Evaluation and pinning gate every change (F), and the rollout stage sets how much is automated (G).</span>
+    <span>Figure 2 — The model stays opaque; trust comes from checks around it. Five checks run on every request, in the order it meets them: screen it inside the customer's data perimeter (A), ground it in their sources (B), check the model's output in code (C), route it by risk (D), and log every step (E). Two controls run on every change: evaluate and pin (F), and roll out gradually (G).</span>
     <div class="legend-items">
       <span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> Opaque model</span>
       <span><i class="swatch-dot" style="background:var(--cyan-soft);border-color:var(--cyan)"></i> Checks on every request</span>
@@ -1284,77 +1295,81 @@
 </div>
 
         <p>
-          The seven layers in detail, in the order a request meets them (<em>Figure 2</em>). <em>Table 1</em> shows which concern each one answers; <em>Table 2</em> lists what the customer receives from each and the Google Cloud service behind it:
+          <strong>The seven layers.</strong> Each card says what the layer does, which concerns from <em>Table 1</em> it answers, what the customer receives as evidence, and the Google Cloud products behind it, followed by the details.
         </p>
-        <ul>
-          <li><strong>A · Secure the Data Perimeter and Document Provenance (Data Governance):</strong> Keep customer data inside enforceable boundaries: contractual zero-training on customer data, regional residency, VPC perimeters, customer-managed encryption keys (<code>CMEK</code>), and explicit retention bounds. Screen every request at the boundary for PII, toxicity, off-topic asks, and prompt injection (Episode 01 covers data boundaries and prompt-injection defenses for agents that reach databases). Document what the customer is running: model cards (intended scope, limitations, benchmark results) and compliance certifications (<code>SOC 2</code>, <code>ISO 27001 / 42001</code>, <code>HIPAA BAA</code>).</li>
-          <li><strong>B · Ground Outputs in Their Sources (Explainability):</strong> Pair retrieval with clickable inline citations linked to the customer's own documents, return structured JSON (<code>verbatim_quote</code>, <code>sources</code>, <code>assumptions</code>, <code>answer</code>), and return an explicit <em>"not found in your documents"</em> response whenever evidence is absent (<a href="ep03_q4_modern_rag_pairings.html">Question 04</a> covers retrieval and citation design in depth).</li>
-          <li><strong>C · Check Every Output in Code (Control):</strong> Verify in server code that cited passages genuinely support each claim, screen outputs for PII and off-policy content, and enforce permissions, dollar caps, and business rules in application code (<a href="https://www.anthropic.com/research/building-effective-agents" target="_blank" rel="noopener">Anthropic, Dec 2024</a>). Constrain outputs where repeatability matters (structured output schemas, enumerated values, and a pinned thinking level) while keeping sampling parameters at the defaults current reasoning models are tuned for (<a href="https://ai.google.dev/gemini-api/docs/gemini-3" target="_blank" rel="noopener">Google, 2026</a>). No decoding setting makes a hosted model repeatable: even greedy decoding on shared inference servers varies with the batch a request lands in (in one study, 1,000 identical requests to an open-weight model produced 80 distinct outputs; <a href="https://thinkingmachines.ai/blog/defeating-nondeterminism-in-llm-inference/" target="_blank" rel="noopener">He et al., Sep 2025</a>). Promise measured consistency (<code>pass^k</code>), and put calculations, thresholds, and final decisions in code.</li>
-          <li><strong>D · Route by Risk to Accountable Humans (Accountability):</strong> Match autonomy to error cost by automating low-risk tasks while routing uncertain or high-impact cases via calibrated routing thresholds and dry-run previews to named human reviewers with clear sign-off ownership (<code>RACI</code>). Calibrated thresholds need a calibrated signal. A model's self-reported confidence ("I am 95% sure") tends to be overconfident (<a href="https://arxiv.org/abs/2306.13063" target="_blank" rel="noopener">Xiong et al., ICLR 2024</a>), so route on evidence the system can check: whether every cited quote was found in the source, whether every rule criterion resolved, agreement across <code>k</code> independent samples (<a href="https://arxiv.org/abs/2203.11171" target="_blank" rel="noopener">Wang et al., ICLR 2023</a>), and token log-probabilities where the API exposes them. Tune the routing threshold on the golden set to hit a target precision for auto-approved cases (for example, at least 99% agreement with SME labels), and send everything below it to review. Guard against rubber-stamping: show reviewers the evidence before the model's recommendation, track each reviewer's override rate, and occasionally insert known-bad cases to confirm reviews are real.</li>
-          <li><strong>E · Log Every Step (Auditability):</strong> Log every interaction (input, retrieved chunks, prompt version, pinned model version, thought summaries as supporting evidence, output, and reviewer feedback), record step-by-step traces across every tool call so any decision can be reconstructed months later, and expose live drift and quality dashboards to operators. Treat provider errors as part of observability: isolate HTTP 429 and timeout faults into retry queues with backoff, and record each retry in the trace so a reconstructed run shows which calls failed and why.</li>
-          <li><strong>F · Evaluate and Pin with Customer Experts (Quality and Stability):</strong> Co-create a <strong>golden set</strong> of 100 to 300 real historical cases alongside the customer's domain specialists; track accuracy, groundedness, hallucination rate, refusal rate, latency, and cost; rerun the set like a regression suite on every prompt, retrieval, or model change; and share the failure breakdown openly (<em>"94% pass rate on your golden set; the remaining 6% fall into these boundary categories, which route to review"</em>). Slice results by the segments that matter for fairness and coverage (region, product line, and protected attributes where legally permitted) so a high overall pass rate cannot hide a failing group. After launch, sample a fixed share of production cases each week for SME review so the golden set keeps pace with real traffic.
-            <p style="margin:8px 0 0;">If you fine-tune or run reinforcement learning, keep the reasoning trace out of the reward signal so it stays useful for monitoring (<a href="https://arxiv.org/abs/2503.11926" target="_blank" rel="noopener">Baker et al., Mar 2025</a>). <strong>Pin exact model versions</strong> so upgrades occur only when the customer's golden set passes. Pinning is temporary: providers retire API model versions on a published schedule, so maintain a migration calendar and run each successor through the customer's golden set before cutover. Self-hosted open weights (Option 4) remove forced retirement altogether.</p>
-          </li>
-          <li><strong>G · Roll Out Gradually (Earned Trust):</strong> Start on a low-risk, high-visibility wedge and earn promotion across stages: <code>Scoped Pilot → Shadow Mode</code> (running silently beside humans to compare outcomes) <code>→ Assisted Copilot → Partial Scoped Automation</code>, backed by an instant operational kill switch (<a href="https://martinfowler.com/articles/feature-toggles.html" target="_blank" rel="noopener">Hodgson, Oct 2017</a>).</li>
-        </ul>
 
+        <div class="layer-cards">
+          <div class="t-card-full l-req">
+            <span class="b-pill llm">Layer A · Check on every request</span> <span style="font-family:var(--mono);font-size:11px;color:var(--cyan);font-weight:700;margin:0 3px;">──▶</span> <span class="b-pill" style="color:var(--ink);background:var(--panel);border-color:var(--line-2);">3 Training-Data Provenance</span> <span class="b-pill" style="color:var(--ink);background:var(--panel);border-color:var(--line-2);">5 Data Governance</span>
+            <h4>A · Data perimeter</h4>
+            <p class="lc-lead">Keep their data inside enforceable boundaries, and screen every request at the edge.</p>
+            <div class="t-fix-row"><b>Customer gets:</b> zero-training terms, residency region, key ownership, input-screening results, model card, data statements, and certifications</div>
+            <div class="t-fix-row gcp"><b>On Google Cloud:</b> <code>VPC Service Controls</code>, <code>CMEK</code> (<code>Cloud KMS</code>), <code>Assured Workloads</code> and regional endpoints; <code>Model Armor</code>; published model cards</div>
+            <div class="t-fix-row mit"><b>Details:</b> Keep customer data inside enforceable boundaries: contractual zero-training on customer data, regional residency, VPC perimeters, customer-managed encryption keys (<code>CMEK</code>), and explicit retention bounds. Screen every request at the boundary for PII, toxicity, off-topic asks, and prompt injection (Episode 01 covers data boundaries and prompt-injection defenses for agents that reach databases). Document what the customer is running: model cards (intended scope, limitations, benchmark results) and compliance certifications (<code>SOC 2</code>, <code>ISO 27001 / 42001</code>, <code>HIPAA BAA</code>). For training-data questions, provide data statements (source categories, knowledge cut-off, filtering), published bias and safety evaluations, licensing terms, and IP indemnification. When the customer needs line-level disclosure of training data, fully open models with published training corpora (such as <a href="https://allenai.org/olmo" rel="noopener" target="_blank">AI2 OLMo</a>) are the option.</div>
+          </div>
 
-        <div class="nine-q-wrap">
-          <div class="nine-q-head">Table 2 · What Each Layer Gives the Customer, and the Google Cloud Service Behind It</div>
-          <div class="tbl-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Layer</th>
-                  <th>What the Customer Receives</th>
-                  <th>Google Cloud Service</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td><b>A · Data perimeter and provenance</b></td>
-                  <td>Zero-training terms, residency region, key ownership; input-screening results; model card and certifications</td>
-                  <td><code>VPC Service Controls</code>, <code>CMEK</code> (<code>Cloud KMS</code>), <code>Assured Workloads</code> and regional endpoints; <code>Model Armor</code>; published model cards</td>
-                </tr>
-                <tr>
-                  <td><b>B · Grounding</b></td>
-                  <td>Verbatim source quotes with links; "not found" when evidence is missing</td>
-                  <td><code>RAG Engine</code> grounding; structured output schemas</td>
-                </tr>
-                <tr>
-                  <td><b>C · Output checks in code</b></td>
-                  <td>Quote-verification results, rule checks, schema validation</td>
-                  <td><code>Model Armor</code> output screening; application code with structured output schemas</td>
-                </tr>
-                <tr>
-                  <td><b>D · Risk routing and human review</b></td>
-                  <td>Named reviewer sign-off; the routing threshold and its measured precision</td>
-                  <td>The customer's review queue, with sign-offs logged to <code>Cloud Logging</code></td>
-                </tr>
-                <tr>
-                  <td><b>E · Logs and traces</b></td>
-                  <td>A trace ID that replays any decision</td>
-                  <td><code>Cloud Logging</code>, <code>Cloud Trace</code></td>
-                </tr>
-                <tr>
-                  <td><b>F · Evaluation and pinning</b></td>
-                  <td>Golden-set results, <code>pass^k</code>, failure slices; pinned model ID and a regression report before each cutover</td>
-                  <td><code>Agent Platform</code> evaluation service; pinned model version IDs; evaluation pipeline in CI</td>
-                </tr>
-                <tr>
-                  <td><b>G · Graduated rollout</b></td>
-                  <td>Shadow-mode comparison results; a kill switch</td>
-                  <td><code>Agent Platform</code> evaluation service for shadow comparisons; a feature flag in the serving layer</td>
-                </tr>
-                <tr>
-                  <td><b>Option 4 · Open weights</b></td>
-                  <td>Checksum of the self-hosted checkpoint</td>
-                  <td><code>Model Garden</code> open weights on customer-controlled infrastructure</td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="t-card-full l-req">
+            <span class="b-pill llm">Layer B · Check on every request</span> <span style="font-family:var(--mono);font-size:11px;color:var(--cyan);font-weight:700;margin:0 3px;">──▶</span> <span class="b-pill" style="color:var(--ink);background:var(--panel);border-color:var(--line-2);">1 Explainability</span> <span class="b-pill" style="color:var(--ink);background:var(--panel);border-color:var(--line-2);">6 Reliability</span>
+            <h4>B · Ground in their sources</h4>
+            <p class="lc-lead">Every answer cites the customer's own documents, or says it found nothing.</p>
+            <div class="t-fix-row"><b>Customer gets:</b> verbatim source quotes with links; an explicit "not found in your documents" when evidence is missing</div>
+            <div class="t-fix-row gcp"><b>On Google Cloud:</b> <code>RAG Engine</code> grounding; structured output schemas</div>
+            <div class="t-fix-row mit"><b>Details:</b> Pair retrieval with clickable inline citations linked to the customer's own documents, return structured JSON (<code>verbatim_quote</code>, <code>sources</code>, <code>assumptions</code>, <code>answer</code>), and return an explicit <em>"not found in your documents"</em> response whenever evidence is absent (<a href="ep03_q4_modern_rag_pairings.html">Question 04</a> covers retrieval and citation design in depth).</div>
+          </div>
+
+          <div class="t-card-full l-req">
+            <span class="b-pill llm">Layer C · Check on every request</span> <span style="font-family:var(--mono);font-size:11px;color:var(--cyan);font-weight:700;margin:0 3px;">──▶</span> <span class="b-pill" style="color:var(--ink);background:var(--panel);border-color:var(--line-2);">1 Explainability</span> <span class="b-pill" style="color:var(--ink);background:var(--panel);border-color:var(--line-2);">2 Predictability</span>
+            <h4>C · Check outputs in code</h4>
+            <p class="lc-lead">Code verifies every claim and applies the business rules, so the model never has the last word.</p>
+            <div class="t-fix-row"><b>Customer gets:</b> quote-verification results, rule checks, and schema validation</div>
+            <div class="t-fix-row gcp"><b>On Google Cloud:</b> <code>Model Armor</code> output screening; your own service (for example, on <code>Cloud Run</code>) with structured output schemas</div>
+            <div class="t-fix-row mit"><b>Details:</b> Verify in server code that cited passages genuinely support each claim, screen outputs for PII and off-policy content, and enforce permissions, dollar caps, and business rules in application code (<a href="https://www.anthropic.com/research/building-effective-agents" rel="noopener" target="_blank">Anthropic, Dec 2024</a>). Constrain outputs where repeatability matters (structured output schemas, enumerated values, and a pinned thinking level) while keeping sampling parameters at the defaults current reasoning models are tuned for (<a href="https://ai.google.dev/gemini-api/docs/gemini-3" rel="noopener" target="_blank">Google, 2026</a>). No decoding setting makes a hosted model repeatable: even greedy decoding on shared inference servers varies with the batch a request lands in (in one study, 1,000 identical requests to an open-weight model produced 80 distinct outputs; <a href="https://thinkingmachines.ai/blog/defeating-nondeterminism-in-llm-inference/" rel="noopener" target="_blank">He et al., Sep 2025</a>). Promise measured consistency (<code>pass^k</code>), and put calculations, thresholds, and final decisions in code.</div>
+          </div>
+
+          <div class="t-card-full l-req">
+            <span class="b-pill llm">Layer D · Check on every request</span> <span style="font-family:var(--mono);font-size:11px;color:var(--cyan);font-weight:700;margin:0 3px;">──▶</span> <span class="b-pill" style="color:var(--ink);background:var(--panel);border-color:var(--line-2);">6 Reliability</span> <span class="b-pill" style="color:var(--ink);background:var(--panel);border-color:var(--line-2);">7 Accountability</span>
+            <h4>D · Route by risk</h4>
+            <p class="lc-lead">Low-risk cases run automatically; uncertain or high-impact ones go to a named reviewer.</p>
+            <div class="t-fix-row"><b>Customer gets:</b> named reviewer sign-off; the routing threshold and its measured precision</div>
+            <div class="t-fix-row gcp"><b>On Google Cloud:</b> the customer's review queue, with sign-offs logged to <code>Cloud Logging</code></div>
+            <div class="t-fix-row mit"><b>Details:</b> Match autonomy to error cost by automating low-risk tasks while routing uncertain or high-impact cases via calibrated routing thresholds and dry-run previews to named human reviewers with clear sign-off ownership (<code>RACI</code>). Calibrated thresholds need a calibrated signal. A model's self-reported confidence ("I am 95% sure") tends to be overconfident (<a href="https://arxiv.org/abs/2306.13063" rel="noopener" target="_blank">Xiong et al., ICLR 2024</a>), so route on evidence the system can check: whether every cited quote was found in the source, whether every rule criterion resolved, agreement across <code>k</code> independent samples (<a href="https://arxiv.org/abs/2203.11171" rel="noopener" target="_blank">Wang et al., ICLR 2023</a>), and token log-probabilities where the API exposes them. Tune the routing threshold on the golden set to hit a target precision for auto-approved cases (for example, at least 99% agreement with SME labels), and send everything below it to review. Guard against rubber-stamping: show reviewers the evidence before the model's recommendation, track each reviewer's override rate, and occasionally insert known-bad cases to confirm reviews are real.</div>
+          </div>
+
+          <div class="t-card-full l-req">
+            <span class="b-pill llm">Layer E · Check on every request</span> <span style="font-family:var(--mono);font-size:11px;color:var(--cyan);font-weight:700;margin:0 3px;">──▶</span> <span class="b-pill" style="color:var(--ink);background:var(--panel);border-color:var(--line-2);">7 Accountability</span>
+            <h4>E · Log every step</h4>
+            <p class="lc-lead">Every input, source, model version, check, and sign-off is recorded, so any decision can be replayed.</p>
+            <div class="t-fix-row"><b>Customer gets:</b> a trace ID that replays any decision</div>
+            <div class="t-fix-row gcp"><b>On Google Cloud:</b> <code>Cloud Logging</code>, <code>Cloud Trace</code></div>
+            <div class="t-fix-row mit"><b>Details:</b> Log every interaction (input, retrieved chunks, prompt version, pinned model version, thought summaries as supporting evidence, output, and reviewer feedback), record step-by-step traces across every tool call so any decision can be reconstructed months later, and expose live drift and quality dashboards to operators. Treat provider errors as part of observability: isolate HTTP 429 and timeout faults into retry queues with backoff, and record each retry in the trace so a reconstructed run shows which calls failed and why.</div>
+          </div>
+
+          <div class="t-card-full l-card-full">
+            <span class="b-pill g">Layer F · Control on every change</span> <span style="font-family:var(--mono);font-size:11px;color:var(--good);font-weight:700;margin:0 3px;">──▶</span> <span class="b-pill" style="color:var(--ink);background:var(--panel);border-color:var(--line-2);">2 Predictability</span> <span class="b-pill" style="color:var(--ink);background:var(--panel);border-color:var(--line-2);">8 Version Stability</span> <span class="b-pill" style="color:var(--ink);background:var(--panel);border-color:var(--line-2);">9 Quality</span>
+            <h4>F · Evaluate and pin</h4>
+            <p class="lc-lead">A golden set built with their experts gates every change, and the model version moves only when it passes.</p>
+            <div class="t-fix-row"><b>Customer gets:</b> golden-set results, <code>pass^k</code> consistency (a case passes only if all <code>k</code> runs succeed; <a href="https://arxiv.org/abs/2406.12045" rel="noopener" target="_blank">Yao et al., ICLR 2025</a>), and failure slices; a pinned model ID and a regression report before each cutover</div>
+            <div class="t-fix-row gcp"><b>On Google Cloud:</b> <code>Agent Platform</code> evaluation service; pinned model version IDs; evaluation pipeline in CI</div>
+            <div class="t-fix-row mit"><b>Details:</b> Co-create a <strong>golden set</strong> of 100 to 300 real historical cases alongside the customer's domain specialists; track accuracy, groundedness, hallucination rate, refusal rate, latency, and cost; rerun the set like a regression suite on every prompt, retrieval, or model change; and share the failure breakdown openly (<em>"94% pass rate on your golden set; the remaining 6% fall into these boundary categories, which route to review"</em>). Slice results by the segments that matter for fairness and coverage (region, product line, and protected attributes where legally permitted) so a high overall pass rate cannot hide a failing group. After launch, sample a fixed share of production cases each week for SME review so the golden set keeps pace with real traffic.<p>If you fine-tune or run reinforcement learning, keep the reasoning trace out of the reward signal so it stays useful for monitoring (<a href="https://arxiv.org/abs/2503.11926" rel="noopener" target="_blank">Baker et al., Mar 2025</a>). <strong>Pin exact model versions</strong> so upgrades occur only when the customer's golden set passes. Pinning is temporary: providers retire API model versions on a published schedule, so maintain a migration calendar and run each successor through the customer's golden set before cutover. Self-hosted open weights (Option 4) remove forced retirement altogether.</p></div>
+          </div>
+
+          <div class="t-card-full l-card-full">
+            <span class="b-pill g">Layer G · Control on every change</span> <span style="font-family:var(--mono);font-size:11px;color:var(--good);font-weight:700;margin:0 3px;">──▶</span> <span class="b-pill" style="color:var(--ink);background:var(--panel);border-color:var(--line-2);">6 Reliability</span>
+            <h4>G · Roll out gradually</h4>
+            <p class="lc-lead">Shadow mode first, automation only when the numbers clear the bar, with a kill switch.</p>
+            <div class="t-fix-row"><b>Customer gets:</b> shadow-mode comparison results; a kill switch</div>
+            <div class="t-fix-row gcp"><b>On Google Cloud:</b> <code>Agent Platform</code> evaluation service for shadow comparisons; a feature flag in the serving layer</div>
+            <div class="t-fix-row mit"><b>Details:</b> Start on a low-risk, high-visibility wedge and earn promotion across stages: <code>Scoped Pilot → Shadow Mode</code> (running silently beside humans to compare outcomes) <code>→ Assisted Copilot → Partial Scoped Automation</code>, backed by an instant operational kill switch (<a href="https://martinfowler.com/articles/feature-toggles.html" rel="noopener" target="_blank">Hodgson, Oct 2017</a>).</div>
           </div>
         </div>
+
+        <p>
+          <strong>Note:</strong> Concern 4, Model Weights, is not a layer but an architecture choice: self-hosted open weights (such as Gemma or Llama) pinned by checksum, available on Google Cloud through <code>Model Garden</code> (Option 4, Section 3). Per-decision explanations still come from the layers above.
+        </p>
+
+        <p>
+          <em>Figure 3</em> puts the "On Google Cloud" lines from the cards into the same picture as <em>Figure 2</em>.
+        </p>
 
 <div class="diagram-frame" id="fig-q1-gcp">
   <svg viewBox="0 0 920 622" role="img" aria-label="The same seven layers on Google Cloud, lettered A to G in request-flow order. Inside a VPC Service Controls, CMEK (Cloud KMS), and Assured Workloads perimeter, a request is screened by Model Armor (A), grounded with RAG Engine on Agent Platform (B), handled by Gemini on Agent Platform or open weights from Model Garden, checked by Model Armor and your service on Cloud Run with structured output schemas (C), and routed by risk to your review queue with sign-offs logged to Cloud Logging (D), while Cloud Logging and Cloud Trace record every step (E). The Agent Platform evaluation service and pinned model version IDs gate every change (F), and shadow comparisons with a feature-flag kill switch govern graduated rollout (G).">
@@ -1578,7 +1593,7 @@
         <ol>
           <li><strong>What exact decision does the system make, and what does an error cost?</strong> Sets how much autonomy is acceptable (Layer D) and which option below fits each step.</li>
           <li><strong>Who needs the explanation?</strong> End users need citations, operators need dashboards, auditors need logs and lineage, and regulators need formal documentation. Sets what Layers B and E must produce.</li>
-          <li><strong>Which regulations apply?</strong> Decides which layers are mandatory rather than optional (<em>Table 4</em>, below).</li>
+          <li><strong>Which regulations apply?</strong> Decides which layers are mandatory rather than optional (<em>Table 3</em>, below).</li>
           <li><strong>Where does the data live, and who can access it?</strong> Shapes the data perimeter (Layer A), and whether self-hosted open weights (Option 4) are required.</li>
           <li><strong>What measurable bar defines "good" before we build?</strong> Becomes the golden set and its pass threshold (Layer F).</li>
           <li><strong>How fast is a bad output detected and fixed?</strong> Sets monitoring (Layer E) and the kill switch (Layer G).</li>
@@ -1587,11 +1602,11 @@
 
         <h3>Six ways to split the work between model and code</h3>
         <p>
-          Every design choice for a decision step trades two things: <strong>transparency</strong>, meaning how much of the logic a person can inspect, and <strong>language flexibility</strong>, meaning how much unstructured text the step can handle. <em>Table 3</em> describes six options in plain terms, and <em>Figure 4</em> places them on those two axes.
+          Every design choice for a decision step trades two things: <strong>transparency</strong>, meaning how much of the logic a person can inspect, and <strong>language flexibility</strong>, meaning how much unstructured text the step can handle. <em>Table 2</em> describes six options in plain terms, and <em>Figure 4</em> places them on those two axes.
         </p>
 
         <div class="nine-q-wrap">
-          <div class="nine-q-head">Table 3 · Six Ways to Split the Work Between Model and Code</div>
+          <div class="nine-q-head">Table 2 · Six Ways to Split the Work Between Model and Code</div>
           <div class="tbl-wrap">
             <table>
               <thead>
@@ -1618,7 +1633,7 @@
                   <td>Needs structured, tabular data</td>
                   <td>Credit scoring, risk grading, numerical forecasting</td>
                 </tr>
-                <tr id="table-3-option-3">
+                <tr id="table-2-option-3">
                   <td><b>3. Hybrid (sweet spot)</b></td>
                   <td>The LLM reads documents and extracts structured facts with source quotes; rules or a scoring model make the decision</td>
                   <td>The decision logic, plus every fact it used and the quote behind it</td>
@@ -1660,7 +1675,7 @@
   </defs>
 
     <rect x="14" y="14" width="892" height="482" rx="14" style="fill:var(--panel-2);stroke:var(--line);stroke-width:1.75"/>
-    <text class="zl" x="34" y="42">SIX OPTIONS (TABLE 3) · NOT A STRAIGHT TRADE-OFF</text>
+    <text class="zl" x="34" y="42">SIX OPTIONS (TABLE 2) · NOT A STRAIGHT TRADE-OFF</text>
 
     <!-- High-stakes sweet spot -->
     <rect x="580" y="72" width="290" height="168" rx="12" style="fill:var(--good-soft);stroke:var(--good);stroke-width:1.6;stroke-dasharray:6 4"/>
@@ -1720,7 +1735,7 @@
   <div class="fig-caption">
     <span>Figure 4 — The six options are not a straight trade-off. Rules, pure search, and classical ML are transparent but need structured input or refuse to synthesize; pinned open weights handle open-ended language but stay neural inside. The hybrid option reaches the high-stakes sweet spot: the model handles the language, and code makes the decision on verified facts. Positions are qualitative.</span>
     <div class="legend-items">
-      <span><i class="swatch-dot" style="background:var(--cyan-soft);border-color:var(--cyan)"></i> Option (numbered as in Table 3)</span>
+      <span><i class="swatch-dot" style="background:var(--cyan-soft);border-color:var(--cyan)"></i> Option (numbered as in Table 2)</span>
       <span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good)"></i> Recommended for high-stakes decisions</span>
       <span><i class="swatch-dot" style="background:var(--panel-3);border-color:var(--muted)"></i> Unconstrained baseline</span>
     </div>
@@ -1738,11 +1753,11 @@
 
         <h3>Which regulations apply</h3>
         <p>
-          Scoping question 3 often settles the argument about how much control is enough, because regulation makes some layers mandatory (<em>Table 4</em>):
+          Scoping question 3 often settles the argument about how much control is enough, because regulation makes some layers mandatory (<em>Table 3</em>):
         </p>
 
         <div class="nine-q-wrap">
-          <div class="nine-q-head">Table 4 · What Regulators Ask For, and Which Layer Produces It</div>
+          <div class="nine-q-head">Table 3 · What Regulators Ask For, and Which Layer Produces It</div>
           <div class="tbl-wrap">
             <table>
               <thead>
@@ -1817,7 +1832,7 @@
 }</pre>
         </div>
         <p>
-          Code then does everything that needs to be defensible: it confirms each quote exists in the chart, applies the written policy rule, and routes the result (<em>Figure 5</em> and <em>Table 5</em>).
+          Code then does everything that needs to be defensible: it confirms each quote exists in the chart, applies the written policy rule, and routes the result (<em>Figure 5</em> and <em>Table 4</em>).
         </p>
 
 <div class="diagram-frame" id="fig-q1-worked">
@@ -1899,7 +1914,7 @@
 </div>
 
         <div class="nine-q-wrap">
-          <div class="nine-q-head">Table 5 · Who Decides What</div>
+          <div class="nine-q-head">Table 4 · Who Decides What</div>
           <div class="tbl-wrap">
             <table>
               <thead>
@@ -1960,7 +1975,7 @@
           Building that trust starts by identifying which of the nine "black box" concerns (<em>Table 1</em>) and underlying risks drives the requirement, then wrapping the model in seven verifiable layers ordered along the request path (<code>A</code>–<code>G</code>): a governed data perimeter and provenance record (<code>A</code>), source-grounded citations (<code>B</code>), deterministic output verification and rules in code (<code>C</code>), risk-based routing to accountable reviewers (<code>D</code>), replayable audit logs (<code>E</code>), co-owned golden-set evaluation and version pinning (<code>F</code>), and graduated rollout from shadow mode behind a kill switch (<code>G</code>).
         </p>
         <p>
-          Alongside those layers, architecture limits how much of each decision the model makes at all. Choosing per step among the six options (<em>Table 3</em>)—especially the hybrid pattern where the model extracts quoted facts and deterministic code executes the policy rule—ensures that high-stakes outcomes are both explainable and defensible. On Google Cloud's <strong>Gemini Enterprise Agent Platform</strong> (<strong>Agent Platform</strong>), those layers map directly to <code>VPC Service Controls</code>, <code>CMEK</code>, and <code>Model Armor</code> for perimeter and screening, <code>RAG Engine</code> grounding over customer data stores, <code>Cloud Run</code> for deterministic rule checks, <code>Cloud Logging</code> and <code>Cloud Trace</code> for replay, and the Agent Platform evaluation service with explicit model version pinning.
+          Alongside those layers, architecture limits how much of each decision the model makes at all. Choosing per step among the six options (<em>Table 2</em>)—especially the hybrid pattern where the model extracts quoted facts and deterministic code executes the policy rule—ensures that high-stakes outcomes are both explainable and defensible. On Google Cloud's <strong>Gemini Enterprise Agent Platform</strong> (<strong>Agent Platform</strong>), those layers map directly to <code>VPC Service Controls</code>, <code>CMEK</code>, and <code>Model Armor</code> for perimeter and screening, <code>RAG Engine</code> grounding over customer data stores, <code>Cloud Run</code> for deterministic rule checks, <code>Cloud Logging</code> and <code>Cloud Trace</code> for replay, and the Agent Platform evaluation service with explicit model version pinning.
         </p>
 
         <h2 id="sec-followups">Likely Follow-Up Questions</h2>
