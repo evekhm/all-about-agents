@@ -1097,7 +1097,7 @@
                 <tr>
                   <td><b>"We can't tell when it is wrong."</b></td>
                   <td><b>Reliability</b></td>
-                  <td>Groundedness checks, calibrated abstention (the system declines to answer when its confidence falls below a threshold tuned on the evaluation set), and known failure rates</td>
+                  <td>Groundedness checks, calibrated abstention (the system declines to answer when checkable signals, such as quotes found and criteria resolved, fall below a threshold tuned on the evaluation set), and known failure rates</td>
                 </tr>
                 <tr>
                   <td><b>"We can't audit a past decision."</b></td>
@@ -1124,7 +1124,7 @@
         </p>
         <ul>
           <li><strong>Legal and Financial Liability:</strong> A wrong answer reaches an external customer, a patient record, or a financial ledger, and the enterprise owns the consequences.</li>
-          <li><strong>Regulatory Scrutiny:</strong> Frameworks such as the EU AI Act, GDPR automated-decision rules, banking model risk management (<code>SR 11-7</code>), HIPAA, and FDA guidance require defensible explanations when an examiner asks how a decision was reached.</li>
+          <li><strong>Regulatory Scrutiny:</strong> Frameworks such as the EU AI Act, GDPR automated-decision rules, banking model risk management (<code>SR 26-2</code>, which replaced <code>SR 11-7</code>), HIPAA, and FDA guidance require defensible explanations when an examiner asks how a decision was reached.</li>
           <li><strong>Confidential Data Exposure:</strong> Proprietary records leaking into vendor training runs or surfacing across users via prompt injection.</li>
           <li><strong>Reputational Harm:</strong> A public screenshot of an assistant stating something fabricated or off-policy.</li>
           <li><strong>Loss of Control and Lock-In:</strong> Unplanned vendor shifts in model behavior, terms, or unit pricing.</li>
@@ -1250,7 +1250,7 @@
         </p>
         <ul>
           <li><strong>A · Ground Outputs in Evidence (Explainability):</strong> Pair retrieval with clickable inline citations linked to the customer's own documents, return structured JSON (<code>verbatim_quote</code>, <code>sources</code>, <code>assumptions</code>, <code>answer</code>), verify in server code that cited passages genuinely support the claim, and return an explicit <em>"not found in your documents"</em> response whenever evidence is absent (<a href="ep03_q4_modern_rag_pairings.html">Question 04</a> covers retrieval and citation design in depth).</li>
-          <li><strong>B · Measure It Openly with Customer Experts (Evaluation):</strong> Co-create a golden dataset of 100 to 300 real historical cases alongside the customer's domain specialists, track accuracy, groundedness, hallucination rate, refusal rate, latency, and cost; rerun the set like a regression suite on every prompt, retrieval, or model change; and share the failure breakdown openly (<em>"94% pass rate on your test set; the remaining 6% fall into these boundary categories, which route to review"</em>).</li>
+          <li><strong>B · Measure It Openly with Customer Experts (Evaluation):</strong> Co-create a golden dataset of 100 to 300 real historical cases alongside the customer's domain specialists; track accuracy, groundedness, hallucination rate, refusal rate, latency, and cost; rerun the set like a regression suite on every prompt, retrieval, or model change; and share the failure breakdown openly (<em>"94% pass rate on your test set; the remaining 6% fall into these boundary categories, which route to review"</em>).</li>
           <li><strong>C · Observe Every Step (Auditability):</strong> Log every interaction (input, retrieved chunks, prompt version, pinned model version, thought summaries as supporting evidence, output, and reviewer feedback), record step-by-step traces across every tool call so any decision can be reconstructed months later, and expose live drift and quality dashboards to operators. Treat provider errors as part of observability: isolate HTTP 429 and timeout faults into retry queues with backoff, and record each retry in the trace so a reconstructed run shows which calls failed and why.</li>
           <li><strong>D · Enforce Deterministic Guardrails and Version Pinning (Control &amp; Stability):</strong> Screen inputs and outputs for PII, toxicity, off-topic asks, and prompt injection (Episode 01 covers data boundaries and prompt-injection defenses for agents that reach databases), and enforce permissions, dollar caps, and business rules in application code (<a href="https://www.anthropic.com/research/building-effective-agents" target="_blank" rel="noopener">Anthropic, Dec 2024</a>).
             <p style="margin:8px 0 0;">Constrain outputs where repeatability matters (structured output schemas, enumerated values, and a pinned thinking level) while keeping sampling parameters at the defaults current reasoning models are tuned for (<a href="https://ai.google.dev/gemini-api/docs/gemini-3" target="_blank" rel="noopener">Google, 2026</a>). No decoding setting makes a hosted model repeatable: even greedy decoding on shared inference servers varies with the batch a request lands in (in one study, 1,000 identical requests to an open-weight model produced 80 distinct outputs; <a href="https://thinkingmachines.ai/blog/defeating-nondeterminism-in-llm-inference/" target="_blank" rel="noopener">He et al., Sep 2025</a>). Promise measured consistency (<code>pass^k</code>), and put calculations, thresholds, and final decisions in code.</p>
@@ -1339,6 +1339,53 @@
           How far we go on those controls depends on seven practical questions we align on with the customer: (1) what exact decision the system makes and what an error costs; (2) <em>who</em> needs the explanation (end users need citations, operators need dashboards, auditors need logs and lineage, regulators need formal documentation); (3) which regulations apply; (4) where data lives and who can access it; (5) what measurable bar defines "good" before building; (6) how fast a bad output is detected and fixed; and (7) how model updates roll out. Depending on those answers, we choose for each step among six options that trade open-ended language flexibility against structural transparency (<em>Table 2</em>):
         </p>
 
+        <div class="nine-q-wrap">
+          <div class="nine-q-head">Table 2 · Six Options Trading Transparency Against Flexibility</div>
+          <div class="tbl-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Architectural Option</th>
+                  <th>Transparency &amp; Strengths</th>
+                  <th>Flexibility Trade-Off &amp; Best Fit</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><b>1. Deterministic Rules &amp; Solvers</b></td>
+                  <td>100% inspectable <code>if-then</code> logic, SQL, or math solvers</td>
+                  <td>Requires structured inputs; ideal for calculations, thresholds, &amp; hard policy gates</td>
+                </tr>
+                <tr>
+                  <td><b>2. Interpretable Classical ML + SHAP</b></td>
+                  <td>Decision trees, logistic regression, or GBDTs with per-feature SHAP attributions</td>
+                  <td>Tabular inputs; ideal for regulated credit scoring, risk grading, &amp; numerical forecasting</td>
+                </tr>
+                <tr>
+                  <td><b>3. Hybrid Architecture (Sweet Spot)</b></td>
+                  <td>LLM extracts structured fields or drafts; deterministic rules or scoring models decide</td>
+                  <td>Combines unstructured language understanding with 100% auditable final decision logic</td>
+                </tr>
+                <tr>
+                  <td><b>4. Pinned Small / Open-Weight Models</b></td>
+                  <td>Frozen weight hashes, customer-controlled hosting, &amp; full data/checkpoint provenance</td>
+                  <td>Weights remain neural parameters; ideal when strict version immutability or air-gapping is required</td>
+                </tr>
+                <tr>
+                  <td><b>5. Constrained Generation</b></td>
+                  <td>Classifies into fixed enums or selects from pre-approved legal/support templates</td>
+                  <td>Eliminates open-ended phrasing risk while keeping natural-language intent understanding</td>
+                </tr>
+                <tr>
+                  <td><b>6. Pure Search &amp; Retrieval</b></td>
+                  <td>Surfaces ranked original source passages directly to the human reader</td>
+                  <td>Zero synthesis hallucination risk when users prefer reading primary clauses themselves</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
         <p>
           Question (3), which regulations apply, usually decides how much of each layer is mandatory (<em>Table 4</em>):
         </p>
@@ -1387,53 +1434,6 @@
         <p style="font-size:14.5px;color:var(--muted);">
           <em>Note:</em> Dates and article numbers change; confirm the current text with the customer's counsel before committing to a compliance claim.
         </p>
-
-        <div class="nine-q-wrap">
-          <div class="nine-q-head">Table 2 · Six Options Trading Transparency Against Flexibility</div>
-          <div class="tbl-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Architectural Option</th>
-                  <th>Transparency &amp; Strengths</th>
-                  <th>Flexibility Trade-Off &amp; Best Fit</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td><b>1. Deterministic Rules &amp; Solvers</b></td>
-                  <td>100% inspectable <code>if-then</code> logic, SQL, or math solvers</td>
-                  <td>Requires structured inputs; ideal for calculations, thresholds, &amp; hard policy gates</td>
-                </tr>
-                <tr>
-                  <td><b>2. Interpretable Classical ML + SHAP</b></td>
-                  <td>Decision trees, logistic regression, or GBDTs with per-feature SHAP attributions</td>
-                  <td>Tabular inputs; ideal for regulated credit scoring, risk grading, &amp; numerical forecasting</td>
-                </tr>
-                <tr>
-                  <td><b>3. Hybrid Architecture (Sweet Spot)</b></td>
-                  <td>LLM extracts structured fields or drafts; deterministic rules or scoring models decide</td>
-                  <td>Combines unstructured language understanding with 100% auditable final decision logic</td>
-                </tr>
-                <tr>
-                  <td><b>4. Pinned Small / Open-Weight Models</b></td>
-                  <td>Frozen weight hashes, customer-controlled hosting, &amp; full data/checkpoint provenance</td>
-                  <td>Weights remain neural parameters; ideal when strict version immutability or air-gapping is required</td>
-                </tr>
-                <tr>
-                  <td><b>5. Constrained Generation</b></td>
-                  <td>Classifies into fixed enums or selects from pre-approved legal/support templates</td>
-                  <td>Eliminates open-ended phrasing risk while keeping natural-language intent understanding</td>
-                </tr>
-                <tr>
-                  <td><b>6. Pure Search &amp; Retrieval</b></td>
-                  <td>Surfaces ranked original source passages directly to the human reader</td>
-                  <td>Zero synthesis hallucination risk when users prefer reading primary clauses themselves</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
 
         <p>
           <strong>The Cost of Trust.</strong> Each layer has a price: citation verification adds a retrieval and a check to every answer, <code>k</code>-sample agreement multiplies inference cost by <code>k</code>, and human review adds minutes of expert time per routed case. Matching autonomy to error cost (Layer E) is what keeps that price bounded: low-risk, high-volume cases run fully automated with sampled audits, while the expensive controls concentrate on the small share of decisions where a mistake is costly.
@@ -1520,7 +1520,7 @@
           <strong>What the auditor receives.</strong> The verified facts and their source quotes, the policy rule and its version, the pinned model version, a trace ID that replays the run (Layer C), and the reviewer's sign-off if the case was routed (Layer E). The model's thinking summary is stored beside them as supporting evidence.
         </p>
         <p>
-          <strong>Why it matters.</strong> The verifiable design does more than explain the decision; it changed it. A plausible-sounding trace would have produced a wrongful denial. Code evaluating the actual rule produced a request for one missing document. <a href="ep03_q5_domain_specific_agent.html">Question 05</a> builds the full policy agent around this pattern.
+          <strong>Why it matters.</strong> The verifiable design does more than explain the decision; it changed it. A plausible-sounding trace would have produced a wrongful denial. Code evaluating the actual rule produced a request for the missing evidence. <a href="ep03_q5_domain_specific_agent.html">Question 05</a> builds the full policy agent around this pattern.
         </p>
 
         <h2 id="sec-6">6. Summary: Putting It Together in One Answer</h2>
@@ -1534,7 +1534,7 @@
         <h2 id="sec-followups">Likely Follow-Up Questions</h2>
         <ul>
           <li><strong>"Can't we just make the model deterministic?"</strong> Through structure and code, yes; through a decoding setting, no. Current reasoning models such as Gemini 3 are tuned to run at their default sampling temperature, and Google advises against lowering it; even greedy decoding on shared servers varies with batching. We get predictability from schemas and enumerated outputs, pinned versions and thinking levels, measured <code>pass^k</code> on the customer's golden set, and code for every step that must give the same answer every time.</li>
-          <li><strong>"Why not show the model's chain of thought to the auditor?"</strong> Reasoning traces often omit what actually drove the answer; in hint-based tests, reasoning models disclosed the hint in fewer than 20% of cases. We log traces for debugging and give auditors verified quotes, rules, and replayable traces.</li>
+          <li><strong>"Why not show the model's chain of thought to the auditor?"</strong> Reasoning traces often omit what actually drove the answer; in hint-based tests, reasoning models often disclosed the hint in fewer than 20% of cases. We log traces for debugging and give auditors verified quotes, rules, and replayable traces.</li>
           <li><strong>"Doesn't an open-weight model solve the black-box problem?"</strong> It solves access, while leaving per-decision understanding unsolved. Open weights let the customer pin, inspect, and self-host the exact checkpoint, and explaining an individual decision from those weights remains research-grade; explanations come from the system layers.</li>
           <li><strong>"How do you decide what gets auto-approved?"</strong> On checkable signals (every quote found, every criterion resolved, agreement across samples) rather than the model's self-reported confidence. The threshold is tuned on the golden set to a target precision, and everything below it goes to a named reviewer.</li>
           <li><strong>"What happens when the provider retires our pinned model?"</strong> Pinning buys time: we keep a migration calendar, run each successor through the customer's golden set, and cut over only when it passes. Self-hosted open weights (Option 4) remove forced retirement altogether.</li>
@@ -1561,7 +1561,7 @@
       <div>
         <span class="sec-badge">Sources</span>
         <h2>References</h2>
-        <p>Primary research papers, engineering benchmarks, and platform documentation cited in this episode.</p>
+        <p>Primary research papers, engineering benchmarks, and platform documentation cited in this question.</p>
       </div>
     </div>
     <div class="sheet-b">
