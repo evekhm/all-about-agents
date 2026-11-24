@@ -24,8 +24,8 @@
     <line class="flow" x1="430" y1="98" x2="454" y2="98" marker-end="url(#arr-q1w-ink)"/>
 
     <rect class="node-cyan" x="456" y="66" width="254" height="64" rx="9"/>
-    <text class="t-b t-c" x="583" y="92">Verifier &amp; Policy Engine</text>
-    <text class="t-s t-c" x="583" y="113">quotes · CEL / CQL rule (a) OR (b)</text>
+    <text class="t-b t-c" x="583" y="92">Code Verifier &amp; Rule</text>
+    <text class="t-s t-c" x="583" y="113">checks quotes · applies (a) OR (b)</text>
     <line class="flow-g" x1="710" y1="98" x2="734" y2="98" marker-end="url(#arr-q1w-good)"/>
 
     <rect class="node-good" x="736" y="66" width="150" height="64" rx="9"/>
@@ -37,8 +37,8 @@
 
     <!-- Row 2: EHR lookup -> Clinician review -->
     <rect class="node-cyan" x="504" y="172" width="382" height="100" rx="9"/>
-    <text class="t-b t-c" x="695" y="199">Missing evidence: Record-Chaser Agent</text>
-    <text class="t-s t-c" x="695" y="223">read-only FHIR · patient_id pinned · re-run once</text>
+    <text class="t-b t-c" x="695" y="199">Missing evidence: read-only lookup</text>
+    <text class="t-s t-c" x="695" y="223">fetch missing exam notes &amp; re-run once</text>
     <text class="t-s t-c" x="695" y="245">still absent → send PEND_FOR_EVIDENCE</text>
     <path d="M 540 172 V 150 H 313 V 134" style="fill:none;stroke:var(--cyan);stroke-width:2;stroke-dasharray:5 4" marker-end="url(#arr-q1w-ink)"/>
     <text class="t-s t-c" x="426" y="145" style="font-size:11px;fill:var(--muted)">notes found</text>
