@@ -894,7 +894,7 @@
     <a href="#intro">Overview</a>
     <a href="#sec-1">What You Can and Cannot See</a>
     <a href="#sec-2">Checkable System</a>
-    <a href="#sec-3">Model Autonomy &amp; Verification</a>
+    <a href="#sec-3">Keep the Decision Out</a>
     <a href="#sec-4">Summary</a>
     <a href="#sec-followups">Follow-Up Questions</a>
     <a href="#references">References</a>
@@ -914,17 +914,11 @@
     </div>
     <div class="sheet-b">
       <div class="post-prose">
-        <p>My goal here is to answer one of the most common questions in enterprise AI system-design interviews: how to make a language model trustworthy to a skeptical customer. We start inside the model—what reasoning traces exist, what granularity each reaches, and why open weights still require multi-step instrumentation—before stepping outside to the nine stakeholder concerns, seven transparent system layers, and the rules for matching model autonomy to what code can verify.</p>
+        <p>A skeptical enterprise customer says, "Your model is a black box." This question is how to answer that in an AI system-design interview, and how to build the system that backs the answer up.</p>
         <div class="closes" style="margin:14px 0 16px;">
-          <span><b>The 30-second answer:</b> The model's weights and latent activations remain opaque: knowledge is spread across billions of weights, per-request activations are discarded after each token, and thought summaries, raw thinking tokens, and circuit tracing leave the causal reason behind a specific answer unverified. Trust therefore comes from the surrounding system, which makes inputs, sources, limits, evaluations, and history transparent across three pillars:<br>1. <strong>Verify</strong> every output: ground answers in cited sources, measure quality on a golden set, and let code make high-stakes decisions on verified facts.<br>2. <strong>Control</strong> and audit execution: enforce code guardrails, pin model versions, protect data governance boundaries, and log every step for replay.<br>3. <strong>Roll out</strong> safely: match human review to risk, and graduate from shadow mode to automation behind an instant kill switch.</span>
+          <span><b>The short answer.</b> Neither proprietary APIs nor open weights give you a production-grade proof of why a model gave a specific answer: thought summaries condense, raw traces can omit causal factors, and circuit tracing remains partial research. Leave the model opaque and make everything around it checkable: the data it sees, the sources it cites, the rules in code, the people who sign off, and a record of every step. For high-stakes decisions, let the model read and let code decide.</span>
         </div>
-        <p><strong>What we will walk through step by step:</strong></p>
-        <ol>
-          <li><a href="#sec-1"><strong>Inside the model:</strong></a> why weights and activations are opaque for both APIs and open weights, and the three levels of reasoning-trace granularity.</li>
-          <li><a href="#sec-2"><strong>From "black box" to a checkable system:</strong></a> the nine distinct stakeholder concerns and six business risks that matter outside the weights, and the seven engineering controls (<code>A</code>–<code>G</code>) with the Google Cloud services that address each concern.</li>
-          <li><a href="#sec-3"><strong>Match model autonomy to what code can verify:</strong></a> why modern AI agents safely handle open-ended planning, coding, and tool calls alongside deterministic checks, plus a worked prior-authorization example showing the hybrid split on regulated decisions.</li>
-          <li><a href="#sec-4"><strong>Summary and follow-up questions:</strong></a> spoken wrap-up and likely interview follow-ups.</li>
-        </ol>
+        <p>The rest follows that order: what stays hidden inside the model (<a href="#sec-1">Section 1</a>), the seven layers that make the system checkable (<a href="#sec-2">Section 2</a>), and one regulated decision built end to end (<a href="#sec-3">Section 3</a>).</p>
         <p>Next in Episode 03: <a href="ep03_q2_model_spectrum_economics.html">Question 02 · Open-Weight vs. Proprietary Models Across the Full Model Spectrum</a> (or view the <a href="ref/ai-interview-cheat-sheet.html">5-Question Master Cheat Sheet</a>).</p>
       </div>
     </div>
@@ -1086,15 +1080,12 @@
           <li><strong>Trace how features influence each other.</strong> Link the active features across layers into an <strong>attribution graph</strong> showing which ones pushed the final token up or down. This is an expensive, research-grade investigation that still captures only part of the computation.</li>
         </ol>
         <p>
-          <strong>The way out: separate reading from deciding.</strong> Have the model extract structured facts (with exact source quotes) into a checklist, and let deterministic code apply the rules to those facts (<a href="https://arxiv.org/abs/2301.13379" target="_blank" rel="noopener">Lyu et al., Jan 2023</a>). Because code executes the rules directly on the recorded facts, the audit trail shows what truly produced the answer. This is the <strong>hybrid pattern</strong>; <a href="#fig-q1-worked"><em>Figure 4</em></a> walks through it on a worked prior-authorization request.
+          <strong>What this means for the customer.</strong> Neither you nor the provider can reliably audit a model's internal reasons in production: summaries condense, thinking tokens can leave out the real cause, and circuit tracing is partial research. Instead of trying to explain the model, make everything around it checkable (<a href="#sec-2">Section 2</a>), and keep decisions that matter out of the model (<a href="#sec-3">Section 3</a>).
         </p>
 
         <h2 id="sec-2">2. From "Black Box" to a Checkable System</h2>
         <p>
-          In practice, internal model tracing hits a hard ceiling across both hosted APIs and open weights: <strong>proprietary APIs</strong> keep weights and layer activations behind the endpoint while exposing only condensed summaries, and <strong>open-weight models</strong> emit sampled tokens that can omit causal factors while full activation-level circuit tracing remains partial and costly.
-        </p>
-        <p>
-          Therefore, enterprise trust shifts from inspecting neural activations to engineering <strong>verifiable system controls</strong> around the model. "Black box" maps to nine distinct concerns. Each tends to come from a particular team and sits on a concrete business risk, so who is in the room usually signals which concerns matter first. Read the rest of this section in three steps: find the customer's concern and its layer letter in <em>Table 1</em>, see where that layer acts on a request in <em>Figure 2</em>, then read that layer's card below.
+          Since internal model reasons remain unverified in production, check everything else. To a customer, "black box" means nine different concerns. Each tends to come from a particular team and carries a business risk, so who is in the room tells you which concerns come first. Read the rest of this section in three steps: find the concern and its layer letter in <em>Table 1</em>, see where that layer acts in <em>Figure 2</em>, then read that layer's card.
         </p>
 
         <div class="nine-q-wrap" id="table-1">
@@ -1193,11 +1184,7 @@
           </div>
         </div>
 
-        <p>
-          That gives us the governing boundary: <strong>the model's weights and latent activations remain opaque, while the surrounding system makes inputs, sources, limits, evaluations, and history transparent</strong>.
-        </p>
-
-<div class="diagram-frame" id="fig-q1">
+        <div class="diagram-frame" id="fig-q1">
   <svg viewBox="0 0 920 606" role="img" aria-label="The model stays opaque; trust comes from checks around it, lettered in the order a request meets them. Inside the customer's data perimeter (A), a request goes through edge input screening, is grounded in customer sources (B), handled by the opaque model, checked in code (C), and routed by risk (D), with every step logged (E). Evaluation and pinning gate every change (F), and the rollout stage sets how much is automated (G)">
   <defs>
     <marker id="arr-q1l-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -1619,20 +1606,23 @@
         <p style="font-size:14.5px;color:var(--muted);">
           <em>Note:</em> Dates and article numbers change; confirm the current text with the customer's counsel before committing to a compliance claim.
         </p>
-
-        <h2 id="sec-3">3. Match Model Autonomy to What Code Can Verify</h2>
-
         <p>
-          Modern AI agents plan workflows, write code, and call APIs safely when deterministic checks verify each step; <a href="ep02_designing_agentic_systems.html">Episode 02</a> covers this in its four-block model and autonomy test. On regulated, audit-heavy decisions (such as medical necessity, credit underwriting, or compliance eligibility), automated denials are often restricted by law and require a line-by-line rule trace. For those decision gates, the strongest architecture pairs the LLM's language strength (reading free-text documents and pulling verbatim quotes) with explicit rules in code that make the binding call. One worked case shows how this <strong id="hybrid-pattern">hybrid</strong> pattern operates in practice.
+          These layers check the model's work. The strongest check is to give the model less to decide, which <a href="#sec-3">Section 3</a> shows on one regulated decision.
         </p>
 
-        <h3>Worked Case: Enterprise Prior Authorization (Lumbar MRI)</h3>
+        <h2 id="sec-3">3. Keep the Decision Out of the Model</h2>
+
         <p>
-          <b>The case.</b> Healthcare prior authorization puts every enterprise constraint in one workflow: messy unstructured charts at high volume, plus strict U.S. rules (California's <a href="https://sd13.senate.ca.gov/news/press-release/december-9-2024/landmark-law-prohibits-health-insurance-companies-using-ai-to" target="_blank" rel="noopener">SB 1120</a>, <a href="https://deloitte.com/us/en/industries/life-sciences-health-care/blogs/health-care/ai-could-help-health-plans-simplify-prior-auth-comply-with-regs.html" target="_blank" rel="noopener">Medicare's WISeR pilot</a>, and <a href="https://aamc.org/advocacy-policy/washington-highlights/cms-addresses-use-ai-medicare-advantage-plans" target="_blank" rel="noopener">CMS rules</a>) where software may auto-approve clear cases while a licensed clinician must make any decision to deny or delay care on medical-necessity grounds. The engineering goal is to maximize safe, touchless <code>AUTO_APPROVE</code> and automated record-chasing while keeping every denial clinician-owned and every claim backed by a verified source quote. Take a <a href="https://ldh.la.gov/assets/medicaid/MCPP/10.12.21/847_ACLA_Lumbar_Spine_MRI_2022_NIA_CG_044.pdf" target="_blank" rel="noopener">lumbar MRI policy</a> that approves coverage if either (a) six weeks of conservative care failed or (b) a neurological deficit is documented.
+          Agents can plan, write code, and call tools when deterministic checks verify each step; <a href="ep02_designing_agentic_systems.html">Episode 02</a> builds that with its autonomy test. Regulated decisions raise the bar: every denial needs a specific, checkable reason, and in some settings software is barred from issuing denials at all. For those, separate reading from deciding (<a href="https://arxiv.org/abs/2301.13379" target="_blank" rel="noopener">Lyu et al., Jan 2023</a>): the model turns messy text into quoted facts, and code applies the rule.
+        </p>
+
+        <h3>Worked Case: Prior Authorization for a Lumbar MRI</h3>
+        <p>
+          <b>The case.</b> In California (<a href="https://sd13.senate.ca.gov/news/press-release/december-9-2024/landmark-law-prohibits-health-insurance-companies-using-ai-to" target="_blank" rel="noopener">SB 1120</a>), in <a href="https://aamc.org/advocacy-policy/washington-highlights/cms-addresses-use-ai-medicare-advantage-plans" target="_blank" rel="noopener">Medicare Advantage</a>, and in <a href="https://deloitte.com/us/en/industries/life-sciences-health-care/blogs/health-care/ai-could-help-health-plans-simplify-prior-auth-comply-with-regs.html" target="_blank" rel="noopener">Medicare's WISeR pilot</a>, software may approve a clear prior-authorization request, while only a licensed clinician may deny one for medical necessity. Take a <a href="https://ldh.la.gov/assets/medicaid/MCPP/10.12.21/847_ACLA_Lumbar_Spine_MRI_2022_NIA_CG_044.pdf" target="_blank" rel="noopener">lumbar MRI policy</a> that covers the scan if either (a) at least six weeks of conservative treatment has failed, or (b) a new or worsening neurological deficit is documented. If the model simply recommended <code>DENY</code> with the note "only 3 weeks of ibuprofen," a busy clinician would likely sign, and nobody would have checked (b).
         </p>
 
         <p>
-          <strong>How the LLM helps—and how code checks it.</strong> Real clinical notes rarely use exact policy phrasing: they mix overlapping treatment dates, abbreviations (<code>"PT"</code> for physical therapy, <code>"EHL 3/5"</code> for toe-extension weakness), clinical synonyms (<code>"foot drop"</code> for motor deficit), and negations (<code>"denies saddle anesthesia"</code>). In this split, a toolless, single-call Quarantined LLM (<a href="ep02_designing_agentic_systems.html">Episode 02</a>) normalizes those clinical terms into a fixed schema, pairing every claim with a verbatim quote and chart location:
+          <b>The model reads.</b> Clinical notes rarely match policy wording: they use abbreviations (<code>"EHL 3/5"</code> for toe-extension weakness), synonyms (<code>"foot drop"</code>), and negations (<code>"denies saddle anesthesia"</code>). Turning that into fixed fields is the model's job. A toolless, single-call Quarantined LLM (<a href="ep02_designing_agentic_systems.html">Episode 02</a>) returns each fact with a verbatim quote and its page:
         </p>
         <div class="code-card">
           <div class="code-title">Normalized Chart Facts with Verbatim Quotes (Model Output)</div>
@@ -1647,7 +1637,10 @@
 }</pre>
         </div>
         <p>
-          Deterministic code normalizes OCR line breaks, verifies every quote exists in the chart, checks date and threshold math, and runs one generic rule engine over a pinned declarative policy rule in <a href="https://cel.dev/" target="_blank" rel="noopener">Common Expression Language (CEL)</a> or <a href="https://cql.hl7.org/" target="_blank" rel="noopener">HL7 CQL</a> (as in CMS Da Vinci DTR workflows), such as <code>claim.conservative_care.weeks >= 6 || claim.neuro_deficit.documented == true</code>; an LLM can compile payer policy PDFs into those declarative rules offline for clinician sign-off. A second quarantined verifier call checks that each extracted quote supports its claim, routing disagreements to the clinician. When either criterion passes verification, the system issues an <code>AUTO_APPROVE</code>. Here, <code>(a)</code> falls short (3 of 6 weeks) and <code>(b)</code> has missing evidence, so a scoped, read-only Record-Chaser Agent searches electronic health record (EHR) FHIR resources (<code>DocumentReference</code>, imaging reports) for recent exam notes and sends fetched notes back to the toolless Quarantined LLM for one extraction pass; the Record-Chaser Agent receives only the structured missing-field request, with <code>patient_id</code> and read-only scopes pinned at the gateway so untrusted chart text stays isolated from tool execution. If exam notes remain absent, code sends a targeted <code>PEND_FOR_EVIDENCE</code> request for the missing artifact while the review clock keeps running. Unmet or conflicting cases go to a licensed clinician with the verified facts side by side and no recommendation, so only clinicians issue denials (SB 1120), each with a specific reason (CMS-0057-F). <em>Figure 4</em> shows the flow.
+          <b>Code decides.</b> Code checks that every quote exists in the chart, does the date math, and evaluates the policy rule. Three outcomes follow: <b>approve</b> when a criterion is met on verified evidence; <b>fetch</b> when evidence is missing (here <code>(a)</code> is 3 of 6 weeks and <code>(b)</code> is unknown, so a read-only Record-Chaser Agent looks for recent exam notes in the health record and sends them back through the same extraction); and <b>route</b> anything still unmet to a licensed clinician, with the verified facts side by side and zero recommendation (<em>Figure 4</em>).
+        </p>
+        <p>
+          In production, the rule is a pinned declarative policy (<a href="https://cel.dev/" target="_blank" rel="noopener">CEL</a>, or <a href="https://cql.hl7.org/" target="_blank" rel="noopener">HL7 CQL</a> as in CMS Da Vinci workflows) that clinicians sign off, a second model call checks that each quote supports its claim, and the Record-Chaser's <code>patient_id</code> and read-only scopes are pinned at the gateway.
         </p>
 
 <div class="diagram-frame" id="fig-q1-worked">
@@ -1702,7 +1695,7 @@
     <text class="t-s t-c" x="249" y="247">required when unmet (only clinicians deny)</text>
   </svg>
   <div class="fig-caption">
-    <span>Figure 4 — Hybrid workflow with automated evidence lookup: a toolless Quarantined LLM normalizes clinical facts with verbatim quotes, code verifies quotes and evaluates a declarative CEL or CQL rule for AUTO_APPROVE or scoped read-only FHIR lookup via a Record-Chaser Agent, and clinicians review only unmet or unresolved cases.</span>
+    <span>Figure 4 — The model only reads: code approves on verified evidence, fetches missing records, or routes the case to a clinician, who owns every denial.</span>
     <div class="legend-items">
       <span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> Model step</span>
       <span><i class="swatch-dot" style="background:var(--cyan-soft);border-color:var(--cyan)"></i> Code step</span>
@@ -1712,22 +1705,15 @@
 </div>
 
         <p>
-          <strong>What the member and the auditor get.</strong> Once the clinician selects <code>Deny</code> and picks the unmet criterion on the neutral review screen, an LLM can draft the member-facing CMS-0057-F denial notice from the exact policy clause and verified chart quotes for the clinician to edit and sign. The auditor gets those same quoted facts with exact chart locations, the policy and pinned model versions, the clinician's sign-off (<code>D · Route by risk</code>), and the replayable trace with verifier results and thought summaries (<code>E · Log every step</code>).
+          <b>What the member and the auditor get.</b> If the clinician denies, the notice cites the policy clause and the verified quotes, as CMS-0057-F requires. The auditor gets the same facts with chart locations, the policy and model versions, the clinician's sign-off (<code>D · Route by risk</code>), and a replayable trace (<code>E · Log every step</code>).
         </p>
-
         <p>
-          <strong>The broader rule:</strong> apply <a href="ep02_designing_agentic_systems.html">Episode 02</a>'s four-row autonomy test per step—plain code for exact rules, a toolless Quarantined LLM to extract facts from free text, a Privileged LLM with a code verifier for open-ended exploration, and plain code with human sign-off for anything that changes the outside world.
+          The model reads, code decides, a clinician owns every denial, and every step is on the record.
         </p>
 
         <h2 id="sec-4">4. Summary: Putting It Together</h2>
         <p>
-          Every LLM—whether proprietary or open-weight—stores knowledge across billions of weights and computes per-request activations that are discarded after each token. Thought summaries, raw thinking tokens, and research-grade circuit tracing provide partial visibility, while leaving the causal reason behind a specific answer unverified. Enterprise trust therefore comes from the engineered system surrounding the model.
-        </p>
-        <p>
-          Building that trust starts by identifying which of the nine "black box" concerns (<em>Table 1</em>) and underlying risks drives the requirement, then wrapping the model in seven verifiable layers (<code>A</code>–<code>G</code>)—five checks on every request (<code>A · Data perimeter</code>, <code>B · Ground in customer sources</code>, <code>C · Check outputs in code</code>, <code>D · Route by risk</code>, and <code>E · Log every step</code>) and two controls on every change (<code>F · Evaluate and pin</code> and <code>G · Roll out gradually</code>). Applicable regulations and error cost decide which layers come first.
-        </p>
-        <p>
-          Alongside those layers, architecture limits how much of each decision the model makes at all. Matching model autonomy per step—demonstrated on a highly regulated healthcare prior-authorization workflow under SB 1120 and CMS-0057-F—shows how a system can automate aggressively while staying compliant and auditable: a toolless Quarantined LLM normalizes unstructured clinical text into quoted facts, deterministic code verifies those quotes and evaluates a pinned declarative CEL or HL7 CQL policy rule for touchless <code>AUTO_APPROVE</code>, a scoped read-only Record-Chaser Agent gathers missing FHIR records with <code>patient_id</code> pinned at the gateway, and unmet cases go neutrally to a licensed clinician who owns every denial decision and specific rationale. <em>Figure 3</em> maps the seven trust layers to managed Google Cloud services, with full wiring in <a href="ep01_securing_agent_to_database.html">Episode 01</a>.
+          A model's reasons stay hidden behind weights and discarded activations, whether it runs behind an API or on open weights, so trust comes from the system around it. Start from the customer's concern (<em>Table 1</em>), and wrap the model in seven layers: five checks on every request (<code>A</code>–<code>E</code>) and two controls on every change (<code>F</code>–<code>G</code>). Regulation and error cost decide which come first. For high-stakes decisions, keep the decision out of the model: in the prior-authorization case (<a href="#sec-3">Section 3</a>), a highly regulated clinical workflow under SB 1120 and CMS-0057-F, the model extracts quoted facts, code evaluates the policy rule, and a licensed clinician owns every denial. <em>Figure 3</em> maps the seven layers to Google Cloud.
         </p>
 
         <h2 id="sec-followups">Likely Follow-Up Questions</h2>
@@ -1749,11 +1735,8 @@
           <li>Treating human review as a safeguard without measuring whether reviewers ever disagree with the model.</li>
         </ul>
 
-        <div class="closes">
-          <span><b>Takeaway:</b> Diagnose which of the nine "black box" concerns applies, be candid that model weights and activations stay opaque, wrap the model in seven transparent system layers (data perimeter, grounding in customer sources, output checks in code, risk-based routing, step-level logging, golden-set evaluation with version pinning, and gradual rollout), use hybrid designs where code makes high-stakes calls on verified facts, and treat reasoning traces as supporting evidence.</span>
-        </div>
-
-        <p style="margin-top:20px;"><strong>Where this sits in the series:</strong> Episode 01 covers securing the agent-to-database connection (<a href="ep01_securing_agent_to_database.html">nine security layers <code>L1</code>–<code>L9</code></a>), and Episode 02 covers the system-design skeleton (<a href="ep02_designing_agentic_systems.html">four blocks and eleven questions <code>Q1</code>–<code>Q11</code></a>). This question adds the model itself: what stays opaque inside it, and seven layers (<code>A</code>–<code>G</code>) around it that draw on both episodes:</p>
+        <h3>How This Question Connects to Episodes 01 and 02</h3>
+        <p style="margin-top:8px;"><strong>Where this sits in the series:</strong> Episode 01 covers securing the agent-to-database connection (<a href="ep01_securing_agent_to_database.html">nine security layers <code>L1</code>–<code>L9</code></a>), and Episode 02 covers the system-design skeleton (<a href="ep02_designing_agentic_systems.html">four blocks and eleven questions <code>Q1</code>–<code>Q11</code></a>). This question adds the model itself: what stays opaque inside it, and seven layers (<code>A</code>–<code>G</code>) around it that draw on both episodes:</p>
         <div class="nine-q-wrap" style="margin:12px 0 16px;">
           <div class="nine-q-head">Series Bridge · Q1 Layers (A–G) vs. Episode 02 Blocks and Episode 01 Layers</div>
           <div class="tbl-wrap">
@@ -1765,9 +1748,9 @@
                 <tr><td><b>A · Data perimeter</b></td><td>Safeguards (<code>Q10</code>)</td><td><code>L1</code>, <code>L2</code>, <code>L6</code>, <code>L7</code></td></tr>
                 <tr><td><b>B · Ground in customer sources</b></td><td>Workflow (<code>Q9</code>: read data in place)</td><td><code>L7</code></td></tr>
                 <tr><td><b>C · Check outputs in code</b></td><td>Workflow (<code>Q7</code> Verifier, <code>Q8</code> typed contracts)</td><td><code>L3</code>, <code>L4</code></td></tr>
-                <tr><td><b>D · Route by risk</b></td><td>Workflow (Act gate, human)</td><td><code>L8</code></td></tr>
+                <tr><td><b>D · Route by risk</b></td><td>Safeguards (human sign-off)</td><td><code>L8</code></td></tr>
                 <tr><td><b>E · Log every step</b></td><td>Safeguards (audit and eval store)</td><td><code>L9</code></td></tr>
-                <tr><td><b>F · Evaluate and pin</b></td><td>Safeguards (<code>Q11</code> offline evals)</td><td>Control plane (<code>ADK Eval</code>)</td></tr>
+                <tr><td><b>F · Evaluate and pin</b></td><td>Safeguards (<code>Q11</code> offline evals)</td><td>— (<code>ADK Eval</code> and red-team tests run in CI before deploy)</td></tr>
                 <tr><td><b>G · Roll out gradually</b></td><td>Safeguards (<code>Q11</code> rollout), Control Plane (<code>Q5</code> kill switch)</td><td><code>L9</code> (kill switch)</td></tr>
               </tbody>
             </table>
