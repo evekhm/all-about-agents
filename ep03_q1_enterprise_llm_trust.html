@@ -1646,11 +1646,11 @@
 }</pre>
         </div>
         <p>
-          Deterministic code verifies every quote exists verbatim in the chart, checks date and threshold math, and evaluates <code>(a) OR (b)</code>. When either criterion is met with verified quotes, the system issues an <code>AUTO_APPROVE</code>. Here, <code>(a)</code> falls short (3 of 6 weeks) and <code>(b)</code> has missing evidence, so deterministic workflow code runs a read-only electronic health record (EHR) lookup for recent exam notes and re-runs extraction once—keeping the chart-reading LLM toolless so untrusted chart text cannot trigger unauthorized queries. If exam notes remain absent, code sends a targeted <code>PEND_FOR_EVIDENCE</code> request for the missing artifact without pausing the review deadline. Unmet or conflicting cases go to a licensed clinician with the verified facts side by side and no recommendation, so only clinicians issue denials (SB 1120), each with a specific reason (CMS-0057-F). <em>Figure 4</em> shows the flow.
+          Deterministic code normalizes OCR line breaks, verifies every quote exists in the chart, checks date and threshold math, and runs one generic rule engine over a pinned declarative policy rule in <a href="https://cel.dev/" target="_blank" rel="noopener">Common Expression Language (CEL)</a> or <a href="https://cql.hl7.org/" target="_blank" rel="noopener">HL7 CQL</a> (as in CMS Da Vinci DTR workflows), such as <code>claim.conservative_care.weeks >= 6 || claim.neuro_deficit.documented == true</code>; an LLM can compile payer policy PDFs into those declarative rules offline for clinician sign-off. A second quarantined verifier call checks that each extracted quote supports its claim, routing disagreements to the clinician. When either criterion passes verification, the system issues an <code>AUTO_APPROVE</code>. Here, <code>(a)</code> falls short (3 of 6 weeks) and <code>(b)</code> has missing evidence, so a scoped, read-only Record-Chaser Agent searches electronic health record (EHR) FHIR resources (<code>DocumentReference</code>, imaging reports) for recent exam notes and sends fetched notes back to the toolless Quarantined LLM for one extraction pass; the Record-Chaser Agent receives only the structured missing-field request, with <code>patient_id</code> and read-only scopes pinned at the gateway so untrusted chart text stays isolated from tool execution. If exam notes remain absent, code sends a targeted <code>PEND_FOR_EVIDENCE</code> request for the missing artifact while the review clock keeps running. Unmet or conflicting cases go to a licensed clinician with the verified facts side by side and no recommendation, so only clinicians issue denials (SB 1120), each with a specific reason (CMS-0057-F). <em>Figure 4</em> shows the flow.
         </p>
 
 <div class="diagram-frame" id="fig-q1-worked">
-  <svg viewBox="0 0 920 310" role="img" aria-label="Higher-automation hybrid prior-authorization flow: chart and policy enter, a toolless Quarantined LLM normalizes clinical facts with verbatim quotes, a Code Verifier and Policy Engine checks quotes and evaluates (a) OR (b) for touchless AUTO_APPROVE, triggers a read-only EHR lookup when evidence is missing, and routes unmet or unresolved cases neutrally to a licensed clinician">
+  <svg viewBox="0 0 920 310" role="img" aria-label="Higher-automation hybrid prior-authorization flow: chart and policy enter, a toolless Quarantined LLM normalizes clinical facts with verbatim quotes, a Verifier and Policy Engine checks quotes and evaluates a declarative CEL or CQL rule for touchless AUTO_APPROVE, a scoped read-only Record-Chaser Agent searches FHIR when evidence is missing, and unmet or unresolved cases route neutrally to a licensed clinician">
   <defs>
     <marker id="arr-q1w-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:var(--ink)"/>
@@ -1675,8 +1675,8 @@
     <line class="flow" x1="430" y1="98" x2="454" y2="98" marker-end="url(#arr-q1w-ink)"/>
 
     <rect class="node-cyan" x="456" y="66" width="254" height="64" rx="9"/>
-    <text class="t-b t-c" x="583" y="92">Code Verifier &amp; Rule</text>
-    <text class="t-s t-c" x="583" y="113">checks quotes · applies (a) OR (b)</text>
+    <text class="t-b t-c" x="583" y="92">Verifier &amp; Policy Engine</text>
+    <text class="t-s t-c" x="583" y="113">quotes · CEL / CQL rule (a) OR (b)</text>
     <line class="flow-g" x1="710" y1="98" x2="734" y2="98" marker-end="url(#arr-q1w-good)"/>
 
     <rect class="node-good" x="736" y="66" width="150" height="64" rx="9"/>
@@ -1688,8 +1688,8 @@
 
     <!-- Row 2: EHR lookup -> Clinician review -->
     <rect class="node-cyan" x="504" y="172" width="382" height="100" rx="9"/>
-    <text class="t-b t-c" x="695" y="199">Missing evidence: read-only EHR lookup</text>
-    <text class="t-s t-c" x="695" y="223">fetch missing exam notes &amp; re-run once</text>
+    <text class="t-b t-c" x="695" y="199">Missing evidence: Record-Chaser Agent</text>
+    <text class="t-s t-c" x="695" y="223">read-only FHIR · patient_id pinned · re-run once</text>
     <text class="t-s t-c" x="695" y="245">still absent → send PEND_FOR_EVIDENCE</text>
     <path d="M 540 172 V 150 H 313 V 134" style="fill:none;stroke:var(--cyan);stroke-width:2;stroke-dasharray:5 4" marker-end="url(#arr-q1w-ink)"/>
     <text class="t-s t-c" x="426" y="145" style="font-size:11px;fill:var(--muted)">notes found</text>
@@ -1701,7 +1701,7 @@
     <text class="t-s t-c" x="249" y="247">required when unmet (only clinicians deny)</text>
   </svg>
   <div class="fig-caption">
-    <span>Figure 4 — Hybrid workflow with automated evidence lookup: a toolless Quarantined LLM normalizes clinical facts with verbatim quotes, code verifies quotes and policy rules for AUTO_APPROVE or read-only EHR lookup, and clinicians review only unmet or unresolved cases.</span>
+    <span>Figure 4 — Hybrid workflow with automated evidence lookup: a toolless Quarantined LLM normalizes clinical facts with verbatim quotes, code verifies quotes and evaluates a declarative CEL or CQL rule for AUTO_APPROVE or scoped read-only FHIR lookup via a Record-Chaser Agent, and clinicians review only unmet or unresolved cases.</span>
     <div class="legend-items">
       <span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> Model step</span>
       <span><i class="swatch-dot" style="background:var(--cyan-soft);border-color:var(--cyan)"></i> Code step</span>
@@ -1711,7 +1711,7 @@
 </div>
 
         <p>
-          <strong>What the member and the auditor get.</strong> If the clinician denies, a templated notice cites the exact policy clause and verified chart quotes. The auditor gets those same quoted facts with exact chart locations, the policy and pinned model versions, the clinician's sign-off (<code>D · Route by risk</code>), and the replayable trace with verifier results and thought summaries (<code>E · Log every step</code>).
+          <strong>What the member and the auditor get.</strong> Once the clinician selects <code>Deny</code> and picks the unmet criterion on the neutral review screen, an LLM can draft the member-facing CMS-0057-F denial notice from the exact policy clause and verified chart quotes for the clinician to edit and sign. The auditor gets those same quoted facts with exact chart locations, the policy and pinned model versions, the clinician's sign-off (<code>D · Route by risk</code>), and the replayable trace with verifier results and thought summaries (<code>E · Log every step</code>).
         </p>
 
         <p>
