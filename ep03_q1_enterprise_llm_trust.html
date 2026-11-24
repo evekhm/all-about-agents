@@ -925,7 +925,7 @@
           <li><a href="#sec-3"><strong>Keep the decision out of the model:</strong></a> the model reads and code decides, shown on a worked prior-authorization example.</li>
           <li><a href="#sec-4"><strong>Summary and follow-up questions:</strong></a> spoken wrap-up and likely interview follow-ups.</li>
         </ol>
-        <p>Next in Episode 03: <a href="ep03_q2_model_spectrum_economics.html">Question 02 · Open-Weight vs. Proprietary Models Across the Full Model Spectrum</a> (or view the <a href="ref/ai-interview-cheat-sheet.html">5-Question Master Cheat Sheet</a>).</p>
+        <p>More questions in Episode 03 (model selection economics, demand forecasting, modern RAG, and domain-specific agents) are coming soon.</p>
       </div>
     </div>
   </section>
@@ -1298,7 +1298,7 @@
 <p class="lc-summary">Every answer cites the customer's own documents, or says it found nothing.</p>
 <div class="t-fix-row"><b>Customer gets:</b> verbatim source quotes with links; an explicit "not found in your documents" when evidence is missing</div><div class="t-fix-row gcp"><b>On Google Cloud:</b> <a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/overview" rel="noopener" target="_blank">Agent Search</a>, <a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/build/rag-engine/rag-overview" rel="noopener" target="_blank">RAG Engine</a>, or <a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/build/vector-search/overview" rel="noopener" target="_blank">Agent Retrieval / Vector Search</a> (Agent Platform); or in-place <a href="https://docs.cloud.google.com/bigquery/docs/vector-search-intro" rel="noopener" target="_blank">BigQuery</a> / <a href="https://docs.cloud.google.com/alloydb/docs/ai/work-with-embeddings" rel="noopener" target="_blank">AlloyDB</a> vector search, returning verifiable source URIs for clickable citations</div>
 <p class="lc-details">Pair retrieval with clickable inline citations linked to the customer's own documents, return structured JSON (<code>verbatim_quote</code>, <code>sources</code>, <code>assumptions</code>, <code>answer</code>), and return an explicit <em>"not found in your documents"</em> response whenever evidence is absent. Retrieval runs under the caller's verified identity, so citations never expose documents the caller cannot open (<a href="ep01_securing_agent_to_database.html">Episode 01</a>).</p>
-<p class="lc-details"><strong>Choosing a grounding backend.</strong> Picking between Agent Search, BigQuery / AlloyDB vector search, Agent Retrieval, and RAG Engine depends on data residency, latency, and chunking needs; <a href="ep03_q4_modern_rag_pairings.html">Question 04</a> covers retrieval and citation design.</p>
+<p class="lc-details"><strong>Choosing a grounding backend.</strong> Picking between Agent Search, BigQuery / AlloyDB vector search, Agent Retrieval, and RAG Engine depends on data residency, latency, and chunking needs; a dedicated upcoming post in this series covers retrieval and citation design in depth.</p>
 </div>
 <div class="layer-card" id="layer-c">
 <p class="lc-eyebrow">Answers 1 Explainability, 2 Predictability</p>
@@ -1810,8 +1810,6 @@
         </ol>
         <div class="back-home">
           <a href="https://evekhm.github.io/all-about-agents/#interview-label">← All About Agents · AI System Design Interviews</a>
-          &nbsp;·&nbsp;
-          <a href="ref/ai-interview-cheat-sheet.html">5-Question Master Cheat Sheet</a>
         </div>
       </div>
     </div>
