@@ -867,16 +867,6 @@
   .t1-map-legend { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; font-size: 12px; color: var(--muted); margin: 0 0 10px; }
   .t1-map-legend span { display: inline-flex; align-items: center; gap: 5px; }
   .t1-dot { width: 9px; height: 9px; border-radius: 3px; display: inline-block; border: 1.5px solid; }
-  #table-1 tbody tr { cursor: pointer; transition: background-color 0.15s ease, opacity 0.15s ease; }
-  #table-1 tbody tr.t1-active { background: color-mix(in srgb, var(--cyan-soft) 70%, transparent); }
-  #table-1 tbody tr.t1-dim { opacity: 0.42; }
-  #fig-q1 .fig2-node { cursor: pointer; transition: opacity 0.15s ease, filter 0.15s ease; }
-  #fig-q1.has-highlight .fig2-node { opacity: 0.28; }
-  #fig-q1.has-highlight .fig2-node.f2-active { opacity: 1; filter: drop-shadow(0 0 7px color-mix(in srgb, var(--cyan) 55%, transparent)); }
-  #fig-q1.has-highlight .fig2-node.f2-active rect { stroke-width: 2.8; }
-  @media print {
-    .t1-map-hint { display: none; }
-  }
   .layer-cards { display: flex; flex-direction: column; gap: 16px; margin: 14px 0 18px; }
   .layer-card { border: 1px solid var(--line); border-left: 4px solid var(--cyan); border-radius: 10px; background: var(--panel-2); padding: 16px 20px; break-inside: avoid; }
   .layer-card.lc-chg { border-left-color: var(--good); }
@@ -1120,7 +1110,6 @@
             <span><i class="t1-dot" style="background:var(--cyan-soft);border-color:var(--cyan)"></i> Checks on every request (A–E in Figure 2)</span>
             <span><i class="t1-dot" style="background:var(--good-soft);border-color:var(--good)"></i> Controls on every change (F–G in Figure 2)</span>
             <span><i class="t1-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> Self-hosted model checkpoint (Option 4, Section 3)</span>
-            <span class="t1-map-hint">· Hover or click any row to highlight its boxes in <em>Figure 2</em></span>
           </div>
           <div class="tbl-wrap">
             <table>
@@ -1575,10 +1564,7 @@
 
         <h3>How Much of This a Customer Needs</h3>
         <p>
-          <em>Figure 3</em> shows the full set of controls. Every layer adds engineering cost, latency, and ongoing ownership: citation verification adds a retrieval and check to every answer, <code>k</code>-sample agreement multiplies inference cost by <code>k</code>, and human review adds minutes of specialist time per routed case. Matching autonomy to error cost (Layer D) keeps that overhead bounded, allowing low-risk, high-volume cases to run automatically with sampled audits while concentrating heavier controls on decisions where a mistake is costly.
-        </p>
-        <p>
-          Some layers are mandatory regardless of cost because industry regulations require specific evidence, oversight, or auditability. Knowing which rules apply in the customer's sector establishes the baseline architecture early. <em>Table 2</em> highlights a representative sample of existing regulations, summarizing what each framework covers, what it asks for, and which layers from <em>Figure 3</em> produce that evidence.
+          <em>Figure 3</em> shows the full set of controls. Every layer adds engineering cost, latency, and ongoing ownership: citation verification adds a retrieval and check to every answer, <code>k</code>-sample agreement multiplies inference cost by <code>k</code>, and human review adds minutes of specialist time per routed case. Some layers are mandatory regardless of cost because industry regulations require specific evidence, oversight, or auditability. <em>Table 2</em> highlights a representative sample of existing regulations, summarizing what each framework covers, what it asks for, and which layers from <em>Figure 3</em> produce that evidence.
         </p>
 
         <div class="nine-q-wrap">
@@ -1913,66 +1899,6 @@ document.getElementById("theme-toggle").addEventListener("click", function() {
   root.setAttribute("data-theme", next);
   this.textContent = next === "light" ? "◑ Switch to Dark Mode" : "◐ Switch to Light Mode";
 });
-
-(function() {
-  const table1 = document.getElementById("table-1");
-  const fig2 = document.getElementById("fig-q1");
-  if (!table1 || !fig2) return;
-  const rows = Array.from(table1.querySelectorAll("tbody tr[data-layers]"));
-  const nodes = Array.from(fig2.querySelectorAll(".fig2-node[data-layer]"));
-  let lockedLayers = null;
-
-  function applyHighlight(layersSet) {
-    if (!layersSet || layersSet.size === 0) {
-      fig2.classList.remove("has-highlight");
-      nodes.forEach(n => n.classList.remove("f2-active"));
-      rows.forEach(r => { r.classList.remove("t1-active", "t1-dim"); });
-      return;
-    }
-    fig2.classList.add("has-highlight");
-    nodes.forEach(n => {
-      n.classList.toggle("f2-active", layersSet.has(n.getAttribute("data-layer")));
-    });
-    rows.forEach(r => {
-      const rLayers = (r.getAttribute("data-layers") || "").split(",");
-      const match = rLayers.some(l => layersSet.has(l));
-      r.classList.toggle("t1-active", match);
-      r.classList.toggle("t1-dim", !match);
-    });
-  }
-
-  rows.forEach(r => {
-    const rowSet = new Set((r.getAttribute("data-layers") || "").split(","));
-    r.addEventListener("mouseenter", () => { if (!lockedLayers) applyHighlight(rowSet); });
-    r.addEventListener("mouseleave", () => { if (!lockedLayers) applyHighlight(null); });
-    r.addEventListener("click", () => {
-      const key = r.getAttribute("data-layers");
-      if (lockedLayers && lockedLayers.key === key) {
-        lockedLayers = null;
-        applyHighlight(null);
-      } else {
-        lockedLayers = { key, set: rowSet };
-        applyHighlight(rowSet);
-      }
-    });
-  });
-
-  nodes.forEach(n => {
-    const layer = n.getAttribute("data-layer");
-    const nodeSet = new Set([layer]);
-    n.addEventListener("mouseenter", () => { if (!lockedLayers) applyHighlight(nodeSet); });
-    n.addEventListener("mouseleave", () => { if (!lockedLayers) applyHighlight(null); });
-    n.addEventListener("click", () => {
-      if (lockedLayers && lockedLayers.key === layer) {
-        lockedLayers = null;
-        applyHighlight(null);
-      } else {
-        lockedLayers = { key: layer, set: nodeSet };
-        applyHighlight(nodeSet);
-      }
-    });
-  });
-})();
 </script>
 </body>
 </html>
