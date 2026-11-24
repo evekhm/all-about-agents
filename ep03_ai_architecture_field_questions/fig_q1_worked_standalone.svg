@@ -45,10 +45,10 @@
     <text class="t-m-r" x="200" y="98">RISKY · THE MODEL DECIDES</text>
     <rect class="node-violet" x="200" y="110" width="200" height="64" rx="9"/>
     <text class="t-b t-c" x="300" y="137">Model decides</text>
-    <text class="t-s t-c" x="300" y="159">returns DENY</text>
+    <text class="t-s t-c" x="300" y="159">recommends DENY</text>
     <line class="flow" x1="400" y1="142" x2="426" y2="142" marker-end="url(#arr-q1w-ink)"/>
     <rect class="node-card" x="430" y="110" width="200" height="64" rx="9"/>
-    <text class="t-b t-c" x="530" y="137">Trace becomes reason</text>
+    <text class="t-b t-c" x="530" y="137">Clinician signs the trace</text>
     <text class="t-s t-c" x="530" y="159">"only 3 wks ibuprofen"</text>
     <line class="flow" x1="630" y1="142" x2="656" y2="142" marker-end="url(#arr-q1w-ink)"/>
     <rect class="node-bad" x="660" y="110" width="220" height="64" rx="9"/>
@@ -74,7 +74,7 @@
 
     <rect class="node-card" x="560" y="380" width="320" height="100" rx="9"/>
     <text class="t-b" x="578" y="406">Rule: (a) OR (b) approves</text>
-    <text class="t-s" x="578" y="428">(a) ≥ 6 wks supervised PT → not met</text>
+    <text class="t-s" x="578" y="428">(a) ≥ 6 wks conservative care → not met</text>
     <text class="t-s" x="578" y="448">(b) neuro deficit → missing evidence</text>
     <text class="t-s" x="578" y="468">an open criterion can still approve</text>
     <line class="flow-g" x1="560" y1="430" x2="524" y2="430" marker-end="url(#arr-q1w-good)"/>
@@ -82,5 +82,5 @@
     <rect class="node-good" x="200" y="380" width="320" height="100" rx="9"/>
     <text class="t-m-g t-c" x="360" y="410">PEND_FOR_EVIDENCE</text>
     <text class="t-b t-c" x="360" y="436">Request the missing evidence</text>
-    <text class="t-s t-c" x="360" y="460">neuro exam notes · PT log if done</text>
+    <text class="t-s t-c" x="360" y="460">neuro exam notes · then clinician review</text>
   </svg>

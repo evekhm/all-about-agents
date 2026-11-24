@@ -960,7 +960,7 @@
           <strong>Weights and activations.</strong> A model works with two kinds of numbers. <strong>Weights</strong> are the billions of values learned during training. They are fixed and identical for every request. The model's knowledge is spread across all of them at once, so there is no rule or line you can point to and read. <strong>Activations</strong> are the numbers the model computes from those weights and your input while it handles one request: its working state, which exists only during that request. In the formula <code>y = 2x + 3</code>, the <code>2</code> and the <code>3</code> play the role of weights; with <code>x = 5</code>, the intermediate <code>10</code> and the result <code>13</code> play the role of activations. This is the same for every LLM, whether it runs behind a proprietary API or on open weights. The difference is only who can see the numbers.
         </p>
         <p>
-          <strong>One token at a time.</strong> A model writes its answer one token, a word or part of a word, at a time. For each token it runs one forward pass: the input and everything written so far flow up through every layer, each layer computes new activations, and the last layer turns them into probabilities for the next token. One token is sampled, and the rest of that pass's activations are discarded. Each layer's keys and values are cached for speed, but they can be rebuilt from the tokens. The new token is appended to the input, and the next pass begins. <em>Figure 1</em> shows four steps of this loop on the prior-authorization case from Section 4.
+          <strong>One token at a time.</strong> A model writes its answer one token, a word or part of a word, at a time. For each token it runs one forward pass: the input and everything written so far flow up through every layer, each layer computes new activations, and the last layer turns them into probabilities for the next token. One token is sampled, and the rest of that pass's activations are discarded. Each layer's keys and values are cached for speed, but they can be rebuilt from the tokens. The new token is appended to the input, and the next pass begins. <em>Figure 1</em> shows four steps of this loop on the prior-authorization case from Section 3.
         </p>
 
 <div class="diagram-frame" id="fig-q1a">
@@ -1622,6 +1622,11 @@
                   <td>A specific reason for every denied prior-authorization request</td>
                   <td style="white-space:nowrap"><span class="layer-pill lp-req">B</span> <span class="layer-pill lp-req">C</span> <span class="layer-pill lp-chg">Option 3 (Section 3)</span></td>
                 </tr>
+                <tr>
+                  <td><b><a href="https://sd13.senate.ca.gov/news/press-release/december-9-2024/landmark-law-prohibits-health-insurance-companies-using-ai-to" target="_blank" rel="noopener">California SB 1120</a></b></td>
+                  <td>Only a licensed physician or qualified health professional may deny, delay, or modify care based on medical necessity; AI tools may support the review but not make that call (in effect since January 2025)</td>
+                  <td style="white-space:nowrap"><span class="layer-pill lp-req">D</span></td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -1642,11 +1647,11 @@
         </p>
 
         <p>
-          <strong>The case.</strong> Prior authorization is a health plan's approval before it pays for a procedure: the doctor submits the patient's chart, and the plan checks it against a written medical policy. A compliance lead asks: <em>"If your assistant denies a lumbar MRI, can we show the member and the regulator exactly why?"</em> Since 2026, the CMS prior-authorization rule has required a specific reason for every denial from Medicare Advantage, Medicaid, CHIP, and ACA marketplace plans. The policy covers the MRI when either (a) six weeks of supervised physical therapy failed or (b) a progressive neurological deficit is documented.
+          <b>The case.</b> Prior authorization is a health plan's approval before it pays for a procedure: the doctor submits the patient's chart, and the plan checks it against a written medical policy. Plans already use AI here, under a firm rule: software may approve, but only a licensed clinician may deny for medical necessity. California's <a href="https://sd13.senate.ca.gov/news/press-release/december-9-2024/landmark-law-prohibits-health-insurance-companies-using-ai-to" target="_blank" rel="noopener">SB 1120</a> writes that into law, Medicare's WISeR pilot reserves denials for clinicians, and <a href="https://aamc.org/advocacy-policy/washington-highlights/cms-addresses-use-ai-medicare-advantage-plans" target="_blank" rel="noopener">CMS requires</a> Medicare Advantage decisions to rest on the individual patient's record. A compliance lead asks: "If your assistant recommends denying a lumbar MRI, can we show the member and the regulator exactly why?" Imaging policies typically cover a lumbar MRI for low back pain when either (a) at least six weeks of conservative treatment in the last six months has failed, or (b) a new or worsening neurological deficit is documented on exam (<a href="https://ldh.la.gov/assets/medicaid/MCPP/10.12.21/847_ACLA_Lumbar_Spine_MRI_2022_NIA_CG_044.pdf" target="_blank" rel="noopener">NIA Clinical Guideline NIA_CG_044</a>).
         </p>
 
         <p>
-          <strong>When the model decides.</strong> The model reads the chart and the policy, returns <code>DENY</code>, and its thinking reads <em>"patient only tried ibuprofen for 3 weeks."</em> The system stores that as the denial reason. The decision is wrong: nobody checked criterion (b). A better prompt might have caught it on this chart, but nothing in the design would show whether it did, because the thinking reads as a complete reason either way.
+          <b>When the model decides.</b> The model reads the chart and the policy, recommends <code>DENY</code>, and its thinking reads "patient only tried ibuprofen for 3 weeks." A clinician working through a long queue sees a fluent reason and signs. The denial is wrong: nobody checked criterion (b). A clinician in the loop does not catch it, because what they review is the model's story, and the thinking reads as a complete reason whether or not the model checked (b).
         </p>
 
         <p>
@@ -1657,7 +1662,6 @@
 <pre>{
   <span class="hl-k">"conservative_therapy"</span>: {
     <span class="hl-k">"type"</span>: <span class="hl-s">"over-the-counter ibuprofen"</span>,
-    <span class="hl-k">"supervised_pt"</span>: <span class="hl-n">false</span>,
     <span class="hl-k">"weeks"</span>: <span class="hl-n">3</span>,
     <span class="hl-k">"quote"</span>: <span class="hl-s">"Ibuprofen 400 mg TID x 3 weeks, minimal relief"</span>
   },
@@ -1665,7 +1669,7 @@
 }</pre>
         </div>
         <p>
-          Code confirms each quote exists in the chart, then applies the policy: (a) is not met, and (b) has no evidence either way. Because an open criterion can still approve, the result is <code>PEND_FOR_EVIDENCE</code> with a request for the neurological exam notes, not a denial (<em>Figure 4</em>).
+          Code confirms each quote exists in the chart, then applies the policy: (a) is not met (three weeks, not six), and (b) has no evidence either way. Code approves automatically only when a criterion is met with a verified quote, and it never denies. Here it requests the neurological exam notes and, if they do not settle (b), routes the case to a clinician with the evidence laid out criterion by criterion (<em>Figure 4</em>).
         </p>
 
 <div class="diagram-frame" id="fig-q1-worked">
@@ -1696,10 +1700,10 @@
     <text class="t-m-r" x="200" y="98">RISKY · THE MODEL DECIDES</text>
     <rect class="node-violet" x="200" y="110" width="200" height="64" rx="9"/>
     <text class="t-b t-c" x="300" y="137">Model decides</text>
-    <text class="t-s t-c" x="300" y="159">returns DENY</text>
+    <text class="t-s t-c" x="300" y="159">recommends DENY</text>
     <line class="flow" x1="400" y1="142" x2="426" y2="142" marker-end="url(#arr-q1w-ink)"/>
     <rect class="node-card" x="430" y="110" width="200" height="64" rx="9"/>
-    <text class="t-b t-c" x="530" y="137">Trace becomes reason</text>
+    <text class="t-b t-c" x="530" y="137">Clinician signs the trace</text>
     <text class="t-s t-c" x="530" y="159">"only 3 wks ibuprofen"</text>
     <line class="flow" x1="630" y1="142" x2="656" y2="142" marker-end="url(#arr-q1w-ink)"/>
     <rect class="node-bad" x="660" y="110" width="220" height="64" rx="9"/>
@@ -1725,7 +1729,7 @@
 
     <rect class="node-card" x="560" y="380" width="320" height="100" rx="9"/>
     <text class="t-b" x="578" y="406">Rule: (a) OR (b) approves</text>
-    <text class="t-s" x="578" y="428">(a) ≥ 6 wks supervised PT → not met</text>
+    <text class="t-s" x="578" y="428">(a) ≥ 6 wks conservative care → not met</text>
     <text class="t-s" x="578" y="448">(b) neuro deficit → missing evidence</text>
     <text class="t-s" x="578" y="468">an open criterion can still approve</text>
     <line class="flow-g" x1="560" y1="430" x2="524" y2="430" marker-end="url(#arr-q1w-good)"/>
@@ -1733,10 +1737,10 @@
     <rect class="node-good" x="200" y="380" width="320" height="100" rx="9"/>
     <text class="t-m-g t-c" x="360" y="410">PEND_FOR_EVIDENCE</text>
     <text class="t-b t-c" x="360" y="436">Request the missing evidence</text>
-    <text class="t-s t-c" x="360" y="460">neuro exam notes · PT log if done</text>
+    <text class="t-s t-c" x="360" y="460">neuro exam notes · then clinician review</text>
   </svg>
   <div class="fig-caption">
-    <span>Figure 4 — The same chart and the same model produce different outcomes depending on who decides. When the model decides, its thinking becomes the stored reason and criterion (b) is never checked, so the result is a wrongful denial. When the model only extracts quoted facts and code verifies the quotes and applies the policy's OR rule, the open criterion keeps the case alive and the system requests the missing evidence.</span>
+    <span>Figure 4 — Same chart, same model: when the model's reason is what the clinician sees, a plausible trace becomes a wrongful denial; when code checks quoted facts, it approves only on verified evidence and sends everything else to a clinician with the evidence laid out.</span>
     <div class="legend-items">
       <span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> Model step</span>
       <span><i class="swatch-dot" style="background:var(--cyan-soft);border-color:var(--cyan)"></i> Code step</span>
@@ -1747,7 +1751,7 @@
 </div>
 
         <p>
-          <strong>What the member and the auditor get.</strong> If the notes come back without a deficit, code issues the denial from an approved template, and every clause traces to a quote: <em>"Denied under [policy ID, version]. The policy covers a lumbar MRI after six weeks of supervised physical therapy or when a progressive neurological deficit is documented. Your records show three weeks of over-the-counter ibuprofen and no neurological deficit in the exam notes provided."</em> The auditor gets the same facts with their quotes and character offsets, the policy version, the pinned model version, and a trace ID that replays the run (Layer E). The model's thinking is stored beside them as supporting evidence, not as the reason.
+          <strong>What the member and the auditor get.</strong> If the clinician denies, the notice is drafted from an approved template and signed by that clinician, with every clause traced to a quote: <em>"Denied under [policy ID, version]. The policy covers a lumbar MRI after at least six weeks of conservative treatment or when a new or worsening neurological deficit is documented. Your records show three weeks of over-the-counter ibuprofen and no neurological deficit in the exam notes provided."</em> The auditor gets the same facts with their quotes and character offsets, the policy version, the pinned model version, a trace ID that replays the run (Layer E), and the clinician's sign-off (Layer D). The model's thinking is stored beside them as supporting evidence, not as the reason.
         </p>
 
         <p>
@@ -1885,6 +1889,9 @@
           <li>CMS, <a href="https://www.cms.gov/newsroom/fact-sheets/cms-interoperability-and-prior-authorization-final-rule-cms-0057-f" target="_blank" rel="noopener">Interoperability and Prior Authorization Final Rule (CMS-0057-F)</a>, January 17, 2024.</li>
           <li>DeepSeek, <a href="https://api-docs.deepseek.com/guides/thinking_mode/" target="_blank" rel="noopener">Thinking Mode (API Documentation)</a> and <a href="https://arxiv.org/abs/2501.12948" target="_blank" rel="noopener">DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning</a> (arXiv:2501.12948), January 2025. Documents how DeepSeek reasoning models emit raw thinking tokens in <code>reasoning_content</code> / <code>&lt;think&gt;</code> tags.</li>
           <li>Lundberg and Lee, <a href="https://arxiv.org/abs/1705.07874" target="_blank" rel="noopener">A Unified Approach to Interpreting Model Predictions</a> (arXiv:1705.07874), May 2017 (NeurIPS 2017). Introduces SHAP, which attributes a single prediction to each of its input features.</li>
+          <li>California Senate, <a href="https://sd13.senate.ca.gov/news/press-release/december-9-2024/landmark-law-prohibits-health-insurance-companies-using-ai-to" target="_blank" rel="noopener">California SB 1120 (Physicians Make Decisions Act)</a>, 2024 (effective January 2025). Prohibits health plans from using AI to deny, delay, or modify care based on medical necessity without review by a licensed physician or qualified health professional.</li>
+          <li>CMS, <a href="https://aamc.org/advocacy-policy/washington-highlights/cms-addresses-use-ai-medicare-advantage-plans" target="_blank" rel="noopener">Medicare Advantage FAQ on Algorithms and AI</a>, February 6, 2024. Clarifies that Medicare Advantage medical-necessity determinations must be based on the individual patient's clinical record rather than an algorithm alone.</li>
+          <li>National Imaging Associates (NIA), <a href="https://ldh.la.gov/assets/medicaid/MCPP/10.12.21/847_ACLA_Lumbar_Spine_MRI_2022_NIA_CG_044.pdf" target="_blank" rel="noopener">Clinical Guideline NIA_CG_044: Lumbar Spine MRI</a>. Representative payer imaging criteria requiring either failed conservative care or documented progressive neurological deficit.</li>
         </ol>
         <div class="back-home">
           <a href="https://evekhm.github.io/all-about-agents/#interview-label">← All About Agents · AI System Design Interviews</a>
