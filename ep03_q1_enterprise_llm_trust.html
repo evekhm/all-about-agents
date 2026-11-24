@@ -1310,7 +1310,7 @@
 <p class="lc-eyebrow">Answers 1 Explainability, 2 Predictability</p>
 <h3>C · Check outputs in code</h3>
 <p class="lc-summary">Code verifies every claim and applies the business rules, so the model never has the last word.</p>
-<div class="t-fix-row"><b>Customer gets:</b> quote-verification results, rule checks, and schema validation</div><div class="t-fix-row gcp"><b>On Google Cloud:</b> Model Armor + Cloud SDP egress screening (at Agent Gateway / Apigee or Cloud Run); Semantic Governance Policies (SGP) and Agent Registry for tool calls; your own service (for example, on Cloud Run) with structured output schemas</div>
+<div class="t-fix-row"><b>Customer gets:</b> quote-verification results, rule checks, and schema validation</div><div class="t-fix-row gcp"><b>On Google Cloud:</b> Model Armor reply screening at the ingress gateway, with Cloud SDP de-identification (Agent Gateway, Apigee, or your Cloud Run service); Semantic Governance Policies (SGP) and Agent Registry for tool calls; your own service (for example, on Cloud Run) with structured output schemas</div>
 <p class="lc-details"><strong>Verify in code.</strong> Server code checks that cited passages genuinely support each claim, screens outputs for PII and off-policy content, and enforces permissions, dollar caps, and business rules (<a href="https://www.anthropic.com/research/building-effective-agents" rel="noopener" target="_blank">Anthropic, Dec 2024</a>).</p>
 <p class="lc-details"><strong>Repeatability.</strong> Constrain outputs where repeatability matters (structured output schemas, enumerated values, and a pinned thinking level) while keeping sampling parameters at the defaults current reasoning models are tuned for (<a href="https://ai.google.dev/gemini-api/docs/gemini-3" rel="noopener" target="_blank">Gemini 3 guide, 2026</a>). No decoding setting makes a hosted model repeatable: even greedy decoding on shared inference servers varies with the batch a request lands in (in one study, 1,000 identical requests to an open-weight model produced 80 distinct outputs; <a href="https://thinkingmachines.ai/blog/defeating-nondeterminism-in-llm-inference/" rel="noopener" target="_blank">He et al., Sep 2025</a>). Promise measured consistency (<code>pass^k</code>), and put calculations, thresholds, and final decisions in code.</p>
 </div>
@@ -1335,7 +1335,7 @@
 <p class="lc-eyebrow">Answers 2 Predictability, 8 Version Stability, 9 Quality</p>
 <h3>F · Evaluate and pin</h3>
 <p class="lc-summary">A golden set built with domain experts gates every change, and the model version moves only when it passes.</p>
-<div class="t-fix-row"><b>Customer gets:</b> golden-set results, <code>pass^k</code> consistency (a case passes only if all <code>k</code> runs succeed; <a href="https://arxiv.org/abs/2406.12045" rel="noopener" target="_blank">Yao et al., ICLR 2025</a>), and failure slices; a pinned model ID and regression report before each cutover</div><div class="t-fix-row gcp"><b>On Google Cloud:</b> Gemini Enterprise Agent Platform (Agent Platform) evaluation service; pinned model version IDs; evaluation pipeline in CI</div>
+<div class="t-fix-row"><b>Customer gets:</b> golden-set results, <code>pass^k</code> consistency (a case passes only if all <code>k</code> runs succeed; <a href="https://arxiv.org/abs/2406.12045" rel="noopener" target="_blank">Yao et al., ICLR 2025</a>); unlike <code>pass@k</code>, which counts a case solved if any of <code>k</code> attempts succeeds and fits retry budgets, as in <a href="ep02_designing_agentic_systems.html">Episode 02</a>, and failure slices; a pinned model ID and regression report before each cutover</div><div class="t-fix-row gcp"><b>On Google Cloud:</b> Gemini Enterprise Agent Platform (Agent Platform) evaluation service; pinned model version IDs; evaluation pipeline in CI</div>
 <p class="lc-details"><strong>Golden set.</strong> Co-create a <strong>golden set</strong> of real historical cases with the customer's domain specialists, sizing it to the workflow's risk and edge-case coverage; track accuracy, groundedness, hallucination rate, refusal rate, latency, and cost; rerun the set like a regression suite on every prompt, retrieval, or model change; and share the failure breakdown openly. Where an LLM judge scores a metric, first measure the judge's agreement with SME labels on a held-out slice.</p>
 <p class="lc-details"><strong>Pin versions.</strong> Upgrade only when the customer's golden set passes. Pinning is temporary: providers retire API model versions on a published schedule, so maintain a migration calendar and run each successor through the customer's golden set before cutover. Self-hosted open weights remove forced retirement altogether.</p>
 <p class="lc-details"><strong>Training caution.</strong> If you fine-tune or run reinforcement learning, keep the reasoning trace out of the reward signal so it stays useful for monitoring (<a href="https://arxiv.org/abs/2503.11926" rel="noopener" target="_blank">Baker et al., Mar 2025</a>).</p>
@@ -1345,7 +1345,7 @@
 <h3>G · Roll out gradually</h3>
 <p class="lc-summary">Shadow mode first, automation only when the numbers clear the bar, with a kill switch.</p>
 <div class="t-fix-row"><b>Customer gets:</b> shadow-mode comparison results; a kill switch</div><div class="t-fix-row gcp"><b>On Google Cloud:</b> Agent Platform evaluation service for shadow comparisons; traffic splitting or a feature flag in Cloud Run</div>
-<p class="lc-details">Start on a low-risk, high-visibility wedge and earn promotion across stages: <code>Scoped Pilot → Shadow Mode</code> (running silently beside humans to compare outcomes) <code>→ Assisted Copilot → Partial Scoped Automation</code>, backed by an instant operational kill switch (<a href="https://martinfowler.com/articles/feature-toggles.html" rel="noopener" target="_blank">Hodgson, Oct 2017</a>).</p>
+<p class="lc-details">Start on a low-risk, high-visibility wedge and earn promotion across stages: <code>Scoped Pilot → Shadow Mode</code> (running silently beside humans to compare outcomes) <code>→ Assisted Copilot → Partial Scoped Automation</code>, backed by an instant operational kill switch (<a href="https://martinfowler.com/articles/feature-toggles.html" rel="noopener" target="_blank">Hodgson, Oct 2017</a>) that turns off the whole rollout (<a href="ep02_designing_agentic_systems.html">Episode 02</a> builds a per-target kill switch inside an agent's control plane).</p>
 </div>
 </div>
 
@@ -1511,7 +1511,7 @@
     <use href="#icon-gcp-armor" x="212" y="334" width="22" height="22"/>
     <use href="#icon-gcp-run" x="236" y="334" width="22" height="22"/>
     <text class="t-b" x="268" y="343">C · Model Armor + Cloud Run</text>
-    <text class="t-s" x="268" y="360">egress SDP · SGP · schemas &amp; rules</text>
+    <text class="t-s" x="268" y="360">reply SDP · SGP · schemas &amp; rules</text>
     <line class="flow" x1="410" y1="368" x2="410" y2="382" marker-end="url(#arr-q1g-ink)"/>
 
     <!-- D: Route by risk -->
@@ -1625,7 +1625,7 @@
         </p>
 
         <p>
-          How much decision authority belongs in the model therefore scales with two factors: the cost of an error and how cheaply external checks can verify the output. On regulated, audit-heavy decisions—such as medical necessity, credit underwriting, or compliance eligibility—automated denials are often restricted by law and require a line-by-line rule trace. For those specific decision gates, the strongest architecture pairs the LLM's language strength (reading messy documents, mapping clinical or policy terms, and pulling verbatim quotes) with explicit, human-readable rules in code or an interpretable scoring model that makes the binding call. One worked case shows how that hybrid split operates in practice.
+          How much decision authority belongs in the model therefore scales with two factors: the cost of an error and how cheaply external checks can verify the output. On regulated, audit-heavy decisions—such as medical necessity, credit underwriting, or compliance eligibility—automated denials are often restricted by law and require a line-by-line rule trace. For those specific decision gates, the strongest architecture pairs the LLM's language strength (reading messy documents, mapping clinical or policy terms, and pulling verbatim quotes) with explicit, human-readable rules in code or an interpretable scoring model that makes the binding call. One worked case shows how that hybrid split operates in practice. <a href="ep02_designing_agentic_systems.html">Episode 02</a> applies the same split to every step of an agent with its autonomy test: steps that follow an explicit rule become plain code, and only steps that must interpret messy text use a model.
         </p>
 
         <p>
