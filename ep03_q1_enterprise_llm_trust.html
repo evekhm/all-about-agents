@@ -1647,7 +1647,7 @@
         </p>
 
         <p>
-          <b>The case.</b> Prior authorization is a health plan's approval before it pays for a procedure: the doctor submits the patient's chart, and the plan checks it against a written medical policy. Plans already use AI here, under a firm rule: software may approve, but only a licensed clinician may deny for medical necessity. California's <a href="https://sd13.senate.ca.gov/news/press-release/december-9-2024/landmark-law-prohibits-health-insurance-companies-using-ai-to" target="_blank" rel="noopener">SB 1120</a> writes that into law, Medicare's WISeR pilot reserves denials for clinicians, and <a href="https://aamc.org/advocacy-policy/washington-highlights/cms-addresses-use-ai-medicare-advantage-plans" target="_blank" rel="noopener">CMS requires</a> Medicare Advantage decisions to rest on the individual patient's record. A compliance lead asks: "If your assistant recommends denying a lumbar MRI, can we show the member and the regulator exactly why?" Imaging policies typically cover a lumbar MRI for low back pain when either (a) at least six weeks of conservative treatment in the last six months has failed, or (b) a new or worsening neurological deficit is documented on exam (<a href="https://ldh.la.gov/assets/medicaid/MCPP/10.12.21/847_ACLA_Lumbar_Spine_MRI_2022_NIA_CG_044.pdf" target="_blank" rel="noopener">NIA Clinical Guideline NIA_CG_044</a>).
+          <b>The case.</b> Prior authorization is a health plan's approval before it pays for a procedure: the doctor submits the patient's chart, and the plan checks it against a written medical policy. Plans already use AI here, under a firm rule: software may approve, but only a licensed clinician may deny for medical necessity. California's <a href="https://sd13.senate.ca.gov/news/press-release/december-9-2024/landmark-law-prohibits-health-insurance-companies-using-ai-to" target="_blank" rel="noopener">SB 1120</a> writes that into law, <a href="https://deloitte.com/us/en/industries/life-sciences-health-care/blogs/health-care/ai-could-help-health-plans-simplify-prior-auth-comply-with-regs.html" target="_blank" rel="noopener">Medicare's WISeR pilot</a> reserves denials for clinicians, and <a href="https://aamc.org/advocacy-policy/washington-highlights/cms-addresses-use-ai-medicare-advantage-plans" target="_blank" rel="noopener">CMS requires</a> Medicare Advantage decisions to rest on the individual patient's record. A compliance lead asks: "If your assistant recommends denying a lumbar MRI, can we show the member and the regulator exactly why?" Imaging policies typically cover a lumbar MRI for low back pain when either (a) at least six weeks of conservative treatment in the last six months has failed, or (b) a new or worsening neurological deficit is documented on exam (<a href="https://ldh.la.gov/assets/medicaid/MCPP/10.12.21/847_ACLA_Lumbar_Spine_MRI_2022_NIA_CG_044.pdf" target="_blank" rel="noopener">NIA Clinical Guideline NIA_CG_044</a>).
         </p>
 
         <p>
@@ -1655,7 +1655,7 @@
         </p>
 
         <p>
-          <strong>When code decides.</strong> The model only extracts facts, each with a verbatim quote:
+          <strong>When code checks.</strong> The model only extracts facts, each with a verbatim quote:
         </p>
         <div class="code-card">
           <div class="code-title">Extracted Chart Facts with Verbatim Quotes (Model Output)</div>
@@ -1699,7 +1699,7 @@
     <!-- Risky lane: the model decides -->
     <text class="t-m-r" x="200" y="98">RISKY · THE MODEL DECIDES</text>
     <rect class="node-violet" x="200" y="110" width="200" height="64" rx="9"/>
-    <text class="t-b t-c" x="300" y="137">Model decides</text>
+    <text class="t-b t-c" x="300" y="137">Model recommends</text>
     <text class="t-s t-c" x="300" y="159">recommends DENY</text>
     <line class="flow" x1="400" y1="142" x2="426" y2="142" marker-end="url(#arr-q1w-ink)"/>
     <rect class="node-card" x="430" y="110" width="200" height="64" rx="9"/>
@@ -1712,8 +1712,8 @@
 
     <line x1="200" y1="214" x2="880" y2="214" style="stroke:var(--line);stroke-width:1.4;stroke-dasharray:6 5"/>
 
-    <!-- Verifiable lane: the model extracts, code decides -->
-    <text class="t-m-g" x="200" y="278">VERIFIABLE · THE MODEL EXTRACTS, CODE DECIDES</text>
+    <!-- Verifiable lane: the model extracts, code checks -->
+    <text class="t-m-g" x="200" y="278">VERIFIABLE · THE MODEL EXTRACTS, CODE CHECKS</text>
     <rect class="node-violet" x="200" y="290" width="200" height="64" rx="9"/>
     <text class="t-b t-c" x="300" y="317">Model extracts</text>
     <text class="t-s t-c" x="300" y="339">facts + verbatim quotes</text>
@@ -1889,9 +1889,9 @@
           <li>CMS, <a href="https://www.cms.gov/newsroom/fact-sheets/cms-interoperability-and-prior-authorization-final-rule-cms-0057-f" target="_blank" rel="noopener">Interoperability and Prior Authorization Final Rule (CMS-0057-F)</a>, January 17, 2024.</li>
           <li>DeepSeek, <a href="https://api-docs.deepseek.com/guides/thinking_mode/" target="_blank" rel="noopener">Thinking Mode (API Documentation)</a> and <a href="https://arxiv.org/abs/2501.12948" target="_blank" rel="noopener">DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning</a> (arXiv:2501.12948), January 2025. Documents how DeepSeek reasoning models emit raw thinking tokens in <code>reasoning_content</code> / <code>&lt;think&gt;</code> tags.</li>
           <li>Lundberg and Lee, <a href="https://arxiv.org/abs/1705.07874" target="_blank" rel="noopener">A Unified Approach to Interpreting Model Predictions</a> (arXiv:1705.07874), May 2017 (NeurIPS 2017). Introduces SHAP, which attributes a single prediction to each of its input features.</li>
-          <li>California Senate, <a href="https://sd13.senate.ca.gov/news/press-release/december-9-2024/landmark-law-prohibits-health-insurance-companies-using-ai-to" target="_blank" rel="noopener">California SB 1120 (Physicians Make Decisions Act)</a>, 2024 (effective January 2025). Prohibits health plans from using AI to deny, delay, or modify care based on medical necessity without review by a licensed physician or qualified health professional.</li>
+          <li>California Senate, <a href="https://sd13.senate.ca.gov/news/press-release/december-9-2024/landmark-law-prohibits-health-insurance-companies-using-ai-to" target="_blank" rel="noopener">California SB 1120 (Physicians Make Decisions Act)</a>, 2024 (effective January 2025). Requires that a licensed physician or qualified health professional make any denial, delay, or modification of care based on medical necessity; AI tools may not make that determination.</li>
           <li>CMS, <a href="https://aamc.org/advocacy-policy/washington-highlights/cms-addresses-use-ai-medicare-advantage-plans" target="_blank" rel="noopener">Medicare Advantage FAQ on Algorithms and AI</a>, February 6, 2024. Clarifies that Medicare Advantage medical-necessity determinations must be based on the individual patient's clinical record rather than an algorithm alone.</li>
-          <li>National Imaging Associates (NIA), <a href="https://ldh.la.gov/assets/medicaid/MCPP/10.12.21/847_ACLA_Lumbar_Spine_MRI_2022_NIA_CG_044.pdf" target="_blank" rel="noopener">Clinical Guideline NIA_CG_044: Lumbar Spine MRI</a>. Representative payer imaging criteria requiring either failed conservative care or documented progressive neurological deficit.</li>
+          <li>National Imaging Associates (NIA), <a href="https://ldh.la.gov/assets/medicaid/MCPP/10.12.21/847_ACLA_Lumbar_Spine_MRI_2022_NIA_CG_044.pdf" target="_blank" rel="noopener">Clinical Guideline NIA_CG_044: Lumbar Spine MRI</a>. Representative payer imaging criteria requiring either failed conservative care or a new or worsening neurological deficit on exam.</li>
         </ol>
         <div class="back-home">
           <a href="https://evekhm.github.io/all-about-agents/#interview-label">← All About Agents · AI System Design Interviews</a>

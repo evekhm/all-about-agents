@@ -44,7 +44,7 @@
     <!-- Risky lane: the model decides -->
     <text class="t-m-r" x="200" y="98">RISKY · THE MODEL DECIDES</text>
     <rect class="node-violet" x="200" y="110" width="200" height="64" rx="9"/>
-    <text class="t-b t-c" x="300" y="137">Model decides</text>
+    <text class="t-b t-c" x="300" y="137">Model recommends</text>
     <text class="t-s t-c" x="300" y="159">recommends DENY</text>
     <line class="flow" x1="400" y1="142" x2="426" y2="142" marker-end="url(#arr-q1w-ink)"/>
     <rect class="node-card" x="430" y="110" width="200" height="64" rx="9"/>
@@ -58,7 +58,7 @@
     <line x1="200" y1="214" x2="880" y2="214" style="stroke:#cbd5e1;stroke-width:1.4;stroke-dasharray:6 5"/>
 
     <!-- Verifiable lane: the model extracts, code decides -->
-    <text class="t-m-g" x="200" y="278">VERIFIABLE · THE MODEL EXTRACTS, CODE DECIDES</text>
+    <text class="t-m-g" x="200" y="278">VERIFIABLE · THE MODEL EXTRACTS, CODE CHECKS</text>
     <rect class="node-violet" x="200" y="290" width="200" height="64" rx="9"/>
     <text class="t-b t-c" x="300" y="317">Model extracts</text>
     <text class="t-s t-c" x="300" y="339">facts + verbatim quotes</text>
