@@ -927,15 +927,14 @@
     </div>
     <div class="sheet-b">
       <div class="post-prose">
-        <p>My goal with this question is to answer one of the most common questions in enterprise AI system-design interviews: how to make a language model trustworthy to a skeptical customer. We start inside the model—what reasoning traces exist, what granularity each reaches, and why open weights still require multi-step instrumentation—before stepping outside to the nine stakeholder concerns, seven transparent system layers, and six architectural alternatives.</p>
+        <p>My goal here is to answer one of the most common questions in enterprise AI system-design interviews: how to make a language model trustworthy to a skeptical customer. We start inside the model—what reasoning traces exist, what granularity each reaches, and why open weights still require multi-step instrumentation—before stepping outside to the nine stakeholder concerns, seven transparent system layers, and six architectural alternatives.</p>
         <div class="closes" style="margin:14px 0 16px;">
-          <span><b>The 30-second answer:</b> The model's weights and latent activations remain opaque: knowledge is spread across billions of weights, per-request activations are discarded after each token, and thought summaries, raw thinking tokens, or circuit tracing leave the causal reason behind a specific answer unverified. Trust therefore comes from the surrounding system, which makes inputs, sources, limits, evaluations, and history transparent across three pillars:<br>1. <strong>Verify</strong> every output: ground answers in cited sources, measure quality on a golden set, and let code make high-stakes decisions on verified facts.<br>2. <strong>Control</strong> and audit execution: enforce code guardrails, pin model versions, protect data governance boundaries, and log every step for replay.<br>3. <strong>Roll out</strong> safely: match human review to risk, and graduate from shadow mode to automation behind an instant kill switch.</span>
+          <span><b>The 30-second answer:</b> The model's weights and latent activations remain opaque: knowledge is spread across billions of weights, per-request activations are discarded after each token, and thought summaries, raw thinking tokens, and circuit tracing leave the causal reason behind a specific answer unverified. Trust therefore comes from the surrounding system, which makes inputs, sources, limits, evaluations, and history transparent across three pillars:<br>1. <strong>Verify</strong> every output: ground answers in cited sources, measure quality on a golden set, and let code make high-stakes decisions on verified facts.<br>2. <strong>Control</strong> and audit execution: enforce code guardrails, pin model versions, protect data governance boundaries, and log every step for replay.<br>3. <strong>Roll out</strong> safely: match human review to risk, and graduate from shadow mode to automation behind an instant kill switch.</span>
         </div>
         <p><strong>What we will walk through step by step:</strong></p>
         <ol>
           <li><a href="#sec-1"><strong>Inside the model:</strong></a> why weights and activations are opaque for both APIs and open weights, and the three levels of reasoning-trace granularity.</li>
-          <li><a href="#sec-2"><strong>What "black box" means:</strong></a> the nine distinct stakeholder concerns and six business risks that matter outside the weights.</li>
-          <li><a href="#sec-2"><strong>Seven system layers:</strong></a> the engineering controls (<code>A</code>–<code>G</code>) and Google Cloud services that address each concern.</li>
+          <li><a href="#sec-2"><strong>From "black box" to a checkable system:</strong></a> the nine distinct stakeholder concerns and six business risks that matter outside the weights, and the seven engineering controls (<code>A</code>–<code>G</code>) with the Google Cloud services that address each concern.</li>
           <li><a href="#sec-3"><strong>Keep the decision out of the model:</strong></a> a prior-authorization worked example comparing a trace-based denial against a verifiable hybrid design, followed by the six architectural splits (<em>Table 3</em>).</li>
           <li><a href="#sec-4"><strong>Summary and follow-up questions:</strong></a> spoken wrap-up and likely interview follow-ups.</li>
         </ol>
@@ -960,7 +959,7 @@
           <strong>Weights and activations.</strong> A model works with two kinds of numbers. <strong>Weights</strong> are the billions of values learned during training. They are fixed and identical for every request. The model's knowledge is spread across all of them at once, so there is no rule or line you can point to and read. <strong>Activations</strong> are the numbers the model computes from those weights and your input while it handles one request: its working state, which exists only during that request. In the formula <code>y = 2x + 3</code>, the <code>2</code> and the <code>3</code> play the role of weights; with <code>x = 5</code>, the intermediate <code>10</code> and the result <code>13</code> play the role of activations. This is the same for every LLM, whether it runs behind a proprietary API or on open weights. The difference is only who can see the numbers.
         </p>
         <p>
-          <strong>One token at a time.</strong> A model writes its answer one token, a word or part of a word, at a time. For each token it runs one forward pass: the input and everything written so far flow up through every layer, each layer computes new activations, and the last layer turns them into probabilities for the next token. One token is sampled, and the rest of that pass's activations are discarded. Each layer's keys and values are cached for speed, but they can be rebuilt from the tokens. The new token is appended to the input, and the next pass begins. <em>Figure 1</em> shows four steps of this loop on the prior-authorization case from Section 3.
+          <strong>One token at a time.</strong> A model writes its answer one token, a word or part of a word, at a time. For each token it runs one forward pass: the input and everything written so far flow up through every layer, each layer computes new activations, and the last layer turns them into probabilities for the next token. One token is sampled, and that pass's activations are discarded. Each layer's keys and values are cached for speed, but they can be rebuilt from the tokens. The new token is appended to the input, and the next pass begins. <em>Figure 1</em> shows four steps of this loop on the prior-authorization case from Section 3: after reading "ibuprofen", the model writes "needs", "6 wk", "PT" (physical therapy), "fail".
         </p>
 
 <div class="diagram-frame" id="fig-q1a">
@@ -1067,10 +1066,10 @@
     <!-- Bottom comparison note -->
     <rect class="node-card" x="36" y="476" width="848" height="72" rx="9"/>
     <text class="t-s" x="56" y="504"><tspan style="font-weight:700;fill:var(--ink)">Proprietary API:</tspan> usually the thought summary only; weights, activations, and raw tokens stay with the provider</text>
-    <text class="t-s" x="56" y="530"><tspan style="font-weight:700;fill:var(--ink)">Open weights:</tspan> raw tokens, plus activations recorded with forward-pass hooks and decoded with SAEs</text>
+    <text class="t-s" x="56" y="530"><tspan style="font-weight:700;fill:var(--ink)">Open weights:</tspan> raw tokens, plus activations recorded with forward-pass hooks and decoded with sparse autoencoders</text>
   </svg>
   <div class="fig-caption">
-    <span>Figure 1 — One forward pass per token: activations are computed through every layer and discarded once the next token is sampled, and only the generated token is fed back as the next input. To save time, the model keeps some numbers from earlier tokens instead of recalculating them (the KV cache). Rerunning the same text would produce exactly the same numbers, so the cache is a shortcut, not hidden memory: the text so far (the prompt plus everything the model has generated) is the only information carried from one step to the next. A separate pass condenses the raw trace into a thought summary.</span>
+    <span>Figure 1 — One forward pass per token: activations are computed through every layer and discarded once the next token is sampled, and only the generated token is fed back as the next input. To save time, the model keeps some numbers from earlier tokens instead of recalculating them (the KV cache). Rerunning the same text would produce exactly the same numbers, so the cache is purely a shortcut: the text so far (the prompt plus everything the model has generated) is the only information carried from one step to the next. A separate pass condenses the raw trace into a thought summary.</span>
     <div class="legend-items">
       <span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> Latent activations (computed, then discarded)</span>
       <span><i class="swatch-dot" style="background:var(--cyan-soft);border-color:var(--cyan)"></i> Generated tokens (fed back as input)</span>
@@ -1080,14 +1079,14 @@
 </div>
 
         <p>
-          <strong>What this means.</strong> Everything the model weighs while choosing a token lives in activations that are never written down. The only thing carried from one step to the next is the text so far: the prompt plus every token the model has generated. That generated text is the model's notepad, not a recording of its thinking.
+          <strong>What this means.</strong> Everything the model weighs while choosing a token lives in activations that are never written down. The only thing carried from one step to the next is the text so far: the prompt plus every token the model has generated. That generated text is the model's notepad; the thinking behind each token stays in the discarded activations.
         </p>
         <p>
           <strong>Three things you can look at</strong> (the three levels in <em>Figure 1</em>):
         </p>
         <ul>
-          <li><strong>Level 1 · Thought summaries.</strong> <em>What you see:</em> a short prose summary of the model's reasoning. <em>Who can see it:</em> anyone using a reasoning API such as Gemini (<a href="https://ai.google.dev/gemini-api/docs/thinking" target="_blank" rel="noopener">Google, 2026</a>); this is usually all a proprietary API returns. <em>What it proves:</em> little about why the model answered as it did. A summary sits two steps removed from the computation: it condenses tokens that were themselves sampled from activations.</li>
-          <li><strong>Level 2 · Raw thinking tokens.</strong> <em>What you see:</em> the actual tokens the model wrote to itself before answering. <em>Who can see it:</em> users of open-weight reasoning models such as DeepSeek-R1 (<a href="https://api-docs.deepseek.com/guides/thinking_mode/" target="_blank" rel="noopener">DeepSeek Thinking Mode</a>, which exposes the full reasoning trace in <code>reasoning_content</code> or <code>&lt;think&gt;</code> tags); proprietary APIs usually keep them with the provider. <em>What it proves:</em> what the model wrote, not what caused its answer. On hard multi-step problems, the model has to write intermediate results down to use them in later steps, which makes the trace useful working memory to monitor (<a href="https://arxiv.org/abs/2507.11473" target="_blank" rel="noopener">Korbak et al., Jul 2025</a>). But it can leave out the real reason, as the hint test below shows.</li>
+          <li><strong>Level 1 · Thought summaries.</strong> <em>What you see:</em> a short prose summary of the model's reasoning. <em>Who can see it:</em> anyone using a reasoning API such as the Gemini API (<a href="https://ai.google.dev/gemini-api/docs/thinking" target="_blank" rel="noopener">Gemini API thinking docs, 2026</a>); this is usually all a proprietary API returns. <em>What it proves:</em> little about why the model answered as it did. A summary sits two steps removed from the computation: it condenses tokens that were themselves sampled from activations.</li>
+          <li><strong>Level 2 · Raw thinking tokens.</strong> <em>What you see:</em> the actual tokens the model wrote to itself before answering. <em>Who can see it:</em> users of open-weight reasoning models such as DeepSeek-R1 (<a href="https://api-docs.deepseek.com/guides/thinking_mode/" target="_blank" rel="noopener">DeepSeek Thinking Mode</a>, which exposes the full reasoning trace in <code>reasoning_content</code> or <code>&lt;think&gt;</code> tags); proprietary APIs usually keep them with the provider. <em>What it proves:</em> what the model wrote; the cause of its answer stays out of view. On hard multi-step problems, the model has to write intermediate results down to use them in later steps, which makes the trace useful working memory to monitor (<a href="https://arxiv.org/abs/2507.11473" target="_blank" rel="noopener">Korbak et al., Jul 2025</a>). But it can leave out the real reason, as the hint test below shows.</li>
           <li><strong>Level 3 · Activations (circuit tracing).</strong> <em>What you see:</em> which internal features fired and how they pushed the model toward its next token. <em>Who can see it:</em> only teams running open weights on infrastructure they control, with specialist tooling. <em>What it proves:</em> part of the real internal path for one prompt. Attribution graphs (<a href="https://transformer-circuits.pub/2025/attribution-graphs/biology.html" target="_blank" rel="noopener">Lindsey et al., Mar 2025</a>)—brought to open-weight models by the <a href="https://www.anthropic.com/research/open-source-circuit-tracing" target="_blank" rel="noopener">circuit-tracing library</a>—and sparse autoencoders (<a href="https://deepmind.google/blog/gemma-scope-2-helping-the-ai-safety-community-deepen-understanding-of-complex-language-model-behavior/" target="_blank" rel="noopener">Gemma Scope 2</a>) capture only a fraction of the computation, at research cost.</li>
         </ul>
 
@@ -1100,11 +1099,11 @@
         </p>
         <ol>
           <li><strong>Record the activations.</strong> Host the model on infrastructure you control and attach hooks that save each layer's activations as the prompt runs.</li>
-          <li><strong>Split them into readable features.</strong> A single activation value usually mixes many unrelated concepts, so a second, specially trained model, a <strong>sparse autoencoder</strong> or transcoder, splits the activations into features a person can try to label. Each must be trained for that exact model.</li>
+          <li><strong>Split them into readable features.</strong> A single activation value usually mixes many unrelated concepts, so a second, specially trained model, a <strong>sparse autoencoder</strong> or transcoder, splits the activations into features a person can try to label. Each one has to be trained for that exact model.</li>
           <li><strong>Trace how features influence each other.</strong> Link the active features across layers into an <strong>attribution graph</strong> showing which ones pushed the final token up or down. This is an expensive, research-grade investigation that still captures only part of the computation.</li>
         </ol>
         <p>
-          <strong>The way out: separate reading from deciding.</strong> Have the model extract structured facts (with exact source quotes) into a checklist, and let deterministic code apply the rules to those facts (<a href="https://arxiv.org/abs/2301.13379" target="_blank" rel="noopener">Lyu et al., Jan 2023</a>). Because code executes the rules directly on the recorded facts, the audit trail shows what truly produced the answer. This is <a href="#table-3-option-3">Option 3 (Hybrid) in <em>Table 3</em></a>; <a href="#fig-q1-worked"><em>Figure 4</em></a> walks through it on a real prior-authorization request.
+          <strong>The way out: separate reading from deciding.</strong> Have the model extract structured facts (with exact source quotes) into a checklist, and let deterministic code apply the rules to those facts (<a href="https://arxiv.org/abs/2301.13379" target="_blank" rel="noopener">Lyu et al., Jan 2023</a>). Because code executes the rules directly on the recorded facts, the audit trail shows what truly produced the answer. This is <a href="#table-3-option-3">Option 3 (Hybrid) in <em>Table 3</em></a>; <a href="#fig-q1-worked"><em>Figure 4</em></a> walks through it on a worked prior-authorization request.
         </p>
 
         <h2 id="sec-2">2. From "Black Box" to a Checkable System</h2>
@@ -1313,10 +1312,9 @@
 <p class="lc-eyebrow">Check on every request · Answers 3 Training-Data Provenance, 5 Data Governance</p>
 <h3>A · Data perimeter</h3>
 <p class="lc-summary">Keep customer data inside enforceable boundaries, and screen every request at the edge.</p>
-<div class="t-fix-row"><b>Customer gets:</b> zero-training terms, residency region, key ownership, and input-screening results; model card, data statements, and certifications</div><div class="t-fix-row gcp"><b>On Google Cloud:</b> VPC Service Controls, CMEK (Cloud KMS), Assured Workloads and regional endpoints; Model Armor; published model cards</div>
+<div class="t-fix-row"><b>Customer gets:</b> zero-training terms, residency region, key ownership, and input-screening results; model card, data statements, and certifications</div><div class="t-fix-row gcp"><b>On Google Cloud:</b> VPC Service Controls, customer-managed encryption keys (CMEK, in Cloud KMS), Assured Workloads and regional endpoints; Model Armor; published model cards</div>
 <p class="lc-details"><strong>Boundaries.</strong> Contractual zero-training on customer data, regional residency, VPC perimeters, customer-managed encryption keys (CMEK), and explicit retention bounds.</p>
-<p class="lc-details"><strong>Input screening.</strong> Screen every request at the boundary for PII, toxicity, off-topic asks, and prompt injection (Episode 01 covers data boundaries and prompt-injection defenses for agents that reach databases).</p>
-<p class="lc-details"><strong>Model documentation.</strong> Document what the customer is running: model cards (intended scope, limitations, benchmark results) and compliance certifications (SOC 2, ISO 27001 / 42001, HIPAA BAA). For training-data questions, provide data statements (source categories, knowledge cut-off, filtering), published bias and safety evaluations, licensing terms, and IP indemnification. When the customer needs line-level disclosure of training data, fully open models with published training corpora (such as <a href="https://allenai.org/olmo" rel="noopener" target="_blank">AI2 OLMo</a>) are the option.</p>
+<p class="lc-details"><strong>Input screening.</strong> Screen every request at the boundary for PII, toxicity, off-topic asks, and prompt injection (<a href="https://evekhm.github.io/all-about-agents/ep01_securing_agent_to_database.html" target="_blank" rel="noopener">Episode 01</a> covers data boundaries and prompt-injection defenses for agents that reach databases).</p>
 </div>
 <div class="layer-card" id="layer-b">
 <p class="lc-eyebrow">Check on every request · Answers 1 Explainability, 6 Reliability</p>
@@ -1331,15 +1329,15 @@
 <p class="lc-summary">Code verifies every claim and applies the business rules, so the model never has the last word.</p>
 <div class="t-fix-row"><b>Customer gets:</b> quote-verification results, rule checks, and schema validation</div><div class="t-fix-row gcp"><b>On Google Cloud:</b> Model Armor output screening; your own service (for example, on Cloud Run) with structured output schemas</div>
 <p class="lc-details"><strong>Verify in code.</strong> Server code checks that cited passages genuinely support each claim, screens outputs for PII and off-policy content, and enforces permissions, dollar caps, and business rules (<a href="https://www.anthropic.com/research/building-effective-agents" rel="noopener" target="_blank">Anthropic, Dec 2024</a>).</p>
-<p class="lc-details"><strong>Repeatability.</strong> Constrain outputs where repeatability matters (structured output schemas, enumerated values, and a pinned thinking level) while keeping sampling parameters at the defaults current reasoning models are tuned for (<a href="https://ai.google.dev/gemini-api/docs/gemini-3" rel="noopener" target="_blank">Google, 2026</a>). No decoding setting makes a hosted model repeatable: even greedy decoding on shared inference servers varies with the batch a request lands in (in one study, 1,000 identical requests to an open-weight model produced 80 distinct outputs; <a href="https://thinkingmachines.ai/blog/defeating-nondeterminism-in-llm-inference/" rel="noopener" target="_blank">He et al., Sep 2025</a>). Promise measured consistency (<code>pass^k</code>), and put calculations, thresholds, and final decisions in code.</p>
+<p class="lc-details"><strong>Repeatability.</strong> Constrain outputs where repeatability matters (structured output schemas, enumerated values, and a pinned thinking level) while keeping sampling parameters at the defaults current reasoning models are tuned for (<a href="https://ai.google.dev/gemini-api/docs/gemini-3" rel="noopener" target="_blank">Gemini 3 guide, 2026</a>). No decoding setting makes a hosted model repeatable: even greedy decoding on shared inference servers varies with the batch a request lands in (in one study, 1,000 identical requests to an open-weight model produced 80 distinct outputs; <a href="https://thinkingmachines.ai/blog/defeating-nondeterminism-in-llm-inference/" rel="noopener" target="_blank">He et al., Sep 2025</a>). Promise measured consistency (<code>pass^k</code>), and put calculations, thresholds, and final decisions in code.</p>
 </div>
 <div class="layer-card" id="layer-d">
 <p class="lc-eyebrow">Check on every request · Answers 6 Reliability, 7 Accountability</p>
 <h3>D · Route by risk</h3>
 <p class="lc-summary">Low-risk cases run automatically; uncertain or high-impact ones go to a named reviewer.</p>
 <div class="t-fix-row"><b>Customer gets:</b> named reviewer sign-off; the routing threshold and its measured precision</div><div class="t-fix-row gcp"><b>On Google Cloud:</b> the customer's review queue, with sign-offs logged to Cloud Logging</div>
-<p class="lc-details"><strong>Route by error cost.</strong> Automate low-risk tasks, and route uncertain or high-impact cases, with dry-run previews, to named human reviewers with clear sign-off ownership (RACI).</p>
-<p class="lc-details"><strong>Calibrate the signal.</strong> A model's self-reported confidence ("I am 95% sure") tends to be overconfident (<a href="https://arxiv.org/abs/2306.13063" rel="noopener" target="_blank">Xiong et al., ICLR 2024</a>), so route on evidence the system can check: whether every cited quote was found in the source, whether every rule criterion resolved, agreement across <code>k</code> independent samples (<a href="https://arxiv.org/abs/2203.11171" rel="noopener" target="_blank">Wang et al., ICLR 2023</a>), and token log-probabilities where the API exposes them. Tune the routing threshold on the golden set to hit a target precision for auto-approved cases (for example, at least 99% agreement with SME labels), and send everything below it to review.</p>
+<p class="lc-details"><strong>Route by error cost.</strong> Automate low-risk tasks, and route uncertain or high-impact cases, with dry-run previews, to named human reviewers with clear sign-off ownership (RACI: responsible, accountable, consulted, informed).</p>
+<p class="lc-details"><strong>Calibrate the signal.</strong> A model's self-reported confidence ("I am 95% sure") tends to be overconfident (<a href="https://arxiv.org/abs/2306.13063" rel="noopener" target="_blank">Xiong et al., ICLR 2024</a>), so route on evidence the system can check: whether every cited quote was found in the source, whether every rule criterion resolved, agreement across <code>k</code> independent samples (<a href="https://arxiv.org/abs/2203.11171" rel="noopener" target="_blank">Wang et al., ICLR 2023</a>), and token log-probabilities where the API exposes them. Tune the routing threshold on the golden set to hit a target precision for auto-approved cases (for example, at least 99% agreement with labels from subject-matter experts (SMEs)), and send everything below it to review.</p>
 <p class="lc-details"><strong>Prevent rubber-stamping.</strong> Show reviewers the evidence before the model's recommendation, track each reviewer's override rate, and occasionally insert known-bad cases to confirm reviews are real.</p>
 </div>
 <div class="layer-card" id="layer-e">
@@ -1354,8 +1352,8 @@
 <p class="lc-eyebrow">Control on every change · Answers 2 Predictability, 8 Version Stability, 9 Quality</p>
 <h3>F · Evaluate and pin</h3>
 <p class="lc-summary">A golden set built with domain experts gates every change, and the model version moves only when it passes.</p>
-<div class="t-fix-row"><b>Customer gets:</b> golden-set results, <code>pass^k</code> consistency (a case passes only if all <code>k</code> runs succeed; <a href="https://arxiv.org/abs/2406.12045" rel="noopener" target="_blank">Yao et al., ICLR 2025</a>), and failure slices; a pinned model ID and regression report before each cutover</div><div class="t-fix-row gcp"><b>On Google Cloud:</b> Agent Platform evaluation service; pinned model version IDs; evaluation pipeline in CI</div>
-<p class="lc-details"><strong>Golden set.</strong> Co-create a <strong>golden set</strong> of 100 to 300 real historical cases alongside the customer's domain specialists; track accuracy, groundedness, hallucination rate, refusal rate, latency, and cost; rerun the set like a regression suite on every prompt, retrieval, or model change; and share the failure breakdown openly (<em>"94% pass rate on your golden set; the remaining 6% fall into these boundary categories, which route to review"</em>). Slice results by the segments that matter for fairness and coverage (region, product line, and protected attributes where legally permitted) so a high overall pass rate cannot hide a failing group. After launch, sample a fixed share of production cases each week for SME review so the golden set keeps pace with real traffic.</p>
+<div class="t-fix-row"><b>Customer gets:</b> golden-set results, <code>pass^k</code> consistency (a case passes only if all <code>k</code> runs succeed; <a href="https://arxiv.org/abs/2406.12045" rel="noopener" target="_blank">Yao et al., ICLR 2025</a>), and failure slices; a pinned model ID and regression report before each cutover</div><div class="t-fix-row gcp"><b>On Google Cloud:</b> Gemini Enterprise Agent Platform (Agent Platform) evaluation service; pinned model version IDs; evaluation pipeline in CI</div>
+<p class="lc-details"><strong>Golden set.</strong> Co-create a <strong>golden set</strong> of real historical cases alongside the customer's domain specialists, sized to the workflow's risk and edge-case coverage; track accuracy, groundedness, hallucination rate, refusal rate, latency, and cost; rerun the set like a regression suite on every prompt, retrieval, or model change; and share the failure breakdown openly. Where an LLM judge scores a metric, first measure the judge's agreement with SME labels on a held-out slice.</p>
 <p class="lc-details"><strong>Pin versions.</strong> Upgrade only when the customer's golden set passes. Pinning is temporary: providers retire API model versions on a published schedule, so maintain a migration calendar and run each successor through the customer's golden set before cutover. Self-hosted open weights (Option 4) remove forced retirement altogether.</p>
 <p class="lc-details"><strong>Training caution.</strong> If you fine-tune or run reinforcement learning, keep the reasoning trace out of the reward signal so it stays useful for monitoring (<a href="https://arxiv.org/abs/2503.11926" rel="noopener" target="_blank">Baker et al., Mar 2025</a>).</p>
 </div>
@@ -1536,7 +1534,7 @@
     <!-- D: Route by risk -->
     <rect class="node-cyan" x="200" y="386" width="420" height="44" rx="9"/>
     <use href="#icon-gcp-log" x="216" y="396" width="24" height="24"/>
-    <text class="t-b" x="250" y="405">D · Your review queue</text>
+    <text class="t-b" x="250" y="405">D · Customer review queue</text>
     <text class="t-s" x="250" y="422">sign-offs logged to Cloud Logging</text>
 
     <!-- E: Log every step -->
@@ -1577,21 +1575,20 @@
 
         <h3>How Much of This a Customer Needs</h3>
         <p>
-          Figure 3 shows the complete system. No customer starts with all of it at full strength: every layer adds cost, and proposing all seven on day one ignores which concerns this customer actually raised. Two things decide which layers come first and how strict each one must be: the regulations that apply, and what an error costs.
+          <em>Figure 3</em> shows the full set of controls. Every layer adds engineering cost, latency, and ongoing ownership: citation verification adds a retrieval and check to every answer, <code>k</code>-sample agreement multiplies inference cost by <code>k</code>, and human review adds minutes of specialist time per routed case. Matching autonomy to error cost (Layer D) keeps that overhead bounded, allowing low-risk, high-volume cases to run automatically with sampled audits while concentrating heavier controls on decisions where a mistake is costly.
         </p>
-
-        <h4>Check which regulations apply</h4>
         <p>
-          Regulation makes some layers mandatory. <em>Table 2</em> maps each framework to the layers that produce what it asks for.
+          Some layers are mandatory regardless of cost because industry regulations require specific evidence, oversight, or auditability. Knowing which rules apply in the customer's sector establishes the baseline architecture early. <em>Table 2</em> highlights a representative sample of existing regulations, summarizing what each framework covers, what it asks for, and which layers from <em>Figure 3</em> produce that evidence.
         </p>
 
         <div class="nine-q-wrap">
-          <div class="nine-q-head">Table 2 · What Regulators Ask For, and Which Layer Produces It</div>
+          <div class="nine-q-head">Table 2 · Example Regulations: What Regulators Ask For, and Which Layer Produces It</div>
           <div class="tbl-wrap">
             <table>
               <thead>
                 <tr>
                   <th>Framework</th>
+                  <th>What It Covers</th>
                   <th>What It Requires</th>
                   <th>Layer</th>
                 </tr>
@@ -1599,32 +1596,38 @@
               <tbody>
                 <tr>
                   <td><b><a href="https://eur-lex.europa.eu/eli/reg/2024/1689/oj" target="_blank" rel="noopener">EU AI Act</a> (high-risk systems)</b></td>
-                  <td>Automatic event logging (Art. 12), transparency to deployers (Art. 13), human oversight (Art. 14), technical documentation (Art. 11, Annex IV), and a right to an explanation of individual decisions (Art. 86). Under the Digital Omnibus, obligations for Annex III systems apply from December 2, 2027, and for Annex I products from August 2, 2028</td>
+                  <td>European Union regulation governing AI systems placed on the EU market, applying safety, transparency, and oversight obligations to high-risk domains such as healthcare, credit, and employment.</td>
+                  <td>Automatic event logging (<a href="https://artificialintelligenceact.eu/article/12/" target="_blank" rel="noopener">Art. 12</a>), transparency to deployers (<a href="https://artificialintelligenceact.eu/article/13/" target="_blank" rel="noopener">Art. 13</a>), human oversight (<a href="https://artificialintelligenceact.eu/article/14/" target="_blank" rel="noopener">Art. 14</a>), technical documentation (<a href="https://artificialintelligenceact.eu/article/11/" target="_blank" rel="noopener">Art. 11</a>, <a href="https://artificialintelligenceact.eu/annex/4/" target="_blank" rel="noopener">Annex IV</a>), and a right to an explanation of individual decisions (<a href="https://artificialintelligenceact.eu/article/86/" target="_blank" rel="noopener">Art. 86</a>). Under the Digital Omnibus, obligations for <a href="https://artificialintelligenceact.eu/annex/3/" target="_blank" rel="noopener">Annex III</a> systems apply from December 2, 2027, and for <a href="https://artificialintelligenceact.eu/annex/1/" target="_blank" rel="noopener">Annex I</a> products from August 2, 2028.</td>
                   <td style="white-space:nowrap"><span class="layer-pill lp-req">A</span> <span class="layer-pill lp-req">B</span> <span class="layer-pill lp-req">D</span> <span class="layer-pill lp-req">E</span></td>
                 </tr>
                 <tr>
                   <td><b><a href="https://eur-lex.europa.eu/eli/reg/2016/679/oj" target="_blank" rel="noopener">GDPR</a></b></td>
-                  <td>Safeguards for solely automated decisions with legal or similarly significant effects (Art. 22), and meaningful information about the logic involved (Arts. 13–15)</td>
+                  <td>General Data Protection Regulation — EU law protecting personal data and privacy, including individual rights around automated profiling and decision-making.</td>
+                  <td>Safeguards for solely automated decisions with legal or similarly significant effects (<a href="https://gdpr-info.eu/art-22-gdpr/" target="_blank" rel="noopener">Art. 22</a>), and meaningful information about the logic involved (<a href="https://gdpr-info.eu/art-13-gdpr/" target="_blank" rel="noopener">Art. 13</a>, <a href="https://gdpr-info.eu/art-14-gdpr/" target="_blank" rel="noopener">Art. 14</a>, <a href="https://gdpr-info.eu/art-15-gdpr/" target="_blank" rel="noopener">Art. 15</a>).</td>
                   <td style="white-space:nowrap"><span class="layer-pill lp-req">B</span> <span class="layer-pill lp-req">D</span> <span class="layer-pill lp-chg">Option 3 (Section 3)</span></td>
                 </tr>
                 <tr>
                   <td><b><a href="https://www.federalreserve.gov/supervisionreg/srletters/sr2602.htm" target="_blank" rel="noopener">SR 11-7 / SR 26-2</a> (U.S. banking model risk)</b></td>
+                  <td>U.S. Federal Reserve, OCC, and FDIC supervisory guidance for banks on governing financial, credit, and operational models (SR 26-2 superseded SR 11-7 in April 2026).</td>
                   <td>Independent validation with effective challenge, ongoing monitoring, and outcomes analysis, scaled to a model's materiality. Generative and agentic AI fall outside its formal scope, so for LLM systems it serves as the benchmark banks' model-risk teams apply.</td>
                   <td style="white-space:nowrap"><span class="layer-pill lp-req">E</span> <span class="layer-pill lp-chg">F</span></td>
                 </tr>
                 <tr>
-                  <td><b>HIPAA</b></td>
-                  <td>Business associate agreements, minimum-necessary access, and audit controls for systems that touch PHI</td>
+                  <td><b><a href="https://www.hhs.gov/hipaa/for-professionals/index.html" target="_blank" rel="noopener">HIPAA</a></b></td>
+                  <td>Health Insurance Portability and Accountability Act — U.S. federal law setting privacy and security standards to safeguard patient medical records and protected health information (PHI).</td>
+                  <td>Business associate agreements, minimum-necessary access, and audit controls for systems that touch protected health information (PHI).</td>
                   <td style="white-space:nowrap"><span class="layer-pill lp-req">A</span> <span class="layer-pill lp-req">E</span></td>
                 </tr>
                 <tr>
                   <td><b><a href="https://www.cms.gov/newsroom/fact-sheets/cms-interoperability-and-prior-authorization-final-rule-cms-0057-f" target="_blank" rel="noopener">CMS Prior Authorization Rule</a> (CMS-0057-F)</b></td>
-                  <td>A specific reason for every denied prior-authorization request</td>
+                  <td>U.S. Centers for Medicare &amp; Medicaid Services rule streamlining electronic prior authorization and requiring health plans to explain coverage decisions clearly and on defined timelines.</td>
+                  <td>A specific reason for every denied prior-authorization request.</td>
                   <td style="white-space:nowrap"><span class="layer-pill lp-req">B</span> <span class="layer-pill lp-req">C</span> <span class="layer-pill lp-chg">Option 3 (Section 3)</span></td>
                 </tr>
                 <tr>
                   <td><b><a href="https://sd13.senate.ca.gov/news/press-release/december-9-2024/landmark-law-prohibits-health-insurance-companies-using-ai-to" target="_blank" rel="noopener">California SB 1120</a></b></td>
-                  <td>Only a licensed physician or qualified health professional may deny, delay, or modify care based on medical necessity; AI tools may support the review but not make that call (in effect since January 2025)</td>
+                  <td>California's Physicians Make Decisions Act (effective January 2025), governing how health insurers use AI and algorithms in clinical utilization review.</td>
+                  <td>Only a licensed physician or qualified health professional may deny, delay, or modify care based on medical necessity; AI tools may support the review while leaving that clinical determination to a qualified clinician.</td>
                   <td style="white-space:nowrap"><span class="layer-pill lp-req">D</span></td>
                 </tr>
               </tbody>
@@ -1635,15 +1638,10 @@
           <em>Note:</em> Dates and article numbers change; confirm the current text with the customer's counsel before committing to a compliance claim.
         </p>
 
-        <h4>Weigh the cost of each check</h4>
-        <p>
-          Each layer has a price: citation verification adds a retrieval and a check to every answer, <code>k</code>-sample agreement multiplies inference cost by <code>k</code>, and human review adds minutes of expert time per routed case. Matching autonomy to error cost (Layer D) is what keeps that price bounded: low-risk, high-volume cases run fully automated with sampled audits, while the expensive controls concentrate on the small share of decisions where a mistake is costly.
-        </p>
-
         <h2 id="sec-3">3. Keep the Decision Out of the Model</h2>
 
         <p>
-          Section 2's layers check the model's work. The stronger move is to give the model less to decide. When a model pulls a fact and its quote from a document, code can confirm the quote is in the source. When a model makes the decision itself, its reasons stay in activations no one can read (Section 1). So split each decision step: the model does the language work, and rules a person can read make the decision. One real case shows why it matters.
+          Section 2's layers check the model's work. The stronger move is to give the model less to decide. When a model pulls a fact and its quote from a document, code can confirm the quote is in the source. When a model makes the decision itself, its reasons stay in activations no one can read (Section 1). So split each decision step: the model does the language work, and rules a person can read make the decision. One worked case shows why it matters.
         </p>
 
         <p>
@@ -1669,7 +1667,7 @@
 }</pre>
         </div>
         <p>
-          Code confirms each quote exists in the chart, then applies the policy: (a) is not met (three weeks, not six), and (b) has no evidence either way. Code approves automatically only when a criterion is met with a verified quote, and it never denies. Here it requests the neurological exam notes and, if they do not settle (b), routes the case to a clinician with the evidence laid out criterion by criterion (<em>Figure 4</em>).
+          Code confirms each quote exists in the chart, then applies the policy: (a) is not met (three weeks against a six-week minimum), and (b) has no evidence either way. Code approves automatically only when a criterion is met with a verified quote, and it never denies. Here it requests the neurological exam notes and, if they do not settle (b), routes the case to a clinician with the evidence laid out criterion by criterion (<em>Figure 4</em>).
         </p>
 
 <div class="diagram-frame" id="fig-q1-worked">
@@ -1704,7 +1702,7 @@
     <line class="flow" x1="400" y1="146" x2="426" y2="146" marker-end="url(#arr-q1w-ink)"/>
     <rect class="node-card" x="430" y="110" width="200" height="72" rx="9"/>
     <text class="t-b t-c" x="530" y="133">Clinician signs</text>
-    <text class="t-s t-c" x="530" y="153">reads only</text>
+    <text class="t-s t-c" x="530" y="153">sees one line:</text>
     <text class="t-s t-c" x="530" y="170">"only 3 wks ibuprofen"</text>
     <line class="flow" x1="630" y1="146" x2="656" y2="146" marker-end="url(#arr-q1w-ink)"/>
     <rect class="node-bad" x="660" y="110" width="220" height="72" rx="9"/>
@@ -1733,7 +1731,7 @@
     <text class="t-b" x="578" y="406">Rule: (a) OR (b) approves</text>
     <text class="t-s" x="578" y="428">(a) ≥ 6 wks conservative care → not met</text>
     <text class="t-s" x="578" y="448">(b) neuro deficit → missing evidence</text>
-    <text class="t-s" x="578" y="468">an open criterion can still approve</text>
+    <text class="t-s" x="578" y="468">(b) is still open, so code cannot deny</text>
     <line class="flow-g" x1="560" y1="430" x2="524" y2="430" marker-end="url(#arr-q1w-good)"/>
 
     <rect class="node-good" x="200" y="380" width="320" height="100" rx="9"/>
@@ -1753,7 +1751,7 @@
 </div>
 
         <p>
-          <strong>What the member and the auditor get.</strong> If the clinician denies, the notice is drafted from an approved template and signed by that clinician, with every clause traced to a quote: <em>"Denied under [policy ID, version]. The policy covers a lumbar MRI after at least six weeks of conservative treatment or when a new or worsening neurological deficit is documented. Your records show three weeks of over-the-counter ibuprofen and no neurological deficit in the exam notes provided."</em> The auditor gets the same facts with their quotes and character offsets, the policy version, the pinned model version, a trace ID that replays the run (Layer E), and the clinician's sign-off (Layer D). The model's thinking is stored beside them as supporting evidence, not as the reason.
+          <strong>What the member and the auditor get.</strong> If the clinician denies, the notice is drafted from an approved template and signed by that clinician, with every clause traced to a quote: <em>"Denied under [policy ID, version]. The policy covers a lumbar MRI after at least six weeks of conservative treatment or when a new or worsening neurological deficit is documented. Your records show three weeks of over-the-counter ibuprofen and no neurological deficit in the exam notes provided."</em> The auditor gets the same facts, each with its quote and character offsets, the policy version, the pinned model version, a trace ID that replays the run (Layer E), and the clinician's sign-off (Layer D). The model's thinking is stored beside them as supporting evidence.
         </p>
 
         <p>
@@ -1806,7 +1804,7 @@
                   <td><b>5. Constrained generation</b></td>
                   <td>The LLM chooses from fixed categories or fills approved templates instead of writing freely</td>
                   <td>The complete list of outputs it is allowed to produce</td>
-                  <td>Controls what it outputs, not how it chose</td>
+                  <td>Controls the output only; how it chose stays opaque</td>
                   <td>Routing, classification, templated letters</td>
                 </tr>
                 <tr>
@@ -1826,20 +1824,20 @@
           Every LLM—whether proprietary or open-weight—stores knowledge across billions of weights and computes per-request activations that are discarded after each token. Thought summaries, raw thinking tokens, and research-grade circuit tracing provide partial visibility, while leaving the causal reason behind a specific answer unverified. Enterprise trust therefore comes from the engineered system surrounding the model.
         </p>
         <p>
-          Building that trust starts by identifying which of the nine "black box" concerns (<em>Table 1</em>) and underlying risks drives the requirement, then wrapping the model in seven verifiable layers ordered along the request path (<code>A</code>–<code>G</code>): a governed data perimeter and provenance record (<code>A</code>), source-grounded citations (<code>B</code>), deterministic output verification and rules in code (<code>C</code>), risk-based routing to accountable reviewers (<code>D</code>), replayable audit logs (<code>E</code>), co-owned golden-set evaluation and version pinning (<code>F</code>), and graduated rollout from shadow mode behind a kill switch (<code>G</code>). Applicable regulations and error cost decide which layers come first.
+          Building that trust starts by identifying which of the nine "black box" concerns (<em>Table 1</em>) and underlying risks drives the requirement, then wrapping the model in seven verifiable layers (<code>A</code>–<code>G</code>), five checks on every request and two controls on every change: a governed data perimeter and provenance record (<code>A</code>), source-grounded citations (<code>B</code>), deterministic output verification and rules in code (<code>C</code>), risk-based routing to accountable reviewers (<code>D</code>), replayable audit logs (<code>E</code>), co-owned golden-set evaluation and version pinning (<code>F</code>), and graduated rollout from shadow mode behind a kill switch (<code>G</code>). Applicable regulations and error cost decide which layers come first.
         </p>
         <p>
-          Alongside those layers, architecture limits how much of each decision the model makes at all. Choosing per step among the six options (<em>Table 3</em>)—especially the hybrid pattern where the model extracts quoted facts and deterministic code executes the policy rule—ensures that high-stakes outcomes are both explainable and defensible. On Google Cloud's <strong>Gemini Enterprise Agent Platform</strong> (<strong>Agent Platform</strong>), those layers map directly to VPC Service Controls, CMEK, and Model Armor for perimeter and screening, RAG Engine grounding over customer data stores, Cloud Run for deterministic rule checks, Cloud Logging and Cloud Trace for replay, and the Agent Platform evaluation service with explicit model version pinning.
+          Alongside those layers, architecture limits how much of each decision the model makes at all. Choosing per step among the six options (<em>Table 3</em>)—especially the hybrid pattern where the model extracts quoted facts and deterministic code executes the policy rule—ensures that high-stakes outcomes are both explainable and defensible. On Google Cloud's <strong>Agent Platform</strong>, those layers map directly to VPC Service Controls, CMEK, and Model Armor for perimeter and screening, RAG Engine grounding over customer data stores, Cloud Run for deterministic rule checks, Cloud Logging and Cloud Trace for replay, and the Agent Platform evaluation service with explicit model version pinning.
         </p>
 
         <h2 id="sec-followups">Likely Follow-Up Questions</h2>
         <ul>
-          <li><strong>"Can't we just make the model deterministic?"</strong> Through structure and code, yes; through a decoding setting, no. Current reasoning models such as Gemini 3 are tuned to run at the default sampling temperature, and Google advises against lowering it; even greedy decoding on shared servers varies with batching. We get predictability from schemas and enumerated outputs, pinned versions and thinking levels, measured <code>pass^k</code> on the customer's golden set, and code for every step that must give the same answer every time.</li>
-          <li><strong>"Why not show the model's chain of thought to the auditor?"</strong> Reasoning traces often omit what actually drove the answer; in hint-based tests, reasoning models often disclosed the hint in fewer than 20% of cases. We log traces for debugging and give auditors verified quotes, rules, and replayable traces.</li>
-          <li><strong>"Doesn't an open-weight model solve the black-box problem?"</strong> It solves access, while leaving per-decision understanding unsolved. Open weights let the customer pin, inspect, and self-host the exact checkpoint, and explaining an individual decision from those weights remains research-grade; explanations come from the system layers.</li>
+          <li><strong>"Can't we just make the model deterministic?"</strong> Yes, through structure and code; decoding settings alone leave run-to-run variation. Current reasoning models such as Gemini 3 are tuned to run at the default sampling temperature, and Google advises against lowering it; even greedy decoding on shared servers varies with batching. We get predictability from schemas and enumerated outputs, pinned versions and thinking levels, measured <code>pass^k</code> on the customer's golden set, and code for every step that must give the same answer every time.</li>
+          <li><strong>"Why not show the model's chain of thought to the auditor?"</strong> Reasoning traces can omit what drove the answer; in hint-based tests, reasoning models often disclosed the hint in fewer than 20% of cases. We log reasoning traces for debugging and give auditors verified quotes, the rules that ran, and a replayable run log.</li>
+          <li><strong>"Doesn't an open-weight model solve the black-box problem?"</strong> It solves access, while leaving per-decision understanding unsolved. Open weights let the customer pin, inspect, and self-host the exact checkpoint, but explaining an individual decision from those weights remains research-grade; explanations come from the system layers.</li>
           <li><strong>"How do you decide what gets auto-approved?"</strong> On checkable signals (every quote found, every criterion resolved, agreement across samples) rather than the model's self-reported confidence. The threshold is tuned on the golden set to a target precision, and everything below it goes to a named reviewer.</li>
           <li><strong>"What happens when the provider retires our pinned model?"</strong> Pinning buys time: we keep a migration calendar, run each successor through the customer's golden set, and cut over only when it passes. Self-hosted open weights (Option 4) remove forced retirement altogether.</li>
-          <li><strong>"Isn't an LLM judge in your evaluation just another black box?"</strong> It is unless calibrated. We measure the judge's agreement with SME labels on a held-out slice, publish that agreement rate, and use the judge only for metrics where it meets the bar.</li>
+          <li><strong>"Isn't an LLM judge in your evaluation just another black box?"</strong> It is, until it is calibrated. We measure the judge's agreement with SME labels on a held-out slice, publish that agreement rate, and use the judge only for metrics where it meets the bar.</li>
         </ul>
         <p><strong>Common mistakes to avoid:</strong></p>
         <ul>
@@ -1852,7 +1850,7 @@
         </ul>
 
         <div class="closes">
-          <span><b>Takeaway:</b> Diagnose which of the nine "black box" concerns applies, be candid that model weights and activations stay opaque, wrap the model in seven transparent system layers (grounding, co-owned evals, audit traces, code guardrails + version pinning, risk-matched HITL, provenance, and phased shadow-to-auto rollout), use hybrid designs where code makes high-stakes calls on verified facts, and treat reasoning traces as supporting evidence.</span>
+          <span><b>Takeaway:</b> Diagnose which of the nine "black box" concerns applies, be candid that model weights and activations stay opaque, wrap the model in seven transparent system layers (data perimeter, grounding in customer sources, output checks in code, risk-based routing, step-level logging, golden-set evaluation with version pinning, and gradual rollout), use hybrid designs where code makes high-stakes calls on verified facts, and treat reasoning traces as supporting evidence.</span>
         </div>
       </div>
     </div>
@@ -1879,14 +1877,13 @@
           <li>Google DeepMind, <a href="https://deepmind.google/blog/gemma-scope-2-helping-the-ai-safety-community-deepen-understanding-of-complex-language-model-behavior/" target="_blank" rel="noopener">Gemma Scope 2</a>, December 19, 2025, and Google, <a href="https://ai.google.dev/gemini-api/docs/thinking" target="_blank" rel="noopener">Gemini API: Thinking</a>, 2026. Open interpretability tooling for Gemma models and thought summaries in the Gemini API.</li>
           <li>Anthropic, <a href="https://www.anthropic.com/research/building-effective-agents" target="_blank" rel="noopener">Building Effective Agents</a>, December 19, 2024. Separating deterministic workflows from open-ended agents and keeping control flow explicit.</li>
           <li>Pete Hodgson, <a href="https://martinfowler.com/articles/feature-toggles.html" target="_blank" rel="noopener">Feature Toggles (aka Feature Flags)</a>, martinfowler.com, October 9, 2017. Operational kill switches and runtime circuit breakers for safe production degradation.</li>
-          <li>Allen Institute for AI (AI2), <a href="https://allenai.org/olmo" target="_blank" rel="noopener">OLMo: Open Language Models</a>, 2024–2026. Fully open-source language models publishing weights, training code, and pretraining corpora.</li>
           <li>Yao et al. (Sierra), <a href="https://arxiv.org/abs/2406.12045" target="_blank" rel="noopener">τ-bench: A Benchmark for Tool-Agent-User Interaction in Real-World Domains</a> (arXiv:2406.12045), June 17, 2024 (ICLR 2025). Introduces <code>pass^k</code>, the probability that all <code>k</code> trials of a task succeed.</li>
           <li>He et al. (Thinking Machines Lab), <a href="https://thinkingmachines.ai/blog/defeating-nondeterminism-in-llm-inference/" target="_blank" rel="noopener">Defeating Nondeterminism in LLM Inference</a>, September 10, 2025. Identifies batch-size variation on shared servers as the main reason greedy-decoding outputs differ.</li>
           <li>Google, <a href="https://ai.google.dev/gemini-api/docs/gemini-3" target="_blank" rel="noopener">Gemini 3 Developer Guide (temperature guidance)</a>, 2026. Recommends keeping temperature at its 1.0 default on Gemini 3 models and avoiding lowering it on reasoning tasks.</li>
           <li>Xiong et al., <a href="https://arxiv.org/abs/2306.13063" target="_blank" rel="noopener">Can LLMs Express Their Uncertainty? An Empirical Evaluation of Confidence Elicitation in LLMs</a> (arXiv:2306.13063), June 22, 2023 (ICLR 2024). Shows verbalized model confidence tends to be overconfident.</li>
           <li>Wang et al., <a href="https://arxiv.org/abs/2203.11171" target="_blank" rel="noopener">Self-Consistency Improves Chain of Thought Reasoning in Language Models</a> (arXiv:2203.11171), March 21, 2022 (ICLR 2023). Uses agreement across sampled answers as a reliability signal.</li>
-          <li><a href="https://eur-lex.europa.eu/eli/reg/2024/1689/oj" target="_blank" rel="noopener">Regulation (EU) 2024/1689 (Artificial Intelligence Act)</a>, Articles 11–14 and 86, and Annex IV; as amended by the Digital Omnibus on AI, 2026.</li>
-          <li><a href="https://eur-lex.europa.eu/eli/reg/2016/679/oj" target="_blank" rel="noopener">Regulation (EU) 2016/679 (GDPR)</a>, Articles 13–15 and 22.</li>
+          <li><a href="https://eur-lex.europa.eu/eli/reg/2024/1689/oj" target="_blank" rel="noopener">Regulation (EU) 2024/1689 (Artificial Intelligence Act)</a>, <a href="https://artificialintelligenceact.eu/article/11/" target="_blank" rel="noopener">Art. 11</a>, <a href="https://artificialintelligenceact.eu/article/12/" target="_blank" rel="noopener">Art. 12</a>, <a href="https://artificialintelligenceact.eu/article/13/" target="_blank" rel="noopener">Art. 13</a>, <a href="https://artificialintelligenceact.eu/article/14/" target="_blank" rel="noopener">Art. 14</a>, <a href="https://artificialintelligenceact.eu/article/86/" target="_blank" rel="noopener">Art. 86</a>, <a href="https://artificialintelligenceact.eu/annex/1/" target="_blank" rel="noopener">Annex I</a>, <a href="https://artificialintelligenceact.eu/annex/3/" target="_blank" rel="noopener">Annex III</a>, and <a href="https://artificialintelligenceact.eu/annex/4/" target="_blank" rel="noopener">Annex IV</a>; as amended by the Digital Omnibus on AI, 2026.</li>
+          <li><a href="https://eur-lex.europa.eu/eli/reg/2016/679/oj" target="_blank" rel="noopener">Regulation (EU) 2016/679 (GDPR)</a>, <a href="https://gdpr-info.eu/art-13-gdpr/" target="_blank" rel="noopener">Art. 13</a>, <a href="https://gdpr-info.eu/art-14-gdpr/" target="_blank" rel="noopener">Art. 14</a>, <a href="https://gdpr-info.eu/art-15-gdpr/" target="_blank" rel="noopener">Art. 15</a>, and <a href="https://gdpr-info.eu/art-22-gdpr/" target="_blank" rel="noopener">Art. 22</a>.</li>
           <li>Federal Reserve, OCC, and FDIC, <a href="https://www.federalreserve.gov/supervisionreg/srletters/sr2602.htm" target="_blank" rel="noopener">SR 26-2 (superseding SR 11-7): Supervisory Guidance on Model Risk Management</a> (OCC Bulletin 2026-13; FDIC FIL-15-2026), April 17, 2026 (original SR 11-7 issued April 4, 2011).</li>
           <li>CMS, <a href="https://www.cms.gov/newsroom/fact-sheets/cms-interoperability-and-prior-authorization-final-rule-cms-0057-f" target="_blank" rel="noopener">Interoperability and Prior Authorization Final Rule (CMS-0057-F)</a>, January 17, 2024.</li>
           <li>DeepSeek, <a href="https://api-docs.deepseek.com/guides/thinking_mode/" target="_blank" rel="noopener">Thinking Mode (API Documentation)</a> and <a href="https://arxiv.org/abs/2501.12948" target="_blank" rel="noopener">DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning</a> (arXiv:2501.12948), January 2025. Documents how DeepSeek reasoning models emit raw thinking tokens in <code>reasoning_content</code> / <code>&lt;think&gt;</code> tags.</li>
@@ -1894,6 +1891,8 @@
           <li>California Senate, <a href="https://sd13.senate.ca.gov/news/press-release/december-9-2024/landmark-law-prohibits-health-insurance-companies-using-ai-to" target="_blank" rel="noopener">California SB 1120 (Physicians Make Decisions Act)</a>, 2024 (effective January 2025). Requires that a licensed physician or qualified health professional make any denial, delay, or modification of care based on medical necessity; AI tools may not make that determination.</li>
           <li>CMS, <a href="https://aamc.org/advocacy-policy/washington-highlights/cms-addresses-use-ai-medicare-advantage-plans" target="_blank" rel="noopener">Medicare Advantage FAQ on Algorithms and AI</a>, February 6, 2024. Clarifies that Medicare Advantage medical-necessity determinations must be based on the individual patient's clinical record rather than an algorithm alone.</li>
           <li>National Imaging Associates (NIA), <a href="https://ldh.la.gov/assets/medicaid/MCPP/10.12.21/847_ACLA_Lumbar_Spine_MRI_2022_NIA_CG_044.pdf" target="_blank" rel="noopener">Clinical Guideline NIA_CG_044: Lumbar Spine MRI</a>. Representative payer imaging criteria requiring either failed conservative care or a new or worsening neurological deficit on exam.</li>
+          <li>U.S. Department of Health and Human Services (HHS), <a href="https://www.hhs.gov/hipaa/for-professionals/index.html" target="_blank" rel="noopener">HIPAA for Professionals</a>. Federal standards for protected health information (PHI), minimum-necessary access, business associate agreements, and audit controls.</li>
+          <li>Deloitte, <a href="https://deloitte.com/us/en/industries/life-sciences-health-care/blogs/health-care/ai-could-help-health-plans-simplify-prior-auth-comply-with-regs.html" target="_blank" rel="noopener">AI Could Help Health Plans Simplify Prior Auth, Comply With Regs</a>, January 15, 2026. Covers federal prior-authorization turnaround rules and Medicare's WISeR pilot reserving denials for clinicians.</li>
         </ol>
         <div class="back-home">
           <a href="https://evekhm.github.io/all-about-agents/#interview-label">← All About Agents · AI System Design Interviews</a>

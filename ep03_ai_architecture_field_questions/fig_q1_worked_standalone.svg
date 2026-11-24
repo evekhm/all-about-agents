@@ -49,7 +49,7 @@
     <line class="flow" x1="400" y1="146" x2="426" y2="146" marker-end="url(#arr-q1w-ink)"/>
     <rect class="node-card" x="430" y="110" width="200" height="72" rx="9"/>
     <text class="t-b t-c" x="530" y="133">Clinician signs</text>
-    <text class="t-s t-c" x="530" y="153">reads only</text>
+    <text class="t-s t-c" x="530" y="153">sees one line:</text>
     <text class="t-s t-c" x="530" y="170">"only 3 wks ibuprofen"</text>
     <line class="flow" x1="630" y1="146" x2="656" y2="146" marker-end="url(#arr-q1w-ink)"/>
     <rect class="node-bad" x="660" y="110" width="220" height="72" rx="9"/>
@@ -78,7 +78,7 @@
     <text class="t-b" x="578" y="406">Rule: (a) OR (b) approves</text>
     <text class="t-s" x="578" y="428">(a) ≥ 6 wks conservative care → not met</text>
     <text class="t-s" x="578" y="448">(b) neuro deficit → missing evidence</text>
-    <text class="t-s" x="578" y="468">an open criterion can still approve</text>
+    <text class="t-s" x="578" y="468">(b) is still open, so code cannot deny</text>
     <line class="flow-g" x1="560" y1="430" x2="524" y2="430" marker-end="url(#arr-q1w-good)"/>
 
     <rect class="node-good" x="200" y="380" width="320" height="100" rx="9"/>
