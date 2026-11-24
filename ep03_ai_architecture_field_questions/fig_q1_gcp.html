@@ -134,8 +134,8 @@
 <!-- B: Ground in customer sources -->
 <rect class="node-cyan" height="44" rx="9" width="420" x="200" y="200"></rect>
 <use height="24" href="#icon-gcp-ap" width="24" x="216" y="210"></use>
-<text class="t-b" x="250" y="219">B · RAG Engine (Agent Platform)</text>
-<text class="t-s" x="250" y="236">ground in customer sources</text>
+<text class="t-b" x="250" y="219">B · Agent Search / RAG / Vector / BQ</text>
+<text class="t-s" x="250" y="236">ACL-filtered grounding &amp; citations</text>
 <line class="flow" marker-end="url(#arr-q1g-ink)" x1="410" x2="410" y1="244" y2="258"></line>
 <!-- Model -->
 <rect class="node-violet" height="44" rx="9" style="stroke-dasharray:6 4" width="420" x="200" y="262"></rect>
@@ -148,8 +148,8 @@
 <rect class="node-cyan" height="44" rx="9" width="420" x="200" y="324"></rect>
 <use height="22" href="#icon-gcp-armor" width="22" x="212" y="334"></use>
 <use height="22" href="#icon-gcp-run" width="22" x="236" y="334"></use>
-<text class="t-b" x="268" y="343">C · Model Armor + Cloud Run</text>
-<text class="t-s" x="268" y="360">reply SDP · SGP · schemas &amp; rules</text>
+<text class="t-b" x="268" y="343">C · Model Armor + Gateway + Run</text>
+<text class="t-s" x="268" y="360">reply SDP · Registry/IAM · schemas</text>
 <line class="flow" marker-end="url(#arr-q1g-ink)" x1="410" x2="410" y1="368" y2="382"></line>
 <!-- D: Route by risk -->
 <rect class="node-cyan" height="44" rx="9" width="420" x="200" y="386"></rect>
@@ -161,8 +161,8 @@
 <use height="26" href="#icon-gcp-log" width="26" x="723" y="226"></use>
 <use height="26" href="#icon-gcp-trace" width="26" x="757" y="226"></use>
 <text class="t-b t-c" x="753" y="274">E · Logging, Trace,</text>
-<text class="t-b t-c" x="753" y="294">Audit &amp; SCC</text>
-<text class="t-s t-c" x="753" y="318">+ BigQuery audit sink</text>
+<text class="t-b t-c" x="753" y="294">Data Access Audit &amp; SCC</text>
+<text class="t-s t-c" x="753" y="318">+ BigQuery sink (400-day+)</text>
 <!-- Output -->
 <line class="flow" marker-end="url(#arr-q1g-ink)" x1="410" x2="410" y1="430" y2="464"></line>
 <rect class="node-card" height="40" rx="9" width="420" x="200" y="468"></rect>
@@ -170,13 +170,13 @@
 <!-- F and G: controls on every change -->
 <rect class="node-good" height="58" rx="9" width="418" x="34" y="530"></rect>
 <use height="26" href="#icon-gcp-ap" width="26" x="50" y="546"></use>
-<text class="t-b" x="86" y="553">F · Agent Platform evals</text>
+<text class="t-b" x="86" y="553">F · ADK Eval (Agent Platform)</text>
 <text class="t-s" x="86" y="573">golden set + pinned versions</text>
 <path d="M 180 530 V 284 H 196" marker-end="url(#arr-q1g-good)" style="fill:none;stroke:var(--good);stroke-width:2.2"></path>
 <rect class="node-good" height="58" rx="9" width="418" x="468" y="530"></rect>
 <use height="26" href="#icon-gcp-ap" width="26" x="484" y="546"></use>
-<text class="t-b" x="520" y="553">G · Evals + Cloud Run</text>
-<text class="t-s" x="520" y="573">shadow mode · kill switch</text>
+<text class="t-b" x="520" y="553">G · Online Monitoring + Run</text>
+<text class="t-s" x="520" y="573">shadow mode · Remote Config / DB flag</text>
 <path d="M 634 530 V 408 H 624" marker-end="url(#arr-q1g-good)" style="fill:none;stroke:var(--good);stroke-width:2.2"></path>
 </svg>
   <div class="fig-caption">

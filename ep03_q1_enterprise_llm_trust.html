@@ -914,7 +914,7 @@
     </div>
     <div class="sheet-b">
       <div class="post-prose">
-        <p>My goal here is to answer one of the most common questions in enterprise AI system-design interviews: how to make a language model trustworthy to a skeptical customer. We start inside the model—what reasoning traces exist, what granularity each reaches, and why open weights still require multi-step instrumentation—before stepping outside to the nine stakeholder concerns, seven transparent system layers, and how to match model autonomy to what code can verify.</p>
+        <p>My goal here is to answer one of the most common questions in enterprise AI system-design interviews: how to make a language model trustworthy to a skeptical customer. We start inside the model—what reasoning traces exist, what granularity each reaches, and why open weights still require multi-step instrumentation—before stepping outside to the nine stakeholder concerns, seven transparent system layers, and the rules for matching model autonomy to what code can verify.</p>
         <div class="closes" style="margin:14px 0 16px;">
           <span><b>The 30-second answer:</b> The model's weights and latent activations remain opaque: knowledge is spread across billions of weights, per-request activations are discarded after each token, and thought summaries, raw thinking tokens, and circuit tracing leave the causal reason behind a specific answer unverified. Trust therefore comes from the surrounding system, which makes inputs, sources, limits, evaluations, and history transparent across three pillars:<br>1. <strong>Verify</strong> every output: ground answers in cited sources, measure quality on a golden set, and let code make high-stakes decisions on verified facts.<br>2. <strong>Control</strong> and audit execution: enforce code guardrails, pin model versions, protect data governance boundaries, and log every step for replay.<br>3. <strong>Roll out</strong> safely: match human review to risk, and graduate from shadow mode to automation behind an instant kill switch.</span>
         </div>
@@ -925,6 +925,26 @@
           <li><a href="#sec-3"><strong>Match model autonomy to what code can verify:</strong></a> why modern AI agents safely handle open-ended planning, coding, and tool calls alongside deterministic checks, plus a worked prior-authorization example showing the hybrid split on regulated decisions.</li>
           <li><a href="#sec-4"><strong>Summary and follow-up questions:</strong></a> spoken wrap-up and likely interview follow-ups.</li>
         </ol>
+        <p><strong>Where this sits in the series:</strong> Episode 01 covers securing the agent-to-database connection (<a href="ep01_securing_agent_to_database.html">nine security layers <code>L1</code>–<code>L9</code></a>), and Episode 02 covers the system-design skeleton (<a href="ep02_designing_agentic_systems.html">four blocks and eleven questions <code>Q1</code>–<code>Q11</code></a>). This question adds the model itself: what stays opaque inside it, and seven layers (<code>A</code>–<code>G</code>) around it that draw on both episodes:</p>
+        <div class="nine-q-wrap" style="margin:12px 0 16px;">
+          <div class="nine-q-head">Series Bridge · Q1 Layers (A–G) vs. Episode 02 Blocks and Episode 01 Layers</div>
+          <div class="tbl-wrap">
+            <table>
+              <thead>
+                <tr><th>Q1 Layer</th><th>Episode 02 Block / Question</th><th>Episode 01 Layer</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><b>A · Data perimeter</b></td><td>Safeguards (<code>Q10</code>)</td><td><code>L1</code>, <code>L2</code>, <code>L6</code>, <code>L7</code></td></tr>
+                <tr><td><b>B · Ground in customer sources</b></td><td>Workflow (<code>Q9</code>: read data in place)</td><td><code>L7</code></td></tr>
+                <tr><td><b>C · Check outputs in code</b></td><td>Workflow (<code>Q7</code> Verifier, <code>Q8</code> typed contracts)</td><td><code>L3</code>, <code>L4</code></td></tr>
+                <tr><td><b>D · Route by risk</b></td><td>Workflow (Act gate, human)</td><td><code>L8</code></td></tr>
+                <tr><td><b>E · Log every step</b></td><td>Safeguards (audit and eval store)</td><td><code>L9</code></td></tr>
+                <tr><td><b>F · Evaluate and pin</b></td><td>Safeguards (<code>Q11</code> offline evals)</td><td>Control plane (<code>ADK Eval</code>)</td></tr>
+                <tr><td><b>G · Roll out gradually</b></td><td>Safeguards (<code>Q11</code> rollout), Control Plane (<code>Q5</code> kill switch)</td><td><code>L9</code> (kill switch)</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
         <p>Next in Episode 03: <a href="ep03_q2_model_spectrum_economics.html">Question 02 · Open-Weight vs. Proprietary Models Across the Full Model Spectrum</a> (or view the <a href="ref/ai-interview-cheat-sheet.html">5-Question Master Cheat Sheet</a>).</p>
       </div>
     </div>
@@ -1048,7 +1068,7 @@
 
     <!-- Bottom comparison note -->
     <rect class="node-card" x="36" y="476" width="848" height="72" rx="9"/>
-    <text class="t-s" x="56" y="504"><tspan style="font-weight:700;fill:var(--ink)">Proprietary API:</tspan> thought summary only; weights and activations stay hidden</text>
+    <text class="t-s" x="56" y="504"><tspan style="font-weight:700;fill:var(--ink)">Proprietary API:</tspan> usually the thought summary only; weights and activations stay hidden</text>
     <text class="t-s" x="56" y="530"><tspan style="font-weight:700;fill:var(--ink)">Open weights:</tspan> raw tokens + activations via hooks and sparse autoencoders</text>
   </svg>
   <div class="fig-caption">
@@ -1102,7 +1122,7 @@
           <div class="t1-map-legend">
             <span><i class="t1-dot" style="background:var(--cyan-soft);border-color:var(--cyan)"></i> Checks on every request (A–E in Figure 2)</span>
             <span><i class="t1-dot" style="background:var(--good-soft);border-color:var(--good)"></i> Controls on every change (F–G in Figure 2)</span>
-            <span><i class="t1-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> Self-hosted model checkpoint (Option 4, Section 3)</span>
+            <span><i class="t1-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> Self-hosted model checkpoint (Open weights)</span>
           </div>
           <div class="tbl-wrap">
             <table>
@@ -1231,7 +1251,7 @@
     </g>
     <line class="flow" x1="410" y1="220" x2="410" y2="236" marker-end="url(#arr-q1l-ink)"/>
 
-    <g class="fig2-node" data-layer="Option 4">
+    <g class="fig2-node" data-layer="Open weights">
       <rect class="node-violet" x="220" y="240" width="380" height="42" rx="9" style="stroke-dasharray:6 4"/>
       <text class="t-b t-c" x="410" y="266">Model (opaque)</text>
     </g>
@@ -1294,23 +1314,24 @@
 <p class="lc-eyebrow">Answers 3 Training-Data Provenance, 5 Data Governance</p>
 <h3>A · Data perimeter</h3>
 <p class="lc-summary">Keep customer data inside enforceable boundaries, and screen every request at the edge.</p>
-<div class="t-fix-row"><b>Customer gets:</b> zero-training terms, residency region, key ownership, and input-screening results; model card, data statements, and certifications</div><div class="t-fix-row gcp"><b>On Google Cloud:</b> VPC Service Controls, customer-managed encryption keys (CMEK, in Cloud KMS), Assured Workloads, IAM (Allow, Deny, and Principal Access Boundary / PAB), and regional endpoints; Agent Gateway (or Apigee AI Gateway / IAP + Cloud Armor) running inline Model Armor + Sensitive Data Protection (Cloud SDP); published model cards</div>
+<div class="t-fix-row"><b>Customer gets:</b> zero-training terms, residency region, key ownership, and input-screening results; model card, data statements, and certifications</div><div class="t-fix-row gcp"><b>On Google Cloud:</b> <a href="https://docs.cloud.google.com/vpc-service-controls/docs/overview" rel="noopener" target="_blank">VPC Service Controls</a>, customer-managed encryption keys (CMEK, in <a href="https://docs.cloud.google.com/kms/docs/cmek" rel="noopener" target="_blank">Cloud KMS</a>), <a href="https://docs.cloud.google.com/iam/docs/principal-access-boundary-policies" rel="noopener" target="_blank">IAM Principal Access Boundaries (PAB)</a>, and <a href="https://docs.cloud.google.com/run/docs/securing/agent-gateway-cloud-run" rel="noopener" target="_blank">Agent Gateway</a> with <a href="https://docs.cloud.google.com/model-armor/overview" rel="noopener" target="_blank">Model Armor</a> + <a href="https://docs.cloud.google.com/sensitive-data-protection/docs" rel="noopener" target="_blank">Sensitive Data Protection (Cloud SDP)</a> (full wiring in <a href="ep01_securing_agent_to_database.html">Episode 01</a>); published model cards</div>
 <p class="lc-details"><strong>Boundaries.</strong> Contractual zero-training on customer data, regional residency, VPC perimeters, CMEK, and explicit retention bounds.</p>
 <p class="lc-details"><strong>Model documentation.</strong> For training-data questions, provide the model card, data statements (source categories, knowledge cut-off, filtering), licensing terms, and IP indemnification.</p>
-<p class="lc-details"><strong>Input screening.</strong> Screen every request at the boundary for PII, toxicity, off-topic asks, and prompt injection (<a href="ep01_securing_agent_to_database.html">Episode 01</a> covers data boundaries and prompt-injection defenses for agents that reach databases).</p>
+<p class="lc-details"><strong>Input screening.</strong> Screen every request at the boundary for PII, toxicity, off-topic asks, and prompt injection. Screening lowers attack volume; the boundary that holds is the code check in <code>C · Check outputs in code</code> and the data-access rules of <a href="ep01_securing_agent_to_database.html">Episode 01</a>.</p>
 </div>
 <div class="layer-card" id="layer-b">
 <p class="lc-eyebrow">Answers 1 Explainability, 6 Reliability</p>
 <h3>B · Ground in customer sources</h3>
 <p class="lc-summary">Every answer cites the customer's own documents, or says it found nothing.</p>
-<div class="t-fix-row"><b>Customer gets:</b> verbatim source quotes with links; an explicit "not found in your documents" when evidence is missing</div><div class="t-fix-row gcp"><b>On Google Cloud:</b> RAG Engine grounding; structured output schemas</div>
-<p class="lc-details">Pair retrieval with clickable inline citations linked to the customer's own documents, return structured JSON (<code>verbatim_quote</code>, <code>sources</code>, <code>assumptions</code>, <code>answer</code>), and return an explicit <em>"not found in your documents"</em> response whenever evidence is absent (<a href="ep03_q4_modern_rag_pairings.html">Question 04</a> covers retrieval and citation design in depth).</p>
+<div class="t-fix-row"><b>Customer gets:</b> verbatim source quotes with links; an explicit "not found in your documents" when evidence is missing</div><div class="t-fix-row gcp"><b>On Google Cloud:</b> <a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/overview" rel="noopener" target="_blank">Agent Search</a>, <a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/build/rag-engine/rag-overview" rel="noopener" target="_blank">RAG Engine</a>, or <a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/build/vector-search/overview" rel="noopener" target="_blank">Agent Retrieval / Vector Search</a> (Agent Platform); or in-place <a href="https://docs.cloud.google.com/bigquery/docs/vector-search-intro" rel="noopener" target="_blank">BigQuery</a> / <a href="https://docs.cloud.google.com/alloydb/docs/ai/work-with-embeddings" rel="noopener" target="_blank">AlloyDB</a> vector search, returning verifiable source URIs for clickable citations</div>
+<p class="lc-details">Pair retrieval with clickable inline citations linked to the customer's own documents, return structured JSON (<code>verbatim_quote</code>, <code>sources</code>, <code>assumptions</code>, <code>answer</code>), and return an explicit <em>"not found in your documents"</em> response whenever evidence is absent. Retrieval runs under the caller's verified identity, so citations never expose documents the caller cannot open (<a href="ep01_securing_agent_to_database.html">Episode 01</a>; <a href="ep03_q4_modern_rag_pairings.html">Question 04</a> covers retrieval and citation design in depth).</p>
+<p class="lc-details"><strong>Choosing a grounding backend.</strong> Use <strong>Agent Search</strong> for turnkey document ingestion with managed ACLs, or in-place <strong>BigQuery / AlloyDB vector search</strong> when data already lives there and governance matters more than millisecond latency: zero data movement, strict <a href="https://cloud.google.com/terms/service-terms" rel="noopener" target="_blank">Data Residency</a>, CMEK, and <a href="https://cloud.google.com/access-transparency/docs/supported-services" rel="noopener" target="_blank">Access Transparency (AXT)</a>. Use <a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/build/vector-search/overview" rel="noopener" target="_blank">Agent Retrieval</a> (formerly Vector Search 2.0) or Vector Search for high query volume at millisecond latency, and <a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/build/rag-engine/rag-overview" rel="noopener" target="_blank">RAG Engine</a> for custom chunking pipelines with no Data Residency or AXT requirement (see <a href="ep03_q4_modern_rag_pairings.html">Question 04</a> for the full tradeoff matrix).</p>
 </div>
 <div class="layer-card" id="layer-c">
 <p class="lc-eyebrow">Answers 1 Explainability, 2 Predictability</p>
 <h3>C · Check outputs in code</h3>
 <p class="lc-summary">Code verifies every claim and applies the business rules, so the model never has the last word.</p>
-<div class="t-fix-row"><b>Customer gets:</b> quote-verification results, rule checks, and schema validation</div><div class="t-fix-row gcp"><b>On Google Cloud:</b> Model Armor reply screening at the ingress gateway, with Cloud SDP de-identification (Agent Gateway, Apigee, or your Cloud Run service); Semantic Governance Policies (SGP) and Agent Registry for tool calls; your own service (for example, on Cloud Run) with structured output schemas</div>
+<div class="t-fix-row"><b>Customer gets:</b> quote-verification results, rule checks, and schema validation</div><div class="t-fix-row gcp"><b>On Google Cloud:</b> <a href="https://docs.cloud.google.com/model-armor/overview" rel="noopener" target="_blank">Model Armor</a> reply screening and <a href="https://docs.cloud.google.com/sensitive-data-protection/docs" rel="noopener" target="_blank">Cloud SDP</a> de-identification at <a href="https://docs.cloud.google.com/run/docs/securing/agent-gateway-cloud-run" rel="noopener" target="_blank">Agent Gateway</a>; <a href="https://docs.cloud.google.com/agent-registry/overview" rel="noopener" target="_blank">Agent Registry</a> (catalog) + Agent Gateway IAM and Identity-Aware Proxy (IAP) (tool-call authorization); <a href="https://docs.cloud.google.com/run/docs/overview/what-is-cloud-run" rel="noopener" target="_blank">Cloud Run</a> service enforcing structured output schemas and deterministic rules</div>
 <p class="lc-details"><strong>Verify in code.</strong> Server code checks that cited passages genuinely support each claim, screens outputs for PII and off-policy content, and enforces permissions, dollar caps, and business rules (<a href="https://www.anthropic.com/research/building-effective-agents" rel="noopener" target="_blank">Anthropic, Dec 2024</a>).</p>
 <p class="lc-details"><strong>Repeatability.</strong> Constrain outputs where repeatability matters (structured output schemas, enumerated values, and a pinned thinking level) while keeping sampling parameters at the defaults current reasoning models are tuned for (<a href="https://ai.google.dev/gemini-api/docs/gemini-3" rel="noopener" target="_blank">Gemini 3 guide, 2026</a>). No decoding setting makes a hosted model repeatable: even greedy decoding on shared inference servers varies with the batch a request lands in (in one study, 1,000 identical requests to an open-weight model produced 80 distinct outputs; <a href="https://thinkingmachines.ai/blog/defeating-nondeterminism-in-llm-inference/" rel="noopener" target="_blank">He et al., Sep 2025</a>). Promise measured consistency (<code>pass^k</code>), and put calculations, thresholds, and final decisions in code.</p>
 </div>
@@ -1318,25 +1339,25 @@
 <p class="lc-eyebrow">Answers 6 Reliability, 7 Accountability</p>
 <h3>D · Route by risk</h3>
 <p class="lc-summary">Low-risk cases run automatically; uncertain or high-impact ones go to a named reviewer.</p>
-<div class="t-fix-row"><b>Customer gets:</b> named reviewer sign-off; the routing threshold and its measured precision</div><div class="t-fix-row gcp"><b>On Google Cloud:</b> the customer's review queue (Pub/Sub or Workflows + Cloud Run), with sign-offs stored in Cloud SQL or Firestore</div>
+<div class="t-fix-row"><b>Customer gets:</b> named reviewer sign-off; the routing threshold and its measured precision</div><div class="t-fix-row gcp"><b>On Google Cloud:</b> the customer's review queue (<a href="https://docs.cloud.google.com/pubsub/docs/overview" rel="noopener" target="_blank">Pub/Sub</a> or <a href="https://docs.cloud.google.com/workflows/docs/overview" rel="noopener" target="_blank">Workflows</a> + <a href="https://docs.cloud.google.com/run/docs/overview/what-is-cloud-run" rel="noopener" target="_blank">Cloud Run</a>), with sign-offs stored in <a href="https://docs.cloud.google.com/sql/docs/introduction" rel="noopener" target="_blank">Cloud SQL</a> or <a href="https://cloud.google.com/products/firestore" rel="noopener" target="_blank">Firestore</a></div>
 <p class="lc-details"><strong>Route by error cost.</strong> Automate low-risk tasks, and route uncertain or high-impact cases, with dry-run previews, to named human reviewers with clear sign-off ownership (RACI: responsible, accountable, consulted, informed).</p>
 <p class="lc-details"><strong>Calibrate the signal.</strong> A model's self-reported confidence ("I am 95% sure") tends to be overconfident (<a href="https://arxiv.org/abs/2306.13063" rel="noopener" target="_blank">Xiong et al., ICLR 2024</a>), so route on evidence the system can check: whether every cited quote was found in the source, whether every rule criterion resolved, agreement across <code>k</code> independent samples (<a href="https://arxiv.org/abs/2203.11171" rel="noopener" target="_blank">Wang et al., ICLR 2023</a>), and token log-probabilities where the API exposes them. Tune the routing threshold on the golden set to hit a target precision for auto-approved cases (for example, at least 99% agreement with labels from subject-matter experts (SMEs)), and send everything below it to review.</p>
-<p class="lc-details"><strong>Prevent rubber-stamping.</strong> Show reviewers the evidence before the model's recommendation, track each reviewer's override rate, and occasionally insert known-bad cases to confirm reviews are real.</p>
+<p class="lc-details"><strong>Prevent rubber-stamping.</strong> Show reviewers the evidence before the model's recommendation, track each reviewer's override rate, and occasionally insert known-bad cases to confirm reviews are real (<a href="ep01_securing_agent_to_database.html">Episode 01</a> lists approval fatigue as a residual risk).</p>
 </div>
 <div class="layer-card" id="layer-e">
 <p class="lc-eyebrow">Answers 7 Accountability</p>
 <h3>E · Log every step</h3>
 <p class="lc-summary">Every input, source, model version, check, and sign-off is recorded, so any decision can be replayed.</p>
-<div class="t-fix-row"><b>Customer gets:</b> a trace ID that replays any decision</div><div class="t-fix-row gcp"><b>On Google Cloud:</b> Cloud Logging, Cloud Trace, and Cloud Audit Logs (<code>DATA_READ</code>, <code>ADMIN_ACTIVITY</code>), exported via Log Sinks to BigQuery (and Cloud Storage for full payloads) with audit retention; Security Command Center (SCC)</div>
-<p class="lc-details"><strong>What to log.</strong> Every interaction: input, retrieved chunks, prompt version, pinned model version, thought summaries as supporting evidence, output, and reviewer feedback; record step-by-step traces across every tool call so any decision can be reconstructed months later, and expose live drift and quality dashboards to operators.</p>
+<div class="t-fix-row"><b>Customer gets:</b> a trace ID that replays any decision</div><div class="t-fix-row gcp"><b>On Google Cloud:</b> <a href="https://docs.cloud.google.com/logging/docs/overview" rel="noopener" target="_blank">Cloud Logging</a>, <a href="https://docs.cloud.google.com/trace/docs/overview" rel="noopener" target="_blank">Cloud Trace</a>, <a href="https://docs.cloud.google.com/logging/docs/audit" rel="noopener" target="_blank">Data Access audit logs</a> (<code>DATA_READ</code>, <code>DATA_WRITE</code>) in a BigQuery sink configured for 400-day+ retention joined on one trace ID, and <a href="https://docs.cloud.google.com/security-command-center/docs/security-command-center-overview" rel="noopener" target="_blank">Security Command Center (SCC)</a> (full wiring in <a href="ep01_securing_agent_to_database.html">Episode 01</a>)</div>
+<p class="lc-details"><strong>What to log.</strong> Every interaction: input, retrieved chunks, prompt version, pinned model version, thought summaries as supporting evidence, output, and reviewer feedback; redact or tokenize PII before it is written to the log (<a href="ep01_securing_agent_to_database.html">Episode 01</a>); record step-by-step traces across every tool call so any decision can be reconstructed months later, and expose live drift and quality dashboards to operators.</p>
 <p class="lc-details"><strong>Provider errors.</strong> Treat provider errors as part of observability: isolate HTTP 429 and timeout faults into retry queues with backoff, and record each retry in the trace so a reconstructed run shows which calls failed and why.</p>
 </div>
 <div class="layer-card lc-chg" id="layer-f">
-<p class="lc-eyebrow">Answers 2 Predictability, 8 Version Stability, 9 Quality</p>
+<p class="lc-eyebrow">Answers 2 Predictability, 4 Model Weights (pinning &amp; inspection), 8 Version Stability, 9 Quality</p>
 <h3>F · Evaluate and pin</h3>
 <p class="lc-summary">A golden set built with domain experts gates every change, and the model version moves only when it passes.</p>
-<div class="t-fix-row"><b>Customer gets:</b> golden-set results, <code>pass^k</code> consistency (a case passes only if all <code>k</code> runs succeed; <a href="https://arxiv.org/abs/2406.12045" rel="noopener" target="_blank">Yao et al., ICLR 2025</a>); unlike <code>pass@k</code>, which counts a case solved if any of <code>k</code> attempts succeeds and fits retry budgets, as in <a href="ep02_designing_agentic_systems.html">Episode 02</a>, and failure slices; a pinned model ID and regression report before each cutover</div><div class="t-fix-row gcp"><b>On Google Cloud:</b> Gemini Enterprise Agent Platform (Agent Platform) evaluation service; pinned model version IDs; evaluation pipeline in CI</div>
-<p class="lc-details"><strong>Golden set.</strong> Co-create a <strong>golden set</strong> of real historical cases with the customer's domain specialists, sizing it to the workflow's risk and edge-case coverage; track accuracy, groundedness, hallucination rate, refusal rate, latency, and cost; rerun the set like a regression suite on every prompt, retrieval, or model change; and share the failure breakdown openly. Where an LLM judge scores a metric, first measure the judge's agreement with SME labels on a held-out slice.</p>
+<div class="t-fix-row"><b>Customer gets:</b> golden-set results, <code>pass^k</code> consistency (a case passes only if all <code>k</code> runs succeed; <a href="https://arxiv.org/abs/2406.12045" rel="noopener" target="_blank">Yao et al., ICLR 2025</a>), and failure slices; a pinned model ID and regression report before each cutover</div><div class="t-fix-row gcp"><b>On Google Cloud:</b> <a href="https://adk.dev/evaluate/" rel="noopener" target="_blank">ADK Eval</a> on <a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/evaluation-overview" rel="noopener" target="_blank">Gemini Enterprise Agent Platform</a> (Agent Platform); pinned model version IDs; evaluation pipeline in CI</div>
+<p class="lc-details"><strong>Golden set.</strong> Co-create a <strong>golden set</strong> of real historical cases with the customer's domain specialists, sizing it to the workflow's risk and edge-case coverage; track accuracy, groundedness, hallucination rate, refusal rate, latency, and cost; rerun the set like a regression suite on every prompt, retrieval, or model change; and share the failure breakdown openly. <a href="ep02_designing_agentic_systems.html">Episode 02</a> reports <code>pass@k</code> ("at least one win in <code>k</code> tries": run a task <code>k</code> times and count it solved if any attempt passes—useful for coding with unit-test retries), whereas <code>pass^k</code> suits customer-facing consistency claims. Where an LLM judge scores a metric, first measure the judge's agreement with SME labels on a held-out slice; the judge scores offline evaluation only, while request-time verdicts come from code (<code>C · Check outputs in code</code>), as in <a href="ep02_designing_agentic_systems.html">Episode 02</a>'s Verifier.</p>
 <p class="lc-details"><strong>Pin versions.</strong> Upgrade only when the customer's golden set passes. Pinning is temporary: providers retire API model versions on a published schedule, so maintain a migration calendar and run each successor through the customer's golden set before cutover. Self-hosted open weights remove forced retirement altogether.</p>
 <p class="lc-details"><strong>Training caution.</strong> If you fine-tune or run reinforcement learning, keep the reasoning trace out of the reward signal so it stays useful for monitoring (<a href="https://arxiv.org/abs/2503.11926" rel="noopener" target="_blank">Baker et al., Mar 2025</a>).</p>
 </div>
@@ -1344,8 +1365,9 @@
 <p class="lc-eyebrow">Answers 6 Reliability</p>
 <h3>G · Roll out gradually</h3>
 <p class="lc-summary">Shadow mode first, automation only when the numbers clear the bar, with a kill switch.</p>
-<div class="t-fix-row"><b>Customer gets:</b> shadow-mode comparison results; a kill switch</div><div class="t-fix-row gcp"><b>On Google Cloud:</b> Agent Platform evaluation service for shadow comparisons; traffic splitting or a feature flag in Cloud Run</div>
-<p class="lc-details">Start on a low-risk, high-visibility wedge and earn promotion across stages: <code>Scoped Pilot → Shadow Mode</code> (running silently beside humans to compare outcomes) <code>→ Assisted Copilot → Partial Scoped Automation</code>, backed by an instant operational kill switch (<a href="https://martinfowler.com/articles/feature-toggles.html" rel="noopener" target="_blank">Hodgson, Oct 2017</a>) that turns off the whole rollout (<a href="ep02_designing_agentic_systems.html">Episode 02</a> builds a per-target kill switch inside an agent's control plane).</p>
+<div class="t-fix-row"><b>Customer gets:</b> shadow-mode comparison results; demotion rules and a kill switch</div>
+<div class="t-fix-row gcp"><b>On Google Cloud:</b> <a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/evaluation-overview" rel="noopener" target="_blank">Agent Platform Online Monitoring</a> for live shadow comparisons; <a href="https://docs.cloud.google.com/run/docs/rollouts-rollbacks-traffic-migration" rel="noopener" target="_blank">Cloud Run traffic splitting</a> with <a href="https://firebase.google.com/docs/remote-config/server" rel="noopener" target="_blank">Firebase Remote Config</a> or <a href="https://cloud.google.com/products/firestore" rel="noopener" target="_blank">Firestore</a> / <a href="https://docs.cloud.google.com/sql/docs/introduction" rel="noopener" target="_blank">Cloud SQL</a> flags for an instant kill switch</div>
+<p class="lc-details">Start on a low-risk, high-visibility wedge and earn promotion across stages: <code>Scoped Pilot → Shadow Mode</code> (running silently beside humans to compare outcomes) <code>→ Assisted Copilot → Partial Scoped Automation</code>, with automatic demotion when reviewer overrides spike (<a href="ep02_designing_agentic_systems.html">Episode 02</a> gives example gates). Every stage is backed by an instant operational kill switch (<a href="https://martinfowler.com/articles/feature-toggles.html" rel="noopener" target="_blank">Hodgson, Oct 2017</a>) that turns off the whole rollout; <a href="ep02_designing_agentic_systems.html">Episode 02</a> builds a per-target kill switch inside an agent's control plane, and <a href="ep01_securing_agent_to_database.html">Episode 01</a> revokes the agent's identity when it must be cut off from data.</p>
 </div>
 </div>
 
@@ -1494,8 +1516,8 @@
     <!-- B: Ground in customer sources -->
     <rect class="node-cyan" x="200" y="200" width="420" height="44" rx="9"/>
     <use href="#icon-gcp-ap" x="216" y="210" width="24" height="24"/>
-    <text class="t-b" x="250" y="219">B · RAG Engine (Agent Platform)</text>
-    <text class="t-s" x="250" y="236">ground in customer sources</text>
+    <text class="t-b" x="250" y="219">B · Agent Search / RAG / Vector / BQ</text>
+    <text class="t-s" x="250" y="236">ACL-filtered grounding &amp; citations</text>
     <line class="flow" x1="410" y1="244" x2="410" y2="258" marker-end="url(#arr-q1g-ink)"/>
 
     <!-- Model -->
@@ -1510,8 +1532,8 @@
     <rect class="node-cyan" x="200" y="324" width="420" height="44" rx="9"/>
     <use href="#icon-gcp-armor" x="212" y="334" width="22" height="22"/>
     <use href="#icon-gcp-run" x="236" y="334" width="22" height="22"/>
-    <text class="t-b" x="268" y="343">C · Model Armor + Cloud Run</text>
-    <text class="t-s" x="268" y="360">reply SDP · SGP · schemas &amp; rules</text>
+    <text class="t-b" x="268" y="343">C · Model Armor + Gateway + Run</text>
+    <text class="t-s" x="268" y="360">reply SDP · Registry/IAM · schemas</text>
     <line class="flow" x1="410" y1="368" x2="410" y2="382" marker-end="url(#arr-q1g-ink)"/>
 
     <!-- D: Route by risk -->
@@ -1525,8 +1547,8 @@
     <use href="#icon-gcp-log" x="723" y="226" width="26" height="26"/>
     <use href="#icon-gcp-trace" x="757" y="226" width="26" height="26"/>
     <text class="t-b t-c" x="753" y="274">E · Logging, Trace,</text>
-    <text class="t-b t-c" x="753" y="294">Audit &amp; SCC</text>
-    <text class="t-s t-c" x="753" y="318">+ BigQuery audit sink</text>
+    <text class="t-b t-c" x="753" y="294">Data Access Audit &amp; SCC</text>
+    <text class="t-s t-c" x="753" y="318">+ BigQuery sink (400-day+)</text>
 
     <!-- Output -->
     <line class="flow" x1="410" y1="430" x2="410" y2="464" marker-end="url(#arr-q1g-ink)"/>
@@ -1536,14 +1558,14 @@
     <!-- F and G: controls on every change -->
     <rect class="node-good" x="34" y="530" width="418" height="58" rx="9"/>
     <use href="#icon-gcp-ap" x="50" y="546" width="26" height="26"/>
-    <text class="t-b" x="86" y="553">F · Agent Platform evals</text>
+    <text class="t-b" x="86" y="553">F · ADK Eval (Agent Platform)</text>
     <text class="t-s" x="86" y="573">golden set + pinned versions</text>
     <path d="M 180 530 V 284 H 196" style="fill:none;stroke:var(--good);stroke-width:2.2" marker-end="url(#arr-q1g-good)"/>
 
     <rect class="node-good" x="468" y="530" width="418" height="58" rx="9"/>
     <use href="#icon-gcp-ap" x="484" y="546" width="26" height="26"/>
-    <text class="t-b" x="520" y="553">G · Evals + Cloud Run</text>
-    <text class="t-s" x="520" y="573">shadow mode · kill switch</text>
+    <text class="t-b" x="520" y="553">G · Online Monitoring + Run</text>
+    <text class="t-s" x="520" y="573">shadow mode · Remote Config / DB flag</text>
     <path d="M 634 530 V 408 H 624" style="fill:none;stroke:var(--good);stroke-width:2.2" marker-end="url(#arr-q1g-good)"/>
   </svg>
   <div class="fig-caption">
@@ -1558,7 +1580,7 @@
 
         <h3>How Much of This a Customer Needs</h3>
         <p>
-          <em>Figure 3</em> shows the full set of controls. A customer starts with the layers that regulation and error cost demand. Every layer adds engineering cost, latency, and ongoing ownership: citation verification adds a retrieval and a check to every answer, <code>k</code>-sample agreement multiplies inference cost by <code>k</code>, and human review adds minutes of specialist time per routed case. Some layers are mandatory regardless of cost because regulations require specific evidence, oversight, or auditability. <em>Table 2</em> lists six examples: what each framework covers, what it asks for, and which layers produce that evidence.
+          <em>Figure 3</em> shows the full set of controls. Every layer adds engineering cost, latency, and ongoing ownership: citation verification adds a retrieval and a check to every answer, running the model multiple times to check agreement multiplies inference cost, and human review adds minutes of specialist time per routed case. Start with the layers that error cost and regulation demand; some are mandatory because the regulation requires specific evidence, oversight, or auditability. <em>Table 2</em> lists six examples: what each framework covers, what it asks for, and which layers produce that evidence.
         </p>
 
         <div class="nine-q-wrap">
@@ -1584,7 +1606,7 @@
                   <td><b><a href="https://eur-lex.europa.eu/eli/reg/2016/679/oj" target="_blank" rel="noopener">GDPR</a></b></td>
                   <td>General Data Protection Regulation — EU law protecting personal data and privacy, including individual rights around automated profiling and decision-making.</td>
                   <td>Safeguards for solely automated decisions with legal or similarly significant effects (<a href="https://gdpr-info.eu/art-22-gdpr/" target="_blank" rel="noopener">Art. 22</a>), and meaningful information about the logic involved (<a href="https://gdpr-info.eu/art-13-gdpr/" target="_blank" rel="noopener">Art. 13</a>, <a href="https://gdpr-info.eu/art-14-gdpr/" target="_blank" rel="noopener">Art. 14</a>, <a href="https://gdpr-info.eu/art-15-gdpr/" target="_blank" rel="noopener">Art. 15</a>).</td>
-                  <td style="white-space:nowrap"><span class="layer-pill lp-req">B</span> <span class="layer-pill lp-req">D</span> <span class="layer-pill lp-chg">Hybrid (Section 3)</span></td>
+                  <td style="white-space:nowrap"><span class="layer-pill lp-req">B</span> <span class="layer-pill lp-req">D</span> <a href="#hybrid-pattern"><span class="layer-pill lp-chg">Hybrid</span></a></td>
                 </tr>
                 <tr>
                   <td><b><a href="https://www.federalreserve.gov/supervisionreg/srletters/sr2602.htm" target="_blank" rel="noopener">SR 11-7 / SR 26-2</a> (U.S. banking model risk)</b></td>
@@ -1602,7 +1624,7 @@
                   <td><b><a href="https://www.cms.gov/newsroom/fact-sheets/cms-interoperability-and-prior-authorization-final-rule-cms-0057-f" target="_blank" rel="noopener">CMS Prior Authorization Rule</a> (CMS-0057-F)</b></td>
                   <td>U.S. Centers for Medicare &amp; Medicaid Services rule streamlining electronic prior authorization and requiring health plans to explain coverage decisions clearly and on defined timelines.</td>
                   <td>A specific reason for every denied prior-authorization request.</td>
-                  <td style="white-space:nowrap"><span class="layer-pill lp-req">B</span> <span class="layer-pill lp-req">C</span> <span class="layer-pill lp-chg">Hybrid (Section 3)</span></td>
+                  <td style="white-space:nowrap"><span class="layer-pill lp-req">B</span> <span class="layer-pill lp-req">C</span> <a href="#hybrid-pattern"><span class="layer-pill lp-chg">Hybrid</span></a></td>
                 </tr>
                 <tr>
                   <td><b><a href="https://sd13.senate.ca.gov/news/press-release/december-9-2024/landmark-law-prohibits-health-insurance-companies-using-ai-to" target="_blank" rel="noopener">California SB 1120</a></b></td>
@@ -1621,11 +1643,7 @@
         <h2 id="sec-3">3. Match Model Autonomy to What Code Can Verify</h2>
 
         <p>
-          Modern AI agents already handle far more than text extraction: they plan multi-step workflows, write and debug code, call APIs, synthesize research, and recover when a tool fails. That autonomy works in production because the agent's open-ended work is paired with deterministic verification. A coding agent writes entire features, while compilers, unit tests, linters, and code review verify every change before merge. A research or customer-support agent plans searches and drafts actions, while grounded citations (Layer B), policy and schema gates (Layer C), and risk-routed approvals (Layer D) govern high-impact calls such as refunds or account updates.
-        </p>
-
-        <p>
-          How much decision authority belongs in the model therefore scales with two factors: the cost of an error and how cheaply external checks can verify the output. On regulated, audit-heavy decisions—such as medical necessity, credit underwriting, or compliance eligibility—automated denials are often restricted by law and require a line-by-line rule trace. For those specific decision gates, the strongest architecture pairs the LLM's language strength (reading messy documents, mapping clinical or policy terms, and pulling verbatim quotes) with explicit, human-readable rules in code or an interpretable scoring model that makes the binding call. One worked case shows how that hybrid split operates in practice. <a href="ep02_designing_agentic_systems.html">Episode 02</a> applies the same split to every step of an agent with its autonomy test: steps that follow an explicit rule become plain code, and only steps that must interpret messy text use a model.
+          Modern AI agents plan workflows, write code, and call APIs safely when deterministic checks verify each step; <a href="ep02_designing_agentic_systems.html">Episode 02</a> covers this in its four-block model and autonomy test. On regulated, audit-heavy decisions (such as medical necessity, credit underwriting, or compliance eligibility), automated denials are often restricted by law and require a line-by-line rule trace. For those decision gates, the strongest architecture pairs the LLM's language strength (reading free-text documents and pulling verbatim quotes) with explicit rules in code that make the binding call. One worked case shows how this <strong id="hybrid-pattern">hybrid</strong> pattern operates in practice.
         </p>
 
         <p>
@@ -1633,7 +1651,7 @@
         </p>
 
         <p>
-          <strong>How the LLM helps—and how code checks it.</strong> In this split, the model reads the unstructured clinical notes and extracts structured facts, each paired with a verbatim quote from the chart:
+          <strong>How the LLM helps—and how code checks it.</strong> In this split, the extractor runs as a toolless, single-call Quarantined LLM (<a href="ep02_designing_agentic_systems.html">Episode 02</a>), so untrusted clinical notes cannot trigger an action; it extracts structured facts, each paired with a verbatim quote from the chart:
         </p>
         <div class="code-card">
           <div class="code-title">Extracted Chart Facts with Verbatim Quotes (Model Output)</div>
@@ -1709,11 +1727,11 @@
 </div>
 
         <p>
-          <strong>What the member and the auditor get.</strong> If the clinician denies, a templated notice cites the exact policy clause and verified chart quotes. The auditor gets those same quoted facts with exact chart locations, the policy and pinned model versions, the clinician's sign-off (Layer D), and the replayable trace with the model's thought summaries (or raw thinking tokens on open weights) in Layer E.
+          <strong>What the member and the auditor get.</strong> If the clinician denies, a templated notice cites the exact policy clause and verified chart quotes. The auditor gets those same quoted facts with exact chart locations, the policy and pinned model versions, the clinician's sign-off (<code>D · Route by risk</code>), and the replayable trace with the model's thought summaries (or raw thinking tokens on open weights) (<code>E · Log every step</code>).
         </p>
 
         <p>
-          <strong>The broader rule:</strong> match model autonomy to each step. Use deterministic rules or pure search when exact answers exist, pair open-ended generation with external checks for planning and synthesis, and use the hybrid split—model extraction plus verifiable rules in code—whenever a regulated decision must be both automated and auditable.
+          <strong>The broader rule:</strong> apply <a href="ep02_designing_agentic_systems.html">Episode 02</a>'s four-row autonomy test per step—plain code for exact rules, a toolless Quarantined LLM to extract facts from free text, a Privileged LLM with a code verifier for open-ended exploration, and plain code with human sign-off for anything that changes the outside world.
         </p>
 
         <h2 id="sec-4">4. Summary: Putting It Together</h2>
@@ -1721,10 +1739,10 @@
           Every LLM—whether proprietary or open-weight—stores knowledge across billions of weights and computes per-request activations that are discarded after each token. Thought summaries, raw thinking tokens, and research-grade circuit tracing provide partial visibility, while leaving the causal reason behind a specific answer unverified. Enterprise trust therefore comes from the engineered system surrounding the model.
         </p>
         <p>
-          Building that trust starts by identifying which of the nine "black box" concerns (<em>Table 1</em>) and underlying risks drives the requirement, then wrapping the model in seven verifiable layers (<code>A</code>–<code>G</code>), five checks on every request and two controls on every change: a governed data perimeter and provenance record (<code>A</code>), source-grounded citations (<code>B</code>), deterministic output verification and rules in code (<code>C</code>), risk-based routing to accountable reviewers (<code>D</code>), replayable audit logs (<code>E</code>), co-owned golden-set evaluation and version pinning (<code>F</code>), and graduated rollout from shadow mode behind a kill switch (<code>G</code>). Applicable regulations and error cost decide which layers come first.
+          Building that trust starts by identifying which of the nine "black box" concerns (<em>Table 1</em>) and underlying risks drives the requirement, then wrapping the model in seven verifiable layers (<code>A</code>–<code>G</code>)—five checks on every request (<code>A · Data perimeter</code>, <code>B · Ground in customer sources</code>, <code>C · Check outputs in code</code>, <code>D · Route by risk</code>, and <code>E · Log every step</code>) and two controls on every change (<code>F · Evaluate and pin</code> and <code>G · Roll out gradually</code>). Applicable regulations and error cost decide which layers come first.
         </p>
         <p>
-          Alongside those layers, architecture limits how much of each decision the model makes at all. Matching model autonomy per step—especially using the hybrid pattern where the model extracts quoted facts and deterministic code executes the policy rule—ensures that high-stakes outcomes are both explainable and defensible. On Google Cloud's <strong>Agent Platform</strong>, those layers map directly to VPC Service Controls, CMEK, Assured Workloads, and IAM Principal Access Boundaries for the perimeter, Agent Gateway (or Apigee / IAP + Cloud Armor) running Model Armor and Sensitive Data Protection for inline screening, RAG Engine grounding over customer data stores, Semantic Governance Policies, Agent Registry, and Cloud Run for tool and rule checks, Pub/Sub or Workflows with Cloud SQL or Firestore for risk-routed sign-offs, Cloud Logging, Cloud Trace, Cloud Audit Logs, Security Command Center, and a BigQuery sink for long-term replay, and the Agent Platform evaluation service with explicit model version pinning and Cloud Run feature flags for rollout.
+          Alongside those layers, architecture limits how much of each decision the model makes at all. Matching model autonomy per step—especially using the hybrid pattern where the model extracts quoted facts and deterministic code executes the policy rule—ensures that high-stakes outcomes are both explainable and defensible. <em>Figure 3</em> maps those seven layers to managed Google Cloud services, with full wiring in <a href="ep01_securing_agent_to_database.html">Episode 01</a>.
         </p>
 
         <h2 id="sec-followups">Likely Follow-Up Questions</h2>
