@@ -934,10 +934,6 @@
     <div class="sheet-b">
       <div class="post-prose">
 
-        <p>
-          Calling a language model a "black box" points to four general engineering requirements: <strong>behavioral predictability</strong>, <strong>output verifiability</strong>, <strong>enforceable boundaries</strong>, and <strong>defensibility</strong> under audit and regulatory scrutiny. Understanding how to meet those requirements begins with the model itself—specifically, which internal reasoning traces are <strong>observable</strong>, the <strong>granularity</strong> each trace exposes, and where the boundary of opaque weights and latent activations lies.
-        </p>
-
         <h2 id="sec-1">1. Tracing a Model's Reasoning: What You Can and Cannot See</h2>
         <p>
           You can read what a model writes while it reasons, but not reliably why it reached its answer. This section explains where reasoning actually happens, what each kind of trace shows, and what each one can prove.
@@ -1078,7 +1074,7 @@
         </ul>
 
         <div class="closes" style="margin:14px 0 16px;">
-          <span><b>Example: the hint test.</b> Researchers ask a model a multiple-choice question with a hint added, such as "A Stanford professor indicates the answer is (A)," pointing to an answer the model would not otherwise pick. When the hint changes the answer, they check whether the model's reasoning mentions it. Often it does not: the trace builds a plausible argument for (A), like a student who saw the answer key and writes out a full solution without mentioning it. In these tests, reasoning models often disclosed the hint in fewer than 20% of cases (<a href="https://arxiv.org/abs/2505.05410" target="_blank" rel="noopener">Chen et al., May 2025</a>), extending earlier results on prompted chain-of-thought (<a href="https://arxiv.org/abs/2305.04388" target="_blank" rel="noopener">Turpin et al., NeurIPS 2023</a>). Newer models follow planted hints less often, which makes this test harder to run, but it does not make the traces proof.</span>
+          <span><b>Example: the hint test.</b> Researchers ask a model a multiple-choice question with a hint added, such as "A Stanford professor indicates the answer is (A)," pointing to an answer the model would not otherwise pick. When the hint changes the answer, they check whether the model's reasoning mentions it. Frequently it does not: the trace builds a plausible argument for (A), like a student who saw the answer key and writes out a full solution without mentioning it. In these tests, reasoning models disclosed the hint in fewer than 20% of cases (<a href="https://arxiv.org/abs/2505.05410" target="_blank" rel="noopener">Chen et al., May 2025</a>), extending earlier results on prompted chain-of-thought (<a href="https://arxiv.org/abs/2305.04388" target="_blank" rel="noopener">Turpin et al., NeurIPS 2023</a>). Newer models follow planted hints less often, which makes this test harder to run, but it does not make the traces proof.</span>
         </div>
 
         <p>
@@ -1095,7 +1091,7 @@
 
         <h2 id="sec-2">2. From "Black Box" to a Checkable System</h2>
         <p>
-          In practice, internal model tracing hits a hard ceiling for both deployment models: <strong>proprietary APIs</strong> keep weights and layer activations behind the endpoint while exposing only condensed summaries, and <strong>open-weight models</strong> emit sampled tokens that can omit causal factors while full activation-level circuit tracing remains partial and costly.
+          In practice, internal model tracing hits a hard ceiling across both hosted APIs and open weights: <strong>proprietary APIs</strong> keep weights and layer activations behind the endpoint while exposing only condensed summaries, and <strong>open-weight models</strong> emit sampled tokens that can omit causal factors while full activation-level circuit tracing remains partial and costly.
         </p>
         <p>
           Therefore, enterprise trust shifts from inspecting neural activations to engineering <strong>verifiable system controls</strong> around the model. "Black box" maps to nine distinct concerns. Each tends to come from a particular team and sits on a concrete business risk, so who is in the room usually signals which concerns matter first. Read the rest of this section in three steps: find the customer's concern and its layer letter in <em>Table 1</em>, see where that layer acts on a request in <em>Figure 2</em>, then read that layer's card below.
@@ -1147,7 +1143,7 @@
 <tr data-layers="F">
 <td><b>We can't look inside the model.</b></td>
 <td><b>4. Model Weights</b></td>
-<td style="white-space:nowrap"><span class="layer-pill lp-chg">F</span> <span class="layer-pill lp-mdl">Open weights (Sec. 1 &amp; Follow-ups)</span></td>
+<td style="white-space:nowrap"><span class="layer-pill lp-chg">F</span> <span class="layer-pill lp-mdl">Open weights</span></td>
 <td>Model-risk and validation teams; security; sovereignty-bound customers</td>
 <td><b>Regulatory scrutiny:</b> independent validation; lock-in</td>
 
