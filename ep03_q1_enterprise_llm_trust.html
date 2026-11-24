@@ -867,25 +867,22 @@
   .t1-map-legend { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; font-size: 12px; color: var(--muted); margin: 0 0 10px; }
   .t1-map-legend span { display: inline-flex; align-items: center; gap: 5px; }
   .t1-dot { width: 9px; height: 9px; border-radius: 3px; display: inline-block; border: 1.5px solid; }
-  .layer-cards { display: flex; flex-direction: column; gap: 16px; margin: 14px 0 18px; }
-  .layer-card { border: 1px solid var(--line); border-left: 4px solid var(--cyan); border-radius: 10px; background: var(--panel-2); padding: 16px 20px; break-inside: avoid; }
-  .layer-card.lc-chg { border-left-color: var(--good); }
-  .lc-eyebrow { margin: 0 0 2px; font-size: 12.5px; color: var(--muted); letter-spacing: 0.02em; }
-  .layer-card h3 { font-size: 18px; margin: 0 0 4px; color: var(--ink); }
-  .lc-summary { font-weight: 600; font-size: 15px; margin: 0 0 12px; color: var(--ink); }
-  .lc-meta { display: grid; grid-template-columns: 130px 1fr; column-gap: 14px; row-gap: 6px; margin: 0 0 12px; font-size: 14.5px; }
-  .lc-meta dt { color: var(--muted); font-size: 12.5px; font-weight: 600; padding-top: 2px; }
-  .lc-meta dd { margin: 0; color: var(--ink); }
-  @media (max-width: 600px) {
-    .lc-meta { grid-template-columns: 1fr; row-gap: 2px; }
-    .lc-meta dd { margin-bottom: 8px; }
-  }
-  .lc-details { font-size: 14.5px; line-height: 1.6; margin: 0; color: var(--ink); }
+  .layer-cards { display: flex; flex-direction: column; gap: 18px; margin: 16px 0 20px; }
+  .layer-card { border: 1px solid var(--line); border-top: 3px solid var(--cyan); border-radius: 12px; background: var(--panel-2); padding: 18px 22px; box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04); break-inside: avoid; }
+  .layer-card.lc-chg { border-top-color: var(--good); }
+  .lc-eyebrow { display: inline-block; margin: 0 0 6px; padding: 2px 9px; border-radius: 999px; font-size: 11.5px; font-weight: 600; color: var(--muted); background: var(--panel); border: 1px solid var(--line); letter-spacing: 0.01em; }
+  .layer-card h3 { font-size: 18.5px; font-weight: 700; margin: 0 0 4px; color: var(--ink); letter-spacing: -0.01em; }
+  .lc-summary { font-weight: 500; font-size: 15px; margin: 0 0 14px; color: var(--muted); line-height: 1.5; }
+  .layer-card .t-fix-row { margin: 0; padding: 9px 14px; border: 1px solid var(--line); border-left-width: 1px; border-radius: 0; background: var(--panel); font-size: 14px; line-height: 1.55; }
+  .layer-card .t-fix-row:first-of-type { border-radius: 8px 8px 0 0; border-bottom: none; }
+  .layer-card .t-fix-row.gcp { border-radius: 0 0 8px 8px; margin-bottom: 14px; background: color-mix(in srgb, var(--cyan-soft) 35%, var(--panel)); }
+  .layer-card.lc-chg .t-fix-row.gcp { background: color-mix(in srgb, var(--good-soft) 35%, var(--panel)); }
+  .layer-card.lc-chg .t-fix-row.gcp b { color: var(--good); }
+  .lc-details { font-size: 14.5px; line-height: 1.62; margin: 0; color: var(--ink); }
   .lc-details + .lc-details { margin-top: 8px; }
   .t-card-full.l-req { border-left: 4px solid var(--cyan); }
   .t-card-full .lc-lead { margin: 0 0 8px; color: var(--ink); font-weight: 700; font-size: 14.2px; }
   .t-card-full .t-fix-row p { margin: 6px 0 0; color: var(--ink); }
-  .layer-card .t-fix-row.gcp { margin-bottom: 12px; }
   </style>
 </head>
 <body>
@@ -897,7 +894,7 @@
     <a href="#intro">Overview</a>
     <a href="#sec-1">What You Can and Cannot See</a>
     <a href="#sec-2">Checkable System</a>
-    <a href="#sec-3">Keep the Decision Out of the Model</a>
+    <a href="#sec-3">Model Autonomy &amp; Verification</a>
     <a href="#sec-4">Summary</a>
     <a href="#sec-followups">Follow-Up Questions</a>
     <a href="#references">References</a>
@@ -917,7 +914,7 @@
     </div>
     <div class="sheet-b">
       <div class="post-prose">
-        <p>My goal here is to answer one of the most common questions in enterprise AI system-design interviews: how to make a language model trustworthy to a skeptical customer. We start inside the model—what reasoning traces exist, what granularity each reaches, and why open weights still require multi-step instrumentation—before stepping outside to the nine stakeholder concerns, seven transparent system layers, and six architectural alternatives.</p>
+        <p>My goal here is to answer one of the most common questions in enterprise AI system-design interviews: how to make a language model trustworthy to a skeptical customer. We start inside the model—what reasoning traces exist, what granularity each reaches, and why open weights still require multi-step instrumentation—before stepping outside to the nine stakeholder concerns, seven transparent system layers, and how to match model autonomy to what code can verify.</p>
         <div class="closes" style="margin:14px 0 16px;">
           <span><b>The 30-second answer:</b> The model's weights and latent activations remain opaque: knowledge is spread across billions of weights, per-request activations are discarded after each token, and thought summaries, raw thinking tokens, and circuit tracing leave the causal reason behind a specific answer unverified. Trust therefore comes from the surrounding system, which makes inputs, sources, limits, evaluations, and history transparent across three pillars:<br>1. <strong>Verify</strong> every output: ground answers in cited sources, measure quality on a golden set, and let code make high-stakes decisions on verified facts.<br>2. <strong>Control</strong> and audit execution: enforce code guardrails, pin model versions, protect data governance boundaries, and log every step for replay.<br>3. <strong>Roll out</strong> safely: match human review to risk, and graduate from shadow mode to automation behind an instant kill switch.</span>
         </div>
@@ -925,7 +922,7 @@
         <ol>
           <li><a href="#sec-1"><strong>Inside the model:</strong></a> why weights and activations are opaque for both APIs and open weights, and the three levels of reasoning-trace granularity.</li>
           <li><a href="#sec-2"><strong>From "black box" to a checkable system:</strong></a> the nine distinct stakeholder concerns and six business risks that matter outside the weights, and the seven engineering controls (<code>A</code>–<code>G</code>) with the Google Cloud services that address each concern.</li>
-          <li><a href="#sec-3"><strong>Keep the decision out of the model:</strong></a> a prior-authorization worked example comparing a trace-based denial against a verifiable hybrid design, followed by the six architectural splits (<em>Table 3</em>).</li>
+          <li><a href="#sec-3"><strong>Match model autonomy to what code can verify:</strong></a> why modern AI agents safely handle open-ended planning, coding, and tool calls alongside deterministic checks, plus a worked prior-authorization example showing the hybrid split on regulated decisions.</li>
           <li><a href="#sec-4"><strong>Summary and follow-up questions:</strong></a> spoken wrap-up and likely interview follow-ups.</li>
         </ol>
         <p>Next in Episode 03: <a href="ep03_q2_model_spectrum_economics.html">Question 02 · Open-Weight vs. Proprietary Models Across the Full Model Spectrum</a> (or view the <a href="ref/ai-interview-cheat-sheet.html">5-Question Master Cheat Sheet</a>).</p>
@@ -949,7 +946,7 @@
           <strong>Weights and activations.</strong> A model works with two kinds of numbers. <strong>Weights</strong> are the billions of values learned during training. They are fixed and identical for every request. The model's knowledge is spread across all of them at once, so there is no rule or line you can point to and read. <strong>Activations</strong> are the numbers the model computes from those weights and your input while it handles one request: its working state, which exists only during that request. In the formula <code>y = 2x + 3</code>, the <code>2</code> and the <code>3</code> play the role of weights; with <code>x = 5</code>, the intermediate <code>10</code> and the result <code>13</code> play the role of activations. This is the same for every LLM, whether it runs behind a proprietary API or on open weights. The difference is only who can see the numbers.
         </p>
         <p>
-          <strong>One token at a time.</strong> A model writes its answer one token, a word or part of a word, at a time. For each token it runs one forward pass: the input and everything written so far flow up through every layer, each layer computes new activations, and the last layer turns them into probabilities for the next token. One token is sampled, and that pass's activations are discarded. Each layer's keys and values are cached for speed, but they can be rebuilt from the tokens. The new token is appended to the input, and the next pass begins. <em>Figure 1</em> shows four steps of this loop on the prior-authorization case from Section 3: after reading "ibuprofen", the model writes "needs", "6 wk", "PT" (physical therapy), "fail".
+          <strong>One token at a time.</strong> A model writes its answer one token, a word or part of a word, at a time. For each token it runs one forward pass: the input and everything written so far flow up through every layer, each layer computes new activations, and the last layer turns them into probabilities for the next token. One token is sampled, and that pass's activations are discarded. Each layer's keys and values are cached for speed, but they can be rebuilt from the tokens. The new token is appended to the input, and the next pass begins. <em>Figure 1</em> shows four steps of this loop on the prior-authorization case from Section 3: after reading "ibuprofen," the model writes "needs," "6 wk," "PT" (physical therapy), and "fail."
         </p>
 
 <div class="diagram-frame" id="fig-q1a">
@@ -1055,11 +1052,11 @@
 
     <!-- Bottom comparison note -->
     <rect class="node-card" x="36" y="476" width="848" height="72" rx="9"/>
-    <text class="t-s" x="56" y="504"><tspan style="font-weight:700;fill:var(--ink)">Proprietary API:</tspan> usually the thought summary only; weights, activations, and raw tokens stay with the provider</text>
-    <text class="t-s" x="56" y="530"><tspan style="font-weight:700;fill:var(--ink)">Open weights:</tspan> raw tokens, plus activations recorded with forward-pass hooks and decoded with sparse autoencoders</text>
+    <text class="t-s" x="56" y="504"><tspan style="font-weight:700;fill:var(--ink)">Proprietary API:</tspan> thought summary only; weights and activations stay hidden</text>
+    <text class="t-s" x="56" y="530"><tspan style="font-weight:700;fill:var(--ink)">Open weights:</tspan> raw tokens + activations via hooks and sparse autoencoders</text>
   </svg>
   <div class="fig-caption">
-    <span>Figure 1 — One forward pass per token: activations are computed through every layer and discarded once the next token is sampled, and only the generated token is fed back as the next input. To save time, the model keeps some numbers from earlier tokens instead of recalculating them (the KV cache). Rerunning the same text would produce exactly the same numbers, so the cache is purely a shortcut: the text so far (the prompt plus everything the model has generated) is the only information carried from one step to the next. A separate pass condenses the raw trace into a thought summary.</span>
+    <span>Figure 1 — One forward pass per token: activations are discarded after each token, only the sampled token feeds into the next step, and a separate pass condenses the raw trace into a thought summary.</span>
     <div class="legend-items">
       <span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> Latent activations (computed, then discarded)</span>
       <span><i class="swatch-dot" style="background:var(--cyan-soft);border-color:var(--cyan)"></i> Generated tokens (fed back as input)</span>
@@ -1077,7 +1074,7 @@
         <ul>
           <li><strong>Level 1 · Thought summaries.</strong> <em>What you see:</em> a short prose summary of the model's reasoning. <em>Who can see it:</em> anyone using a reasoning API such as the Gemini API (<a href="https://ai.google.dev/gemini-api/docs/thinking" target="_blank" rel="noopener">Gemini API thinking docs, 2026</a>); this is usually all a proprietary API returns. <em>What it proves:</em> little about why the model answered as it did. A summary sits two steps removed from the computation: it condenses tokens that were themselves sampled from activations.</li>
           <li><strong>Level 2 · Raw thinking tokens.</strong> <em>What you see:</em> the actual tokens the model wrote to itself before answering. <em>Who can see it:</em> users of open-weight reasoning models such as DeepSeek-R1 (<a href="https://api-docs.deepseek.com/guides/thinking_mode/" target="_blank" rel="noopener">DeepSeek Thinking Mode</a>, which exposes the full reasoning trace in <code>reasoning_content</code> or <code>&lt;think&gt;</code> tags); proprietary APIs usually keep them with the provider. <em>What it proves:</em> what the model wrote; the cause of its answer stays out of view. On hard multi-step problems, the model has to write intermediate results down to use them in later steps, which makes the trace useful working memory to monitor (<a href="https://arxiv.org/abs/2507.11473" target="_blank" rel="noopener">Korbak et al., Jul 2025</a>). But it can leave out the real reason, as the hint test below shows.</li>
-          <li><strong>Level 3 · Activations (circuit tracing).</strong> <em>What you see:</em> which internal features fired and how they pushed the model toward its next token. <em>Who can see it:</em> only teams running open weights on infrastructure they control, with specialist tooling. <em>What it proves:</em> part of the real internal path for one prompt. Attribution graphs (<a href="https://transformer-circuits.pub/2025/attribution-graphs/biology.html" target="_blank" rel="noopener">Lindsey et al., Mar 2025</a>)—brought to open-weight models by the <a href="https://www.anthropic.com/research/open-source-circuit-tracing" target="_blank" rel="noopener">circuit-tracing library</a>—and sparse autoencoders (<a href="https://deepmind.google/blog/gemma-scope-2-helping-the-ai-safety-community-deepen-understanding-of-complex-language-model-behavior/" target="_blank" rel="noopener">Gemma Scope 2</a>) capture only a fraction of the computation, at research cost.</li>
+          <li><strong>Level 3 · Activations (circuit tracing).</strong> <em>What you see:</em> which internal concepts ("features") fired and how they wired together across layers—like tracing signals on a circuit board—to push the model toward its next token. <em>Who can see it:</em> only teams running open weights on infrastructure they control, with specialist tooling. <em>What it proves:</em> part of the real internal path for one prompt. Attribution graphs (<a href="https://transformer-circuits.pub/2025/attribution-graphs/biology.html" target="_blank" rel="noopener">Lindsey et al., Mar 2025</a>)—brought to open-weight models by the <a href="https://www.anthropic.com/research/open-source-circuit-tracing" target="_blank" rel="noopener">circuit-tracing library</a>—and sparse autoencoders (<a href="https://deepmind.google/blog/gemma-scope-2-helping-the-ai-safety-community-deepen-understanding-of-complex-language-model-behavior/" target="_blank" rel="noopener">Gemma Scope 2</a>) capture only a fraction of the computation, at research cost.</li>
         </ul>
 
         <div class="closes" style="margin:14px 0 16px;">
@@ -1093,7 +1090,7 @@
           <li><strong>Trace how features influence each other.</strong> Link the active features across layers into an <strong>attribution graph</strong> showing which ones pushed the final token up or down. This is an expensive, research-grade investigation that still captures only part of the computation.</li>
         </ol>
         <p>
-          <strong>The way out: separate reading from deciding.</strong> Have the model extract structured facts (with exact source quotes) into a checklist, and let deterministic code apply the rules to those facts (<a href="https://arxiv.org/abs/2301.13379" target="_blank" rel="noopener">Lyu et al., Jan 2023</a>). Because code executes the rules directly on the recorded facts, the audit trail shows what truly produced the answer. This is <a href="#table-3-option-3">Option 3 (Hybrid) in <em>Table 3</em></a>; <a href="#fig-q1-worked"><em>Figure 4</em></a> walks through it on a worked prior-authorization request.
+          <strong>The way out: separate reading from deciding.</strong> Have the model extract structured facts (with exact source quotes) into a checklist, and let deterministic code apply the rules to those facts (<a href="https://arxiv.org/abs/2301.13379" target="_blank" rel="noopener">Lyu et al., Jan 2023</a>). Because code executes the rules directly on the recorded facts, the audit trail shows what truly produced the answer. This is the <strong>hybrid pattern</strong>; <a href="#fig-q1-worked"><em>Figure 4</em></a> walks through it on a worked prior-authorization request.
         </p>
 
         <h2 id="sec-2">2. From "Black Box" to a Checkable System</h2>
@@ -1147,10 +1144,10 @@
 <td><b>Liability:</b> IP, licensing, and privacy exposure</td>
 
 </tr>
-<tr data-layers="Option 4">
+<tr data-layers="F">
 <td><b>We can't look inside the model.</b></td>
 <td><b>4. Model Weights</b></td>
-<td style="white-space:nowrap"><span class="layer-pill lp-mdl">Option 4</span></td>
+<td style="white-space:nowrap"><span class="layer-pill lp-chg">F</span> <span class="layer-pill lp-mdl">Open weights (Sec. 1 &amp; Follow-ups)</span></td>
 <td>Model-risk and validation teams; security; sovereignty-bound customers</td>
 <td><b>Regulatory scrutiny:</b> independent validation; lock-in</td>
 
@@ -1283,7 +1280,7 @@
     <path d="M 620 516 V 385 H 604" style="fill:none;stroke:var(--good);stroke-width:2.2" marker-end="url(#arr-q1l-good)"/>
   </svg>
   <div class="fig-caption">
-    <span>Figure 2 — The model stays opaque; trust comes from checks around it. Five checks run on every request, in the order it meets them: keep data inside the customer's data perimeter (A) with edge input screening, ground it in customer sources (B), check the model's output in code (C), route it by risk (D), and log every step (E). Two controls run on every change: evaluate and pin (F), and roll out gradually (G).</span>
+    <span>Figure 2 — Five request-time checks (A–E) and two change-time controls (F–G) wrap the opaque model.</span>
     <div class="legend-items">
       <span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> Opaque model</span>
       <span><i class="swatch-dot" style="background:var(--cyan-soft);border-color:var(--cyan)"></i> Checks on every request</span>
@@ -1301,9 +1298,10 @@
 <p class="lc-eyebrow">Answers 3 Training-Data Provenance, 5 Data Governance</p>
 <h3>A · Data perimeter</h3>
 <p class="lc-summary">Keep customer data inside enforceable boundaries, and screen every request at the edge.</p>
-<div class="t-fix-row"><b>Customer gets:</b> zero-training terms, residency region, key ownership, and input-screening results; model card, data statements, and certifications</div><div class="t-fix-row gcp"><b>On Google Cloud:</b> VPC Service Controls, customer-managed encryption keys (CMEK, in Cloud KMS), Assured Workloads and regional endpoints; Model Armor; published model cards</div>
-<p class="lc-details"><strong>Boundaries.</strong> Contractual zero-training on customer data, regional residency, VPC perimeters, customer-managed encryption keys (CMEK), and explicit retention bounds.</p>
-<p class="lc-details"><strong>Input screening.</strong> Screen every request at the boundary for PII, toxicity, off-topic asks, and prompt injection (<a href="https://evekhm.github.io/all-about-agents/ep01_securing_agent_to_database.html" target="_blank" rel="noopener">Episode 01</a> covers data boundaries and prompt-injection defenses for agents that reach databases).</p>
+<div class="t-fix-row"><b>Customer gets:</b> zero-training terms, residency region, key ownership, and input-screening results; model card, data statements, and certifications</div><div class="t-fix-row gcp"><b>On Google Cloud:</b> VPC Service Controls, customer-managed encryption keys (CMEK, in Cloud KMS), Assured Workloads, IAM (Allow, Deny, and Principal Access Boundary / PAB), and regional endpoints; Agent Gateway (or Apigee AI Gateway / IAP + Cloud Armor) running inline Model Armor + Sensitive Data Protection (Cloud SDP); published model cards</div>
+<p class="lc-details"><strong>Boundaries.</strong> Contractual zero-training on customer data, regional residency, VPC perimeters, CMEK, and explicit retention bounds.</p>
+<p class="lc-details"><strong>Model documentation.</strong> For training-data questions, provide the model card, data statements (source categories, knowledge cut-off, filtering), licensing terms, and IP indemnification.</p>
+<p class="lc-details"><strong>Input screening.</strong> Screen every request at the boundary for PII, toxicity, off-topic asks, and prompt injection (<a href="ep01_securing_agent_to_database.html">Episode 01</a> covers data boundaries and prompt-injection defenses for agents that reach databases).</p>
 </div>
 <div class="layer-card" id="layer-b">
 <p class="lc-eyebrow">Answers 1 Explainability, 6 Reliability</p>
@@ -1316,7 +1314,7 @@
 <p class="lc-eyebrow">Answers 1 Explainability, 2 Predictability</p>
 <h3>C · Check outputs in code</h3>
 <p class="lc-summary">Code verifies every claim and applies the business rules, so the model never has the last word.</p>
-<div class="t-fix-row"><b>Customer gets:</b> quote-verification results, rule checks, and schema validation</div><div class="t-fix-row gcp"><b>On Google Cloud:</b> Model Armor output screening; your own service (for example, on Cloud Run) with structured output schemas</div>
+<div class="t-fix-row"><b>Customer gets:</b> quote-verification results, rule checks, and schema validation</div><div class="t-fix-row gcp"><b>On Google Cloud:</b> Model Armor + Cloud SDP egress screening (at Agent Gateway / Apigee or Cloud Run); Semantic Governance Policies (SGP) and Agent Registry for tool calls; your own service (for example, on Cloud Run) with structured output schemas</div>
 <p class="lc-details"><strong>Verify in code.</strong> Server code checks that cited passages genuinely support each claim, screens outputs for PII and off-policy content, and enforces permissions, dollar caps, and business rules (<a href="https://www.anthropic.com/research/building-effective-agents" rel="noopener" target="_blank">Anthropic, Dec 2024</a>).</p>
 <p class="lc-details"><strong>Repeatability.</strong> Constrain outputs where repeatability matters (structured output schemas, enumerated values, and a pinned thinking level) while keeping sampling parameters at the defaults current reasoning models are tuned for (<a href="https://ai.google.dev/gemini-api/docs/gemini-3" rel="noopener" target="_blank">Gemini 3 guide, 2026</a>). No decoding setting makes a hosted model repeatable: even greedy decoding on shared inference servers varies with the batch a request lands in (in one study, 1,000 identical requests to an open-weight model produced 80 distinct outputs; <a href="https://thinkingmachines.ai/blog/defeating-nondeterminism-in-llm-inference/" rel="noopener" target="_blank">He et al., Sep 2025</a>). Promise measured consistency (<code>pass^k</code>), and put calculations, thresholds, and final decisions in code.</p>
 </div>
@@ -1333,7 +1331,7 @@
 <p class="lc-eyebrow">Answers 7 Accountability</p>
 <h3>E · Log every step</h3>
 <p class="lc-summary">Every input, source, model version, check, and sign-off is recorded, so any decision can be replayed.</p>
-<div class="t-fix-row"><b>Customer gets:</b> a trace ID that replays any decision</div><div class="t-fix-row gcp"><b>On Google Cloud:</b> Cloud Logging and Cloud Trace, exported via Log Sinks to BigQuery (and Cloud Storage for full payloads) with audit retention</div>
+<div class="t-fix-row"><b>Customer gets:</b> a trace ID that replays any decision</div><div class="t-fix-row gcp"><b>On Google Cloud:</b> Cloud Logging, Cloud Trace, and Cloud Audit Logs (<code>DATA_READ</code>, <code>ADMIN_ACTIVITY</code>), exported via Log Sinks to BigQuery (and Cloud Storage for full payloads) with audit retention; Security Command Center (SCC)</div>
 <p class="lc-details"><strong>What to log.</strong> Every interaction: input, retrieved chunks, prompt version, pinned model version, thought summaries as supporting evidence, output, and reviewer feedback; record step-by-step traces across every tool call so any decision can be reconstructed months later, and expose live drift and quality dashboards to operators.</p>
 <p class="lc-details"><strong>Provider errors.</strong> Treat provider errors as part of observability: isolate HTTP 429 and timeout faults into retry queues with backoff, and record each retry in the trace so a reconstructed run shows which calls failed and why.</p>
 </div>
@@ -1342,8 +1340,8 @@
 <h3>F · Evaluate and pin</h3>
 <p class="lc-summary">A golden set built with domain experts gates every change, and the model version moves only when it passes.</p>
 <div class="t-fix-row"><b>Customer gets:</b> golden-set results, <code>pass^k</code> consistency (a case passes only if all <code>k</code> runs succeed; <a href="https://arxiv.org/abs/2406.12045" rel="noopener" target="_blank">Yao et al., ICLR 2025</a>), and failure slices; a pinned model ID and regression report before each cutover</div><div class="t-fix-row gcp"><b>On Google Cloud:</b> Gemini Enterprise Agent Platform (Agent Platform) evaluation service; pinned model version IDs; evaluation pipeline in CI</div>
-<p class="lc-details"><strong>Golden set.</strong> Co-create a <strong>golden set</strong> of real historical cases alongside the customer's domain specialists, sized to the workflow's risk and edge-case coverage; track accuracy, groundedness, hallucination rate, refusal rate, latency, and cost; rerun the set like a regression suite on every prompt, retrieval, or model change; and share the failure breakdown openly. Where an LLM judge scores a metric, first measure the judge's agreement with SME labels on a held-out slice.</p>
-<p class="lc-details"><strong>Pin versions.</strong> Upgrade only when the customer's golden set passes. Pinning is temporary: providers retire API model versions on a published schedule, so maintain a migration calendar and run each successor through the customer's golden set before cutover. Self-hosted open weights (Option 4) remove forced retirement altogether.</p>
+<p class="lc-details"><strong>Golden set.</strong> Co-create a <strong>golden set</strong> of real historical cases with the customer's domain specialists, sizing it to the workflow's risk and edge-case coverage; track accuracy, groundedness, hallucination rate, refusal rate, latency, and cost; rerun the set like a regression suite on every prompt, retrieval, or model change; and share the failure breakdown openly. Where an LLM judge scores a metric, first measure the judge's agreement with SME labels on a held-out slice.</p>
+<p class="lc-details"><strong>Pin versions.</strong> Upgrade only when the customer's golden set passes. Pinning is temporary: providers retire API model versions on a published schedule, so maintain a migration calendar and run each successor through the customer's golden set before cutover. Self-hosted open weights remove forced retirement altogether.</p>
 <p class="lc-details"><strong>Training caution.</strong> If you fine-tune or run reinforcement learning, keep the reasoning trace out of the reward signal so it stays useful for monitoring (<a href="https://arxiv.org/abs/2503.11926" rel="noopener" target="_blank">Baker et al., Mar 2025</a>).</p>
 </div>
 <div class="layer-card lc-chg" id="layer-g">
@@ -1360,7 +1358,7 @@
         </p>
 
 <div class="diagram-frame" id="fig-q1-gcp">
-  <svg viewBox="0 0 920 622" role="img" aria-label="The same seven layers on Google Cloud, lettered A to G in request-flow order. Inside a VPC Service Controls, CMEK (Cloud KMS), and Assured Workloads perimeter, a request is screened by Model Armor (A), grounded with RAG Engine on Agent Platform (B), handled by Gemini on Agent Platform or open weights from Model Garden, checked by Model Armor and your service on Cloud Run with structured output schemas (C), and routed by risk to the customer's review queue (Pub/Sub or Workflows) with sign-offs stored in Cloud SQL or Firestore (D), while Cloud Logging and Cloud Trace exported to BigQuery and Cloud Storage record every step for multi-month replay (E). The Agent Platform evaluation service and pinned model version IDs gate every change (F), and shadow comparisons with Cloud Run traffic splitting or a feature-flag kill switch govern graduated rollout (G).">
+  <svg viewBox="0 0 920 622" role="img" aria-label="The same seven layers on Google Cloud, lettered A to G in request-flow order. Inside a VPC Service Controls, CMEK (Cloud KMS), Assured Workloads, and IAM Principal Access Boundary perimeter, a request enters via Agent Gateway or Apigee with IAP and Cloud Armor and is screened by Model Armor and Sensitive Data Protection (A), grounded with RAG Engine on Agent Platform (B), handled by Gemini on Agent Platform or open weights from Model Garden, checked by Agent Gateway, Model Armor with Cloud SDP, Semantic Governance Policies, Agent Registry, and your service on Cloud Run with structured output schemas (C), and routed by risk to the customer's review queue (Pub/Sub or Workflows) with sign-offs stored in Cloud SQL or Firestore (D), while Cloud Logging, Cloud Trace, Cloud Audit Logs, Security Command Center, and a BigQuery and Cloud Storage sink record every step for multi-month replay (E). The Agent Platform evaluation service and pinned model version IDs gate every change (F), and shadow comparisons with Cloud Run traffic splitting or a feature-flag kill switch govern graduated rollout (G).">
   <defs>
     <marker id="arr-q1g-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:var(--ink)"/>
@@ -1483,7 +1481,7 @@
     <use href="#icon-gcp-vpc" x="202" y="67" width="20" height="20"/>
     <use href="#icon-gcp-kms" x="226" y="67" width="20" height="20"/>
     <use href="#icon-gcp-aw" x="250" y="67" width="20" height="20"/>
-    <text class="t-s" x="278" y="82">VPC Service Controls · CMEK (Cloud KMS) · Assured Workloads</text>
+    <text class="t-s" x="278" y="82">VPC Service Controls · CMEK · Assured Workloads · IAM PAB</text>
 
     <!-- Request path, in order -->
     <rect class="node-dim" x="350" y="96" width="120" height="24" rx="12"/>
@@ -1493,15 +1491,15 @@
     <!-- Screen input at the perimeter edge -->
     <rect class="node-card" x="200" y="138" width="420" height="44" rx="9"/>
     <use href="#icon-gcp-armor" x="216" y="148" width="24" height="24"/>
-    <text class="t-b" x="250" y="157">Model Armor</text>
-    <text class="t-s" x="250" y="174">screen input for PII, toxicity, prompt injection</text>
+    <text class="t-b" x="250" y="157">Agent Gateway · Model Armor + SDP</text>
+    <text class="t-s" x="250" y="174">screen prompts, PII, injection</text>
     <line class="flow" x1="410" y1="182" x2="410" y2="196" marker-end="url(#arr-q1g-ink)"/>
 
     <!-- B: Ground in customer sources -->
     <rect class="node-cyan" x="200" y="200" width="420" height="44" rx="9"/>
     <use href="#icon-gcp-ap" x="216" y="210" width="24" height="24"/>
     <text class="t-b" x="250" y="219">B · RAG Engine (Agent Platform)</text>
-    <text class="t-s" x="250" y="236">ground in customer documents with citations</text>
+    <text class="t-s" x="250" y="236">ground in customer sources</text>
     <line class="flow" x1="410" y1="244" x2="410" y2="258" marker-end="url(#arr-q1g-ink)"/>
 
     <!-- Model -->
@@ -1509,7 +1507,7 @@
     <use href="#icon-gcp-gemini" x="212" y="272" width="22" height="22"/>
     <use href="#icon-gcp-ap" x="236" y="272" width="22" height="22"/>
     <text class="t-b" x="268" y="281">Gemini on Agent Platform</text>
-    <text class="t-s" x="268" y="298">or open weights from Model Garden</text>
+    <text class="t-s" x="268" y="298">or Model Garden open weights</text>
     <line class="flow" x1="410" y1="306" x2="410" y2="320" marker-end="url(#arr-q1g-ink)"/>
 
     <!-- C: Check outputs in code -->
@@ -1517,23 +1515,22 @@
     <use href="#icon-gcp-armor" x="212" y="334" width="22" height="22"/>
     <use href="#icon-gcp-run" x="236" y="334" width="22" height="22"/>
     <text class="t-b" x="268" y="343">C · Model Armor + Cloud Run</text>
-    <text class="t-s" x="268" y="360">output screening + structured schemas &amp; rules</text>
+    <text class="t-s" x="268" y="360">egress SDP · SGP · schemas &amp; rules</text>
     <line class="flow" x1="410" y1="368" x2="410" y2="382" marker-end="url(#arr-q1g-ink)"/>
 
     <!-- D: Route by risk -->
     <rect class="node-cyan" x="200" y="386" width="420" height="44" rx="9"/>
     <use href="#icon-gcp-run" x="216" y="396" width="24" height="24"/>
     <text class="t-b" x="250" y="405">D · Customer review queue</text>
-    <text class="t-s" x="250" y="422">Pub/Sub or Workflows · sign-offs in Cloud SQL / Firestore</text>
+    <text class="t-s" x="250" y="422">Workflows · Cloud SQL / Firestore</text>
 
     <!-- E: Log every step -->
     <rect class="node-cyan" x="640" y="138" width="226" height="292" rx="9"/>
-    <use href="#icon-gcp-log" x="723" y="232" width="26" height="26"/>
-    <use href="#icon-gcp-trace" x="757" y="232" width="26" height="26"/>
-    <text class="t-b t-c" x="753" y="280">E · Cloud Logging,</text>
-    <text class="t-b t-c" x="753" y="299">Cloud Trace</text>
-    <text class="t-s t-c" x="753" y="321">+ BigQuery sink &amp; Cloud Storage</text>
-    <text class="t-s t-c" x="753" y="339">for multi-month replay</text>
+    <use href="#icon-gcp-log" x="723" y="226" width="26" height="26"/>
+    <use href="#icon-gcp-trace" x="757" y="226" width="26" height="26"/>
+    <text class="t-b t-c" x="753" y="274">E · Logging, Trace,</text>
+    <text class="t-b t-c" x="753" y="294">Audit &amp; SCC</text>
+    <text class="t-s t-c" x="753" y="318">+ BigQuery audit sink</text>
 
     <!-- Output -->
     <line class="flow" x1="410" y1="430" x2="410" y2="464" marker-end="url(#arr-q1g-ink)"/>
@@ -1543,18 +1540,18 @@
     <!-- F and G: controls on every change -->
     <rect class="node-good" x="34" y="530" width="418" height="58" rx="9"/>
     <use href="#icon-gcp-ap" x="50" y="546" width="26" height="26"/>
-    <text class="t-b" x="86" y="553">F · Agent Platform evaluation service</text>
-    <text class="t-s" x="86" y="573">golden set + pinned model version IDs</text>
+    <text class="t-b" x="86" y="553">F · Agent Platform evals</text>
+    <text class="t-s" x="86" y="573">golden set + pinned versions</text>
     <path d="M 180 530 V 284 H 196" style="fill:none;stroke:var(--good);stroke-width:2.2" marker-end="url(#arr-q1g-good)"/>
 
     <rect class="node-good" x="468" y="530" width="418" height="58" rx="9"/>
     <use href="#icon-gcp-ap" x="484" y="546" width="26" height="26"/>
-    <text class="t-b" x="520" y="553">G · Evaluation service + Cloud Run</text>
-    <text class="t-s" x="520" y="573">shadow comparisons · feature-flag kill switch</text>
+    <text class="t-b" x="520" y="553">G · Evals + Cloud Run</text>
+    <text class="t-s" x="520" y="573">shadow mode · kill switch</text>
     <path d="M 634 530 V 408 H 624" style="fill:none;stroke:var(--good);stroke-width:2.2" marker-end="url(#arr-q1g-good)"/>
   </svg>
   <div class="fig-caption">
-    <span>Figure 3 — The same seven layers on Google Cloud. Each request is screened by Model Armor, grounded with RAG Engine, handled by Gemini, checked in your own service, and routed by risk to a customer review queue with sign-offs in Cloud SQL or Firestore, inside a VPC Service Controls and CMEK perimeter, with every step in Cloud Logging and Cloud Trace exported to BigQuery and Cloud Storage for multi-month replay. The Agent Platform evaluation service gates every change and pairs with Cloud Run feature flags for shadow-mode rollout.</span>
+    <span>Figure 3 — The seven layers (A–G) mapped to Google Cloud's Agent Platform and surrounding security, audit, and rollout controls.</span>
     <div class="legend-items">
       <span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> Opaque model</span>
       <span><i class="swatch-dot" style="background:var(--cyan-soft);border-color:var(--cyan)"></i> Checks on every request</span>
@@ -1565,7 +1562,7 @@
 
         <h3>How Much of This a Customer Needs</h3>
         <p>
-          <em>Figure 3</em> shows the full set of controls. Every layer adds engineering cost, latency, and ongoing ownership: citation verification adds a retrieval and check to every answer, <code>k</code>-sample agreement multiplies inference cost by <code>k</code>, and human review adds minutes of specialist time per routed case. Some layers are mandatory regardless of cost because industry regulations require specific evidence, oversight, or auditability. <em>Table 2</em> highlights a representative sample of existing regulations, summarizing what each framework covers, what it asks for, and which layers from <em>Figure 3</em> produce that evidence.
+          <em>Figure 3</em> shows the full set of controls. A customer starts with the layers that regulation and error cost demand. Every layer adds engineering cost, latency, and ongoing ownership: citation verification adds a retrieval and a check to every answer, <code>k</code>-sample agreement multiplies inference cost by <code>k</code>, and human review adds minutes of specialist time per routed case. Some layers are mandatory regardless of cost because regulations require specific evidence, oversight, or auditability. <em>Table 2</em> lists six examples: what each framework covers, what it asks for, and which layers produce that evidence.
         </p>
 
         <div class="nine-q-wrap">
@@ -1591,7 +1588,7 @@
                   <td><b><a href="https://eur-lex.europa.eu/eli/reg/2016/679/oj" target="_blank" rel="noopener">GDPR</a></b></td>
                   <td>General Data Protection Regulation — EU law protecting personal data and privacy, including individual rights around automated profiling and decision-making.</td>
                   <td>Safeguards for solely automated decisions with legal or similarly significant effects (<a href="https://gdpr-info.eu/art-22-gdpr/" target="_blank" rel="noopener">Art. 22</a>), and meaningful information about the logic involved (<a href="https://gdpr-info.eu/art-13-gdpr/" target="_blank" rel="noopener">Art. 13</a>, <a href="https://gdpr-info.eu/art-14-gdpr/" target="_blank" rel="noopener">Art. 14</a>, <a href="https://gdpr-info.eu/art-15-gdpr/" target="_blank" rel="noopener">Art. 15</a>).</td>
-                  <td style="white-space:nowrap"><span class="layer-pill lp-req">B</span> <span class="layer-pill lp-req">D</span> <span class="layer-pill lp-chg">Option 3 (Section 3)</span></td>
+                  <td style="white-space:nowrap"><span class="layer-pill lp-req">B</span> <span class="layer-pill lp-req">D</span> <span class="layer-pill lp-chg">Hybrid (Section 3)</span></td>
                 </tr>
                 <tr>
                   <td><b><a href="https://www.federalreserve.gov/supervisionreg/srletters/sr2602.htm" target="_blank" rel="noopener">SR 11-7 / SR 26-2</a> (U.S. banking model risk)</b></td>
@@ -1602,14 +1599,14 @@
                 <tr>
                   <td><b><a href="https://www.hhs.gov/hipaa/for-professionals/index.html" target="_blank" rel="noopener">HIPAA</a></b></td>
                   <td>Health Insurance Portability and Accountability Act — U.S. federal law setting privacy and security standards to safeguard patient medical records and protected health information (PHI).</td>
-                  <td>Business associate agreements, minimum-necessary access, and audit controls for systems that touch protected health information (PHI).</td>
+                  <td>Business associate agreements, minimum-necessary access, and audit controls for systems that touch PHI.</td>
                   <td style="white-space:nowrap"><span class="layer-pill lp-req">A</span> <span class="layer-pill lp-req">E</span></td>
                 </tr>
                 <tr>
                   <td><b><a href="https://www.cms.gov/newsroom/fact-sheets/cms-interoperability-and-prior-authorization-final-rule-cms-0057-f" target="_blank" rel="noopener">CMS Prior Authorization Rule</a> (CMS-0057-F)</b></td>
                   <td>U.S. Centers for Medicare &amp; Medicaid Services rule streamlining electronic prior authorization and requiring health plans to explain coverage decisions clearly and on defined timelines.</td>
                   <td>A specific reason for every denied prior-authorization request.</td>
-                  <td style="white-space:nowrap"><span class="layer-pill lp-req">B</span> <span class="layer-pill lp-req">C</span> <span class="layer-pill lp-chg">Option 3 (Section 3)</span></td>
+                  <td style="white-space:nowrap"><span class="layer-pill lp-req">B</span> <span class="layer-pill lp-req">C</span> <span class="layer-pill lp-chg">Hybrid (Section 3)</span></td>
                 </tr>
                 <tr>
                   <td><b><a href="https://sd13.senate.ca.gov/news/press-release/december-9-2024/landmark-law-prohibits-health-insurance-companies-using-ai-to" target="_blank" rel="noopener">California SB 1120</a></b></td>
@@ -1625,22 +1622,22 @@
           <em>Note:</em> Dates and article numbers change; confirm the current text with the customer's counsel before committing to a compliance claim.
         </p>
 
-        <h2 id="sec-3">3. Keep the Decision Out of the Model</h2>
+        <h2 id="sec-3">3. Match Model Autonomy to What Code Can Verify</h2>
 
         <p>
-          Wrapping the model with input screening, citation checks, and audit logs still leaves the model in charge of the answer. The stronger move is to give the model less to decide. When a model pulls a fact and its quote from a document, code can confirm the quote is in the source. When a model makes the decision itself, its reasons stay in activations no one can read. So split each decision step: the model does the language work, and rules a person can read make the decision. One worked case shows why it matters.
+          Modern AI agents already handle far more than text extraction: they plan multi-step workflows, write and debug code, call APIs, synthesize research, and recover when a tool fails. That autonomy works in production because the agent's open-ended work is paired with deterministic verification. A coding agent writes entire features, while compilers, unit tests, linters, and code review verify every change before merge. A research or customer-support agent plans searches and drafts actions, while grounded citations (Layer B), policy and schema gates (Layer C), and risk-routed approvals (Layer D) govern high-impact calls such as refunds or account updates.
         </p>
 
         <p>
-          <b>The case.</b> Prior authorization is a health plan's approval before it pays for a procedure: the doctor submits the patient's chart, and the plan checks it against a written medical policy. Plans already use AI here, under a firm rule: software may approve, but only a licensed clinician may deny for medical necessity. California's <a href="https://sd13.senate.ca.gov/news/press-release/december-9-2024/landmark-law-prohibits-health-insurance-companies-using-ai-to" target="_blank" rel="noopener">SB 1120</a> writes that into law, <a href="https://deloitte.com/us/en/industries/life-sciences-health-care/blogs/health-care/ai-could-help-health-plans-simplify-prior-auth-comply-with-regs.html" target="_blank" rel="noopener">Medicare's WISeR pilot</a> reserves denials for clinicians, and <a href="https://aamc.org/advocacy-policy/washington-highlights/cms-addresses-use-ai-medicare-advantage-plans" target="_blank" rel="noopener">CMS requires</a> Medicare Advantage decisions to rest on the individual patient's record. A compliance lead asks: "If your assistant recommends denying a lumbar MRI, can we show the member and the regulator exactly why?" Imaging policies typically cover a lumbar MRI for low back pain when either (a) at least six weeks of conservative treatment in the last six months has failed, or (b) a new or worsening neurological deficit is documented on exam (<a href="https://ldh.la.gov/assets/medicaid/MCPP/10.12.21/847_ACLA_Lumbar_Spine_MRI_2022_NIA_CG_044.pdf" target="_blank" rel="noopener">NIA Clinical Guideline NIA_CG_044</a>).
+          How much decision authority belongs in the model therefore scales with two factors: the cost of an error and how cheaply external checks can verify the output. On regulated, audit-heavy decisions—such as medical necessity, credit underwriting, or compliance eligibility—automated denials are often restricted by law and require a line-by-line rule trace. For those specific decision gates, the strongest architecture pairs the LLM's language strength (reading messy documents, mapping clinical or policy terms, and pulling verbatim quotes) with explicit, human-readable rules in code or an interpretable scoring model that makes the binding call. One worked case shows how that hybrid split operates in practice.
         </p>
 
         <p>
-          <b>When the model's reason decides.</b> The model reads the chart and the policy, recommends <code>DENY</code>, and its thinking reads "patient only tried ibuprofen for 3 weeks." A clinician working through a long queue sees a fluent reason and signs. The denial is wrong: nobody checked criterion (b). A clinician in the loop does not catch it, because what they review is the model's story, and the thinking reads as a complete reason whether or not the model checked (b). The process is compliant: a licensed clinician made the call. It is still wrong.
+          <b>The case.</b> Under prior-authorization rules (California's <a href="https://sd13.senate.ca.gov/news/press-release/december-9-2024/landmark-law-prohibits-health-insurance-companies-using-ai-to" target="_blank" rel="noopener">SB 1120</a>, <a href="https://deloitte.com/us/en/industries/life-sciences-health-care/blogs/health-care/ai-could-help-health-plans-simplify-prior-auth-comply-with-regs.html" target="_blank" rel="noopener">Medicare's WISeR pilot</a>, and <a href="https://aamc.org/advocacy-policy/washington-highlights/cms-addresses-use-ai-medicare-advantage-plans" target="_blank" rel="noopener">CMS rules</a>), software may auto-approve clear cases while a licensed clinician must make any denial. Take a <a href="https://ldh.la.gov/assets/medicaid/MCPP/10.12.21/847_ACLA_Lumbar_Spine_MRI_2022_NIA_CG_044.pdf" target="_blank" rel="noopener">lumbar MRI policy</a> that approves coverage if either (a) six weeks of conservative care failed or (b) a neurological deficit is documented.
         </p>
 
         <p>
-          <strong>When code checks.</strong> The model only extracts facts, each with a verbatim quote:
+          <strong>How the LLM helps—and how code checks it.</strong> In this split, the model reads the unstructured clinical notes and extracts structured facts, each paired with a verbatim quote from the chart:
         </p>
         <div class="code-card">
           <div class="code-title">Extracted Chart Facts with Verbatim Quotes (Model Output)</div>
@@ -1654,157 +1651,74 @@
 }</pre>
         </div>
         <p>
-          Code confirms each quote exists in the chart, then applies the policy: (a) is not met (three weeks against a six-week minimum), and (b) has no evidence either way. Code approves automatically only when a criterion is met with a verified quote, and it never denies. Here it requests the neurological exam notes and, if they do not settle (b), routes the case to a clinician with the evidence laid out criterion by criterion (<em>Figure 4</em>).
+          Code confirms each quote exists verbatim in the chart, then evaluates the policy criteria deterministically: (a) is three weeks against a six-week minimum, and (b) has no evidence either way. When a criterion is met with a verified quote, code can auto-approve with a complete audit trail. Here, criterion (a) falls short and (b) is still open, so code requests the neurological exam notes and, if they do not settle (b), routes the chart to a licensed clinician with every verified fact and policy criterion laid out side by side (<em>Figure 4</em>).
         </p>
 
 <div class="diagram-frame" id="fig-q1-worked">
-  <svg viewBox="0 0 920 510" role="img" aria-label="Same chart, same model: when the model decides, its trace becomes the reason and produces a wrongful denial; when the model only extracts quoted facts and code applies the policy rule, the outcome is a request for the missing evidence">
+  <svg viewBox="0 0 920 310" role="img" aria-label="Verifiable hybrid prior-authorization flow: the chart and policy enter, the model extracts structured facts with verbatim quotes, code verifies the quotes in the chart and applies policy criteria (a) and (b), and because (b) has missing evidence, code routes to PEND_FOR_EVIDENCE to request neuro exam notes followed by clinician review">
   <defs>
     <marker id="arr-q1w-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:var(--ink)"/>
-    </marker>
-    <marker id="arr-q1w-stop" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:var(--stop)"/>
     </marker>
     <marker id="arr-q1w-good" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:var(--good)"/>
     </marker>
   </defs>
 
-    <rect x="14" y="14" width="892" height="482" rx="14" style="fill:var(--panel-2);stroke:var(--line);stroke-width:1.75"/>
-    <text class="zl" x="34" y="42">SAME CHART, SAME MODEL · WHAT THE CLINICIAN SEES CHANGES THE OUTCOME</text>
+    <rect x="14" y="14" width="892" height="282" rx="14" style="fill:var(--panel-2);stroke:var(--line);stroke-width:1.75"/>
+    <text class="zl" x="34" y="42">VERIFIABLE HYBRID WORKFLOW · THE MODEL EXTRACTS, CODE CHECKS</text>
 
-    <!-- Shared input -->
-    <rect class="node-dim" x="32" y="204" width="140" height="64" rx="9"/>
-    <text class="t-b t-c" x="102" y="230">Chart + policy</text>
-    <text class="t-s t-c" x="102" y="252">same input</text>
-    <path d="M 172 226 H 186 V 142 H 196" style="fill:none;stroke:var(--stop);stroke-width:2.2" marker-end="url(#arr-q1w-stop)"/>
-    <path d="M 172 246 H 186 V 322 H 196" style="fill:none;stroke:var(--good);stroke-width:2.4" marker-end="url(#arr-q1w-good)"/>
+    <!-- Row 1: left to right -->
+    <rect class="node-dim" x="34" y="68" width="146" height="64" rx="9"/>
+    <text class="t-b t-c" x="107" y="94">Chart + policy</text>
+    <text class="t-s t-c" x="107" y="115">clinical record</text>
+    <line class="flow" x1="180" y1="100" x2="210" y2="100" marker-end="url(#arr-q1w-ink)"/>
 
-    <!-- Risky lane: a clinician signs the model's reason -->
-    <text class="t-m-r" x="200" y="98">RISKY · A CLINICIAN SIGNS THE MODEL'S REASON</text>
-    <rect class="node-violet" x="200" y="110" width="200" height="72" rx="9"/>
-    <text class="t-b t-c" x="300" y="135">Model recommends</text>
-    <text class="t-s t-c" x="300" y="157">DENY, with a reason</text>
-    <line class="flow" x1="400" y1="146" x2="426" y2="146" marker-end="url(#arr-q1w-ink)"/>
-    <rect class="node-card" x="430" y="110" width="200" height="72" rx="9"/>
-    <text class="t-b t-c" x="530" y="133">Clinician signs</text>
-    <text class="t-s t-c" x="530" y="153">sees one line:</text>
-    <text class="t-s t-c" x="530" y="170">"only 3 wks ibuprofen"</text>
-    <line class="flow" x1="630" y1="146" x2="656" y2="146" marker-end="url(#arr-q1w-ink)"/>
-    <rect class="node-bad" x="660" y="110" width="220" height="72" rx="9"/>
-    <text class="t-m-r t-c" x="770" y="133">WRONGFUL DENIAL</text>
-    <text class="t-s t-c" x="770" y="153">signed, compliant,</text>
-    <text class="t-s t-c" x="770" y="170">criterion (b) never checked</text>
+    <rect class="node-violet" x="214" y="68" width="196" height="64" rx="9"/>
+    <text class="t-b t-c" x="312" y="94">Model extracts</text>
+    <text class="t-s t-c" x="312" y="115">facts + verbatim quotes</text>
+    <line class="flow" x1="410" y1="100" x2="440" y2="100" marker-end="url(#arr-q1w-ink)"/>
 
-    <line x1="200" y1="214" x2="880" y2="214" style="stroke:var(--line);stroke-width:1.4;stroke-dasharray:6 5"/>
+    <rect class="node-cyan" x="444" y="68" width="196" height="64" rx="9"/>
+    <text class="t-b t-c" x="542" y="94">Code verifies</text>
+    <text class="t-s t-c" x="542" y="115">quotes found in chart</text>
+    <line class="flow" x1="640" y1="100" x2="670" y2="100" marker-end="url(#arr-q1w-ink)"/>
 
-    <!-- Verifiable lane: the model extracts, code checks -->
-    <text class="t-m-g" x="200" y="278">VERIFIABLE · THE MODEL EXTRACTS, CODE CHECKS</text>
-    <rect class="node-violet" x="200" y="290" width="200" height="64" rx="9"/>
-    <text class="t-b t-c" x="300" y="317">Model extracts</text>
-    <text class="t-s t-c" x="300" y="339">facts + verbatim quotes</text>
-    <line class="flow" x1="400" y1="322" x2="426" y2="322" marker-end="url(#arr-q1w-ink)"/>
-    <rect class="node-cyan" x="430" y="290" width="200" height="64" rx="9"/>
-    <text class="t-b t-c" x="530" y="317">Code verifies</text>
-    <text class="t-s t-c" x="530" y="339">quotes found in chart</text>
-    <line class="flow" x1="630" y1="322" x2="656" y2="322" marker-end="url(#arr-q1w-ink)"/>
-    <rect class="node-cyan" x="660" y="290" width="220" height="64" rx="9"/>
-    <text class="t-b t-c" x="770" y="317">Code applies rule</text>
-    <text class="t-s t-c" x="770" y="339">policy criteria (a) and (b)</text>
-    <line class="flow" x1="770" y1="354" x2="770" y2="376" marker-end="url(#arr-q1w-ink)"/>
+    <rect class="node-cyan" x="674" y="68" width="210" height="64" rx="9"/>
+    <text class="t-b t-c" x="779" y="94">Code applies rule</text>
+    <text class="t-s t-c" x="779" y="115">policy criteria (a) and (b)</text>
+    <line class="flow" x1="779" y1="132" x2="779" y2="162" marker-end="url(#arr-q1w-ink)"/>
 
-    <rect class="node-card" x="560" y="380" width="320" height="100" rx="9"/>
-    <text class="t-b" x="578" y="406">Rule: (a) OR (b) approves</text>
-    <text class="t-s" x="578" y="428">(a) ≥ 6 wks conservative care → not met</text>
-    <text class="t-s" x="578" y="448">(b) neuro deficit → missing evidence</text>
-    <text class="t-s" x="578" y="468">(b) is still open, so code cannot deny</text>
-    <line class="flow-g" x1="560" y1="430" x2="524" y2="430" marker-end="url(#arr-q1w-good)"/>
+    <!-- Row 2: rule evaluation + outcome -->
+    <rect class="node-card" x="524" y="166" width="360" height="106" rx="9"/>
+    <text class="t-b" x="544" y="192">Rule: (a) OR (b) approves</text>
+    <text class="t-s" x="544" y="214">(a) ≥ 6 wks conservative care → 3 wks (not met)</text>
+    <text class="t-s" x="544" y="234">(b) neuro deficit → missing evidence</text>
+    <text class="t-s" x="544" y="254">Either met → AUTO_APPROVE · (b) open → PEND</text>
+    <line class="flow-g" x1="524" y1="219" x2="468" y2="219" marker-end="url(#arr-q1w-good)"/>
 
-    <rect class="node-good" x="200" y="380" width="320" height="100" rx="9"/>
-    <text class="t-m-g t-c" x="360" y="410">PEND_FOR_EVIDENCE</text>
-    <text class="t-b t-c" x="360" y="436">Request the missing evidence</text>
-    <text class="t-s t-c" x="360" y="460">neuro exam notes · then clinician review</text>
+    <rect class="node-good" x="34" y="166" width="430" height="106" rx="9"/>
+    <text class="t-m-g t-c" x="249" y="196">PEND_FOR_EVIDENCE</text>
+    <text class="t-b t-c" x="249" y="222">Request missing exam notes</text>
+    <text class="t-s t-c" x="249" y="246">then licensed clinician review with verified facts</text>
   </svg>
   <div class="fig-caption">
-    <span>Figure 4 — Same chart, same model, a clinician in the loop either way: when the clinician reviews the model's reason, a plausible trace becomes a signed wrongful denial; when code checks quoted facts, it approves only on verified evidence and sends the rest to a clinician with the evidence laid out.</span>
+    <span>Figure 4 — Verifiable prior-authorization workflow: model extraction followed by deterministic quote and policy checks.</span>
     <div class="legend-items">
       <span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> Model step</span>
       <span><i class="swatch-dot" style="background:var(--cyan-soft);border-color:var(--cyan)"></i> Code step</span>
-      <span><i class="swatch-dot" style="background:var(--stop-soft);border-color:var(--stop)"></i> Wrong outcome</span>
-      <span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good)"></i> Correct outcome</span>
+      <span><i class="swatch-dot" style="background:var(--good-soft);border-color:var(--good)"></i> Verified outcome</span>
     </div>
   </div>
 </div>
 
         <p>
-          <strong>What the member and the auditor get.</strong> If the clinician denies, the notice is drafted from an approved template and signed by that clinician, with every clause traced to a quote: <em>"Denied under [policy ID, version]. The policy covers a lumbar MRI after at least six weeks of conservative treatment or when a new or worsening neurological deficit is documented. Your records show three weeks of over-the-counter ibuprofen and no neurological deficit in the exam notes provided."</em> The auditor gets the same facts, each with its quote and character offsets, the policy version, the pinned model version, a trace ID that replays the run (Layer E), and the clinician's sign-off (Layer D). The model's thinking is stored beside them as supporting evidence.
+          <strong>What the member and the auditor get.</strong> If the clinician denies, a templated notice cites the exact policy clause and verified chart quotes. The auditor gets those same quoted facts with exact chart locations, the policy and pinned model versions, the clinician's sign-off (Layer D), and the replayable trace with the model's thought summaries (or raw thinking tokens on open weights) in Layer E.
         </p>
 
         <p>
-          <strong>Six ways to split the work.</strong> The case mixes several splits, one per step: finding the policy is pure search, extracting quoted facts and applying the rule is the hybrid, the six-week threshold is a deterministic rule, and the notice fills an approved template. <em>Table 3</em> lists the six options. For high-stakes decisions made from documents, the hybrid is the default.
+          <strong>The broader rule:</strong> match model autonomy to each step. Use deterministic rules or pure search when exact answers exist, pair open-ended generation with external checks for planning and synthesis, and use the hybrid split—model extraction plus verifiable rules in code—whenever a regulated decision must be both automated and auditable.
         </p>
-
-        <div class="nine-q-wrap">
-          <div class="nine-q-head">Table 3 · Six Ways to Split the Work Between Model and Code</div>
-          <div class="tbl-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Option</th>
-                  <th>What It Is</th>
-                  <th>What a Person Can Inspect</th>
-                  <th>Limits</th>
-                  <th>Good Fit</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td><b>1. Deterministic rules and solvers</b></td>
-                  <td>Hand-written if-then logic, SQL queries, or math formulas</td>
-                  <td>Every rule, line by line</td>
-                  <td>Needs clean, structured input; cannot read free text</td>
-                  <td>Calculations, thresholds, hard policy gates</td>
-                </tr>
-                <tr>
-                  <td><b>2. Interpretable classical ML + SHAP</b></td>
-                  <td>Traditional machine-learning models trained on tables of numbers and categories rather than text: logistic regression, decision trees, or gradient-boosted decision trees (GBDTs, ensembles of many small decision trees such as XGBoost)</td>
-                  <td>Each prediction broken into per-input contributions with <a href="https://arxiv.org/abs/1705.07874" target="_blank" rel="noopener">SHAP</a>, a method that attributes a single prediction to its inputs (for example, "missed payments: −30 points")</td>
-                  <td>Needs structured, tabular data</td>
-                  <td>Credit scoring, risk grading, numerical forecasting</td>
-                </tr>
-                <tr id="table-3-option-3">
-                  <td><b>3. Hybrid (sweet spot)</b></td>
-                  <td>The LLM reads documents and extracts structured facts with source quotes; rules or a scoring model make the decision</td>
-                  <td>The decision logic, plus every fact it used and the quote behind it</td>
-                  <td>Extraction can still miss a fact, so quotes are verified in code (Layer C)</td>
-                  <td>Policy, eligibility, and compliance decisions made from documents</td>
-                </tr>
-                <tr>
-                  <td><b>4. Pinned small or open-weight model</b></td>
-                  <td>A model whose exact weights the customer hosts and freezes</td>
-                  <td>The exact checkpoint (by checksum) and its training documentation</td>
-                  <td>Its reasoning is still neural and opaque (Section 1)</td>
-                  <td>Air-gapped or sovereignty requirements; strict version control</td>
-                </tr>
-                <tr>
-                  <td><b>5. Constrained generation</b></td>
-                  <td>The LLM chooses from fixed categories or fills approved templates instead of writing freely</td>
-                  <td>The complete list of outputs it is allowed to produce</td>
-                  <td>Controls the output only; how it chose stays opaque</td>
-                  <td>Routing, classification, templated letters</td>
-                </tr>
-                <tr>
-                  <td><b>6. Pure search and retrieval</b></td>
-                  <td>Returns ranked passages from the source documents; generates no text of its own</td>
-                  <td>The exact passages shown</td>
-                  <td>Does not synthesize an answer; the reader decides</td>
-                  <td>Users who prefer to read primary sources themselves</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
 
         <h2 id="sec-4">4. Summary: Putting It Together</h2>
         <p>
@@ -1814,16 +1728,16 @@
           Building that trust starts by identifying which of the nine "black box" concerns (<em>Table 1</em>) and underlying risks drives the requirement, then wrapping the model in seven verifiable layers (<code>A</code>–<code>G</code>), five checks on every request and two controls on every change: a governed data perimeter and provenance record (<code>A</code>), source-grounded citations (<code>B</code>), deterministic output verification and rules in code (<code>C</code>), risk-based routing to accountable reviewers (<code>D</code>), replayable audit logs (<code>E</code>), co-owned golden-set evaluation and version pinning (<code>F</code>), and graduated rollout from shadow mode behind a kill switch (<code>G</code>). Applicable regulations and error cost decide which layers come first.
         </p>
         <p>
-          Alongside those layers, architecture limits how much of each decision the model makes at all. Choosing per step among the six options (<em>Table 3</em>)—especially the hybrid pattern where the model extracts quoted facts and deterministic code executes the policy rule—ensures that high-stakes outcomes are both explainable and defensible. On Google Cloud's <strong>Agent Platform</strong>, those layers map directly to VPC Service Controls, CMEK, and Model Armor for perimeter and screening, RAG Engine grounding over customer data stores, Cloud Run for deterministic rule checks, Pub/Sub or Workflows with Cloud SQL or Firestore for risk-routed sign-offs, Cloud Logging, Cloud Trace, and a BigQuery sink for long-term replay, and the Agent Platform evaluation service with explicit model version pinning and Cloud Run feature flags for rollout.
+          Alongside those layers, architecture limits how much of each decision the model makes at all. Matching model autonomy per step—especially using the hybrid pattern where the model extracts quoted facts and deterministic code executes the policy rule—ensures that high-stakes outcomes are both explainable and defensible. On Google Cloud's <strong>Agent Platform</strong>, those layers map directly to VPC Service Controls, CMEK, Assured Workloads, and IAM Principal Access Boundaries for the perimeter, Agent Gateway (or Apigee / IAP + Cloud Armor) running Model Armor and Sensitive Data Protection for inline screening, RAG Engine grounding over customer data stores, Semantic Governance Policies, Agent Registry, and Cloud Run for tool and rule checks, Pub/Sub or Workflows with Cloud SQL or Firestore for risk-routed sign-offs, Cloud Logging, Cloud Trace, Cloud Audit Logs, Security Command Center, and a BigQuery sink for long-term replay, and the Agent Platform evaluation service with explicit model version pinning and Cloud Run feature flags for rollout.
         </p>
 
         <h2 id="sec-followups">Likely Follow-Up Questions</h2>
         <ul>
-          <li><strong>"Can't we just make the model deterministic?"</strong> Yes, through structure and code; decoding settings alone leave run-to-run variation. Current reasoning models such as Gemini 3 are tuned to run at the default sampling temperature, and Google advises against lowering it; even greedy decoding on shared servers varies with batching. We get predictability from schemas and enumerated outputs, pinned versions and thinking levels, measured <code>pass^k</code> on the customer's golden set, and code for every step that must give the same answer every time.</li>
+          <li><strong>"Can't we just make the model deterministic?"</strong> Yes, through structure and code; decoding settings alone leave run-to-run variation. Current reasoning models such as Gemini 3 are tuned to run at the <a href="https://ai.google.dev/gemini-api/docs/gemini-3" target="_blank" rel="noopener">default sampling temperature</a>, and Google advises against lowering it; even greedy decoding on shared servers varies with batching. We get predictability from schemas and enumerated outputs, pinned versions and thinking levels, measured <code>pass^k</code> on the customer's golden set, and code for every step that must give the same answer every time.</li>
           <li><strong>"Why not show the model's chain of thought to the auditor?"</strong> Reasoning traces can omit what drove the answer; in hint-based tests, reasoning models often disclosed the hint in fewer than 20% of cases. We log reasoning traces for debugging and give auditors verified quotes, the rules that ran, and a replayable run log.</li>
           <li><strong>"Doesn't an open-weight model solve the black-box problem?"</strong> It solves access, while leaving per-decision understanding unsolved. Open weights let the customer pin, inspect, and self-host the exact checkpoint, but explaining an individual decision from those weights remains research-grade; explanations come from the system layers.</li>
           <li><strong>"How do you decide what gets auto-approved?"</strong> On checkable signals (every quote found, every criterion resolved, agreement across samples) rather than the model's self-reported confidence. The threshold is tuned on the golden set to a target precision, and everything below it goes to a named reviewer.</li>
-          <li><strong>"What happens when the provider retires our pinned model?"</strong> Pinning buys time: we keep a migration calendar, run each successor through the customer's golden set, and cut over only when it passes. Self-hosted open weights (Option 4) remove forced retirement altogether.</li>
+          <li><strong>"What happens when the provider retires our pinned model?"</strong> Pinning buys time: we keep a migration calendar, run each successor through the customer's golden set, and cut over only when it passes. Self-hosted open weights remove forced retirement altogether.</li>
           <li><strong>"Isn't an LLM judge in your evaluation just another black box?"</strong> It is, until it is calibrated. We measure the judge's agreement with SME labels on a held-out slice, publish that agreement rate, and use the judge only for metrics where it meets the bar.</li>
         </ul>
         <p><strong>Common mistakes to avoid:</strong></p>
@@ -1859,7 +1773,6 @@
           <li>Korbak et al., <a href="https://arxiv.org/abs/2507.11473" target="_blank" rel="noopener">Chain of Thought Monitorability: A New and Fragile Opportunity for AI Safety</a> (arXiv:2507.11473), July 15, 2025. Cross-lab position that reasoning traces are an imperfect but valuable monitoring signal.</li>
           <li>Baker et al. (OpenAI), <a href="https://arxiv.org/abs/2503.11926" target="_blank" rel="noopener">Monitoring Reasoning Models for Misbehavior and the Risks of Promoting Obfuscation</a> (arXiv:2503.11926), March 14, 2025. Penalizing a model's reasoning trace teaches it to hide intent, which weakens monitoring.</li>
           <li>Lyu et al., <a href="https://arxiv.org/abs/2301.13379" target="_blank" rel="noopener">Faithful Chain-of-Thought Reasoning</a> (arXiv:2301.13379), January 31, 2023 (IJCNLP-AACL 2023). The model translates a query into a symbolic chain that a deterministic solver executes, so the explanation is the computation.</li>
-          <li>Hao et al. (Meta FAIR), <a href="https://arxiv.org/abs/2412.06769" target="_blank" rel="noopener">Training Large Language Models to Reason in a Continuous Latent Space</a> (arXiv:2412.06769), December 9, 2024. The Coconut method feeds hidden states back as the next input, so intermediate reasoning stays in latent space.</li>
           <li>Lindsey et al. (Anthropic), <a href="https://transformer-circuits.pub/2025/attribution-graphs/biology.html" target="_blank" rel="noopener">On the Biology of a Large Language Model</a>, March 2025, and Anthropic, <a href="https://www.anthropic.com/research/open-source-circuit-tracing" target="_blank" rel="noopener">Open-Sourcing Circuit-Tracing Tools</a>, May 2025. Attribution graphs that trace parts of a model's internal computation for individual prompts.</li>
           <li>Google DeepMind, <a href="https://deepmind.google/blog/gemma-scope-2-helping-the-ai-safety-community-deepen-understanding-of-complex-language-model-behavior/" target="_blank" rel="noopener">Gemma Scope 2</a>, December 19, 2025, and Google, <a href="https://ai.google.dev/gemini-api/docs/thinking" target="_blank" rel="noopener">Gemini API: Thinking</a>, 2026. Open interpretability tooling for Gemma models and thought summaries in the Gemini API.</li>
           <li>Anthropic, <a href="https://www.anthropic.com/research/building-effective-agents" target="_blank" rel="noopener">Building Effective Agents</a>, December 19, 2024. Separating deterministic workflows from open-ended agents and keeping control flow explicit.</li>
@@ -1874,7 +1787,6 @@
           <li>Federal Reserve, OCC, and FDIC, <a href="https://www.federalreserve.gov/supervisionreg/srletters/sr2602.htm" target="_blank" rel="noopener">SR 26-2 (superseding SR 11-7): Supervisory Guidance on Model Risk Management</a> (OCC Bulletin 2026-13; FDIC FIL-15-2026), April 17, 2026 (original SR 11-7 issued April 4, 2011).</li>
           <li>CMS, <a href="https://www.cms.gov/newsroom/fact-sheets/cms-interoperability-and-prior-authorization-final-rule-cms-0057-f" target="_blank" rel="noopener">Interoperability and Prior Authorization Final Rule (CMS-0057-F)</a>, January 17, 2024.</li>
           <li>DeepSeek, <a href="https://api-docs.deepseek.com/guides/thinking_mode/" target="_blank" rel="noopener">Thinking Mode (API Documentation)</a> and <a href="https://arxiv.org/abs/2501.12948" target="_blank" rel="noopener">DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning</a> (arXiv:2501.12948), January 2025. Documents how DeepSeek reasoning models emit raw thinking tokens in <code>reasoning_content</code> / <code>&lt;think&gt;</code> tags.</li>
-          <li>Lundberg and Lee, <a href="https://arxiv.org/abs/1705.07874" target="_blank" rel="noopener">A Unified Approach to Interpreting Model Predictions</a> (arXiv:1705.07874), May 2017 (NeurIPS 2017). Introduces SHAP, which attributes a single prediction to each of its input features.</li>
           <li>California Senate, <a href="https://sd13.senate.ca.gov/news/press-release/december-9-2024/landmark-law-prohibits-health-insurance-companies-using-ai-to" target="_blank" rel="noopener">California SB 1120 (Physicians Make Decisions Act)</a>, 2024 (effective January 2025). Requires that a licensed physician or qualified health professional make any denial, delay, or modification of care based on medical necessity; AI tools may not make that determination.</li>
           <li>CMS, <a href="https://aamc.org/advocacy-policy/washington-highlights/cms-addresses-use-ai-medicare-advantage-plans" target="_blank" rel="noopener">Medicare Advantage FAQ on Algorithms and AI</a>, February 6, 2024. Clarifies that Medicare Advantage medical-necessity determinations must be based on the individual patient's clinical record rather than an algorithm alone.</li>
           <li>National Imaging Associates (NIA), <a href="https://ldh.la.gov/assets/medicaid/MCPP/10.12.21/847_ACLA_Lumbar_Spine_MRI_2022_NIA_CG_044.pdf" target="_blank" rel="noopener">Clinical Guideline NIA_CG_044: Lumbar Spine MRI</a>. Representative payer imaging criteria requiring either failed conservative care or a new or worsening neurological deficit on exam.</li>
