@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 606" role="img" aria-label="The model stays opaque; trust comes from checks around it, lettered in the order a request meets them. Inside the customer's data perimeter, a request is screened (A), grounded in their sources (B), handled by the opaque model, checked in code (C), and routed by risk (D), with every step logged (E). Evaluation and pinning gate every change (F), and the rollout stage sets how much is automated (G)" width="1840" height="1212">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 606" role="img" aria-label="The model stays opaque; trust comes from checks around it, lettered in the order a request meets them. Inside the customer's data perimeter, a request is screened (A), grounded in customer sources (B), handled by the opaque model, checked in code (C), and routed by risk (D), with every step logged (E). Evaluation and pinning gate every change (F), and the rollout stage sets how much is automated (G)" width="1840" height="1212">
   <style>
     .t-b { font-family: Inter, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 700; fill: #0f172a; }
     .t-s { font-family: Inter, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 14px; fill: #475569; }
@@ -35,12 +35,12 @@
     <text class="t-s t-c" x="410" y="88">request</text>
     <line class="flow" x1="410" y1="96" x2="410" y2="112" marker-end="url(#arr-q1l-ink)"/>
 
-    <rect class="node-cyan" x="220" y="116" width="380" height="42" rx="9"/>
-    <text class="t-b t-c" x="410" y="142">A · Screen input</text>
+    <rect class="node-card" x="220" y="116" width="380" height="42" rx="9"/>
+    <text class="t-b t-c" x="410" y="142">Screen input (PII, injection)</text>
     <line class="flow" x1="410" y1="158" x2="410" y2="174" marker-end="url(#arr-q1l-ink)"/>
 
     <rect class="node-cyan" x="220" y="178" width="380" height="42" rx="9"/>
-    <text class="t-b t-c" x="410" y="204">B · Ground in their sources</text>
+    <text class="t-b t-c" x="410" y="204">B · Ground in customer sources</text>
     <line class="flow" x1="410" y1="220" x2="410" y2="236" marker-end="url(#arr-q1l-ink)"/>
 
     <rect class="node-violet" x="220" y="240" width="380" height="42" rx="9" style="stroke-dasharray:6 4"/>
