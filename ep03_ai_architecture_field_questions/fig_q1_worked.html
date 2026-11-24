@@ -22,19 +22,21 @@
     <path d="M 172 226 H 186 V 142 H 196" style="fill:none;stroke:var(--stop);stroke-width:2.2" marker-end="url(#arr-q1w-stop)"/>
     <path d="M 172 246 H 186 V 322 H 196" style="fill:none;stroke:var(--good);stroke-width:2.4" marker-end="url(#arr-q1w-good)"/>
 
-    <!-- Risky lane: the model decides -->
-    <text class="t-m-r" x="200" y="98">RISKY · THE MODEL DECIDES</text>
-    <rect class="node-violet" x="200" y="110" width="200" height="64" rx="9"/>
-    <text class="t-b t-c" x="300" y="137">Model recommends</text>
-    <text class="t-s t-c" x="300" y="159">recommends DENY</text>
-    <line class="flow" x1="400" y1="142" x2="426" y2="142" marker-end="url(#arr-q1w-ink)"/>
-    <rect class="node-card" x="430" y="110" width="200" height="64" rx="9"/>
-    <text class="t-b t-c" x="530" y="137">Clinician signs the trace</text>
-    <text class="t-s t-c" x="530" y="159">"only 3 wks ibuprofen"</text>
-    <line class="flow" x1="630" y1="142" x2="656" y2="142" marker-end="url(#arr-q1w-ink)"/>
-    <rect class="node-bad" x="660" y="110" width="220" height="64" rx="9"/>
-    <text class="t-m-r t-c" x="770" y="137">WRONGFUL DENIAL</text>
-    <text class="t-s t-c" x="770" y="159">criterion (b) never checked</text>
+    <!-- Risky lane: a clinician signs the model's reason -->
+    <text class="t-m-r" x="200" y="98">RISKY · A CLINICIAN SIGNS THE MODEL'S REASON</text>
+    <rect class="node-violet" x="200" y="110" width="200" height="72" rx="9"/>
+    <text class="t-b t-c" x="300" y="135">Model recommends</text>
+    <text class="t-s t-c" x="300" y="157">DENY, with a reason</text>
+    <line class="flow" x1="400" y1="146" x2="426" y2="146" marker-end="url(#arr-q1w-ink)"/>
+    <rect class="node-card" x="430" y="110" width="200" height="72" rx="9"/>
+    <text class="t-b t-c" x="530" y="133">Clinician signs</text>
+    <text class="t-s t-c" x="530" y="153">reads only</text>
+    <text class="t-s t-c" x="530" y="170">"only 3 wks ibuprofen"</text>
+    <line class="flow" x1="630" y1="146" x2="656" y2="146" marker-end="url(#arr-q1w-ink)"/>
+    <rect class="node-bad" x="660" y="110" width="220" height="72" rx="9"/>
+    <text class="t-m-r t-c" x="770" y="133">WRONGFUL DENIAL</text>
+    <text class="t-s t-c" x="770" y="153">signed, compliant,</text>
+    <text class="t-s t-c" x="770" y="170">criterion (b) never checked</text>
 
     <line x1="200" y1="214" x2="880" y2="214" style="stroke:var(--line);stroke-width:1.4;stroke-dasharray:6 5"/>
 
@@ -66,7 +68,7 @@
     <text class="t-s t-c" x="360" y="460">neuro exam notes · then clinician review</text>
   </svg>
   <div class="fig-caption">
-    <span>Figure 4 — Same chart, same model: when the model's reason is what the clinician sees, a plausible trace becomes a wrongful denial; when code checks quoted facts, it approves only on verified evidence and sends everything else to a clinician with the evidence laid out.</span>
+    <span>Figure 4 — Same chart, same model, a clinician in the loop either way: when the clinician reviews the model's reason, a plausible trace becomes a signed wrongful denial; when code checks quoted facts, it approves only on verified evidence and sends the rest to a clinician with the evidence laid out.</span>
     <div class="legend-items">
       <span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> Model step</span>
       <span><i class="swatch-dot" style="background:var(--cyan-soft);border-color:var(--cyan)"></i> Code step</span>
