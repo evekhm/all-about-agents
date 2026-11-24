@@ -1,5 +1,5 @@
 <div class="diagram-frame" id="fig-q1-gcp">
-  <svg viewBox="0 0 920 622" role="img" aria-label="The same seven layers on Google Cloud, lettered A to G in request-flow order. Inside a VPC Service Controls, CMEK (Cloud KMS), and Assured Workloads perimeter, a request is screened by Model Armor (A), grounded with RAG Engine on Agent Platform (B), handled by Gemini on Agent Platform or open weights from Model Garden, checked by Model Armor and your service on Cloud Run with structured output schemas (C), and routed by risk to your review queue with sign-offs logged to Cloud Logging (D), while Cloud Logging and Cloud Trace record every step (E). The Agent Platform evaluation service and pinned model version IDs gate every change (F), and shadow comparisons with a feature-flag kill switch govern graduated rollout (G).">
+  <svg viewBox="0 0 920 622" role="img" aria-label="The same seven layers on Google Cloud, lettered A to G in request-flow order. Inside a VPC Service Controls, CMEK (Cloud KMS), and Assured Workloads perimeter, a request is screened by Model Armor (A), grounded with RAG Engine on Agent Platform (B), handled by Gemini on Agent Platform or open weights from Model Garden, checked by Model Armor and your service on Cloud Run with structured output schemas (C), and routed by risk to your review queue with Pub/Sub or Workflows · sign-offs in Cloud SQL / Firestore (D), while Cloud Logging and Cloud Trace record every step (E). The Agent Platform evaluation service and pinned model version IDs gate every change (F), and shadow comparisons with a feature-flag kill switch govern graduated rollout (G).">
   <defs>
     <marker id="arr-q1g-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:var(--ink)"/>
@@ -161,17 +161,18 @@
 
     <!-- D: Route by risk -->
     <rect class="node-cyan" x="200" y="386" width="420" height="44" rx="9"/>
-    <use href="#icon-gcp-log" x="216" y="396" width="24" height="24"/>
+    <use href="#icon-gcp-run" x="216" y="396" width="24" height="24"/>
     <text class="t-b" x="250" y="405">D · Customer review queue</text>
-    <text class="t-s" x="250" y="422">sign-offs logged to Cloud Logging</text>
+    <text class="t-s" x="250" y="422">Pub/Sub or Workflows · sign-offs in Cloud SQL / Firestore</text>
 
     <!-- E: Log every step -->
     <rect class="node-cyan" x="640" y="138" width="226" height="292" rx="9"/>
-    <use href="#icon-gcp-log" x="723" y="236" width="26" height="26"/>
-    <use href="#icon-gcp-trace" x="757" y="236" width="26" height="26"/>
-    <text class="t-b t-c" x="753" y="284">E · Cloud Logging,</text>
-    <text class="t-b t-c" x="753" y="303">Cloud Trace</text>
-    <text class="t-s t-c" x="753" y="325">replayable months later</text>
+    <use href="#icon-gcp-log" x="723" y="232" width="26" height="26"/>
+    <use href="#icon-gcp-trace" x="757" y="232" width="26" height="26"/>
+    <text class="t-b t-c" x="753" y="280">E · Cloud Logging,</text>
+    <text class="t-b t-c" x="753" y="299">Cloud Trace</text>
+    <text class="t-s t-c" x="753" y="321">+ BigQuery sink &amp; Cloud Storage</text>
+    <text class="t-s t-c" x="753" y="339">for multi-month replay</text>
 
     <!-- Output -->
     <line class="flow" x1="410" y1="430" x2="410" y2="464" marker-end="url(#arr-q1g-ink)"/>
@@ -187,8 +188,8 @@
 
     <rect class="node-good" x="468" y="530" width="418" height="58" rx="9"/>
     <use href="#icon-gcp-ap" x="484" y="546" width="26" height="26"/>
-    <text class="t-b" x="520" y="553">G · Evaluation service + feature flag</text>
-    <text class="t-s" x="520" y="573">shadow comparisons · instant kill switch</text>
+    <text class="t-b" x="520" y="553">G · Evaluation service + Cloud Run</text>
+    <text class="t-s" x="520" y="573">shadow comparisons · feature-flag kill switch</text>
     <path d="M 634 530 V 408 H 624" style="fill:none;stroke:var(--good);stroke-width:2.2" marker-end="url(#arr-q1g-good)"/>
   </svg>
   <div class="fig-caption">

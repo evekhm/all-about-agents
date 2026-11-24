@@ -1298,7 +1298,7 @@
 
         <div class="layer-cards">
 <div class="layer-card" id="layer-a">
-<p class="lc-eyebrow">Check on every request · Answers 3 Training-Data Provenance, 5 Data Governance</p>
+<p class="lc-eyebrow">Answers 3 Training-Data Provenance, 5 Data Governance</p>
 <h3>A · Data perimeter</h3>
 <p class="lc-summary">Keep customer data inside enforceable boundaries, and screen every request at the edge.</p>
 <div class="t-fix-row"><b>Customer gets:</b> zero-training terms, residency region, key ownership, and input-screening results; model card, data statements, and certifications</div><div class="t-fix-row gcp"><b>On Google Cloud:</b> VPC Service Controls, customer-managed encryption keys (CMEK, in Cloud KMS), Assured Workloads and regional endpoints; Model Armor; published model cards</div>
@@ -1306,14 +1306,14 @@
 <p class="lc-details"><strong>Input screening.</strong> Screen every request at the boundary for PII, toxicity, off-topic asks, and prompt injection (<a href="https://evekhm.github.io/all-about-agents/ep01_securing_agent_to_database.html" target="_blank" rel="noopener">Episode 01</a> covers data boundaries and prompt-injection defenses for agents that reach databases).</p>
 </div>
 <div class="layer-card" id="layer-b">
-<p class="lc-eyebrow">Check on every request · Answers 1 Explainability, 6 Reliability</p>
+<p class="lc-eyebrow">Answers 1 Explainability, 6 Reliability</p>
 <h3>B · Ground in customer sources</h3>
 <p class="lc-summary">Every answer cites the customer's own documents, or says it found nothing.</p>
 <div class="t-fix-row"><b>Customer gets:</b> verbatim source quotes with links; an explicit "not found in your documents" when evidence is missing</div><div class="t-fix-row gcp"><b>On Google Cloud:</b> RAG Engine grounding; structured output schemas</div>
 <p class="lc-details">Pair retrieval with clickable inline citations linked to the customer's own documents, return structured JSON (<code>verbatim_quote</code>, <code>sources</code>, <code>assumptions</code>, <code>answer</code>), and return an explicit <em>"not found in your documents"</em> response whenever evidence is absent (<a href="ep03_q4_modern_rag_pairings.html">Question 04</a> covers retrieval and citation design in depth).</p>
 </div>
 <div class="layer-card" id="layer-c">
-<p class="lc-eyebrow">Check on every request · Answers 1 Explainability, 2 Predictability</p>
+<p class="lc-eyebrow">Answers 1 Explainability, 2 Predictability</p>
 <h3>C · Check outputs in code</h3>
 <p class="lc-summary">Code verifies every claim and applies the business rules, so the model never has the last word.</p>
 <div class="t-fix-row"><b>Customer gets:</b> quote-verification results, rule checks, and schema validation</div><div class="t-fix-row gcp"><b>On Google Cloud:</b> Model Armor output screening; your own service (for example, on Cloud Run) with structured output schemas</div>
@@ -1321,24 +1321,24 @@
 <p class="lc-details"><strong>Repeatability.</strong> Constrain outputs where repeatability matters (structured output schemas, enumerated values, and a pinned thinking level) while keeping sampling parameters at the defaults current reasoning models are tuned for (<a href="https://ai.google.dev/gemini-api/docs/gemini-3" rel="noopener" target="_blank">Gemini 3 guide, 2026</a>). No decoding setting makes a hosted model repeatable: even greedy decoding on shared inference servers varies with the batch a request lands in (in one study, 1,000 identical requests to an open-weight model produced 80 distinct outputs; <a href="https://thinkingmachines.ai/blog/defeating-nondeterminism-in-llm-inference/" rel="noopener" target="_blank">He et al., Sep 2025</a>). Promise measured consistency (<code>pass^k</code>), and put calculations, thresholds, and final decisions in code.</p>
 </div>
 <div class="layer-card" id="layer-d">
-<p class="lc-eyebrow">Check on every request · Answers 6 Reliability, 7 Accountability</p>
+<p class="lc-eyebrow">Answers 6 Reliability, 7 Accountability</p>
 <h3>D · Route by risk</h3>
 <p class="lc-summary">Low-risk cases run automatically; uncertain or high-impact ones go to a named reviewer.</p>
-<div class="t-fix-row"><b>Customer gets:</b> named reviewer sign-off; the routing threshold and its measured precision</div><div class="t-fix-row gcp"><b>On Google Cloud:</b> the customer's review queue, with sign-offs logged to Cloud Logging</div>
+<div class="t-fix-row"><b>Customer gets:</b> named reviewer sign-off; the routing threshold and its measured precision</div><div class="t-fix-row gcp"><b>On Google Cloud:</b> the customer's review queue (Pub/Sub or Workflows + Cloud Run), with sign-offs stored in Cloud SQL or Firestore</div>
 <p class="lc-details"><strong>Route by error cost.</strong> Automate low-risk tasks, and route uncertain or high-impact cases, with dry-run previews, to named human reviewers with clear sign-off ownership (RACI: responsible, accountable, consulted, informed).</p>
 <p class="lc-details"><strong>Calibrate the signal.</strong> A model's self-reported confidence ("I am 95% sure") tends to be overconfident (<a href="https://arxiv.org/abs/2306.13063" rel="noopener" target="_blank">Xiong et al., ICLR 2024</a>), so route on evidence the system can check: whether every cited quote was found in the source, whether every rule criterion resolved, agreement across <code>k</code> independent samples (<a href="https://arxiv.org/abs/2203.11171" rel="noopener" target="_blank">Wang et al., ICLR 2023</a>), and token log-probabilities where the API exposes them. Tune the routing threshold on the golden set to hit a target precision for auto-approved cases (for example, at least 99% agreement with labels from subject-matter experts (SMEs)), and send everything below it to review.</p>
 <p class="lc-details"><strong>Prevent rubber-stamping.</strong> Show reviewers the evidence before the model's recommendation, track each reviewer's override rate, and occasionally insert known-bad cases to confirm reviews are real.</p>
 </div>
 <div class="layer-card" id="layer-e">
-<p class="lc-eyebrow">Check on every request · Answers 7 Accountability</p>
+<p class="lc-eyebrow">Answers 7 Accountability</p>
 <h3>E · Log every step</h3>
 <p class="lc-summary">Every input, source, model version, check, and sign-off is recorded, so any decision can be replayed.</p>
-<div class="t-fix-row"><b>Customer gets:</b> a trace ID that replays any decision</div><div class="t-fix-row gcp"><b>On Google Cloud:</b> Cloud Logging, Cloud Trace</div>
+<div class="t-fix-row"><b>Customer gets:</b> a trace ID that replays any decision</div><div class="t-fix-row gcp"><b>On Google Cloud:</b> Cloud Logging and Cloud Trace, exported via Log Sinks to BigQuery (and Cloud Storage for full payloads) with audit retention</div>
 <p class="lc-details"><strong>What to log.</strong> Every interaction: input, retrieved chunks, prompt version, pinned model version, thought summaries as supporting evidence, output, and reviewer feedback; record step-by-step traces across every tool call so any decision can be reconstructed months later, and expose live drift and quality dashboards to operators.</p>
 <p class="lc-details"><strong>Provider errors.</strong> Treat provider errors as part of observability: isolate HTTP 429 and timeout faults into retry queues with backoff, and record each retry in the trace so a reconstructed run shows which calls failed and why.</p>
 </div>
 <div class="layer-card lc-chg" id="layer-f">
-<p class="lc-eyebrow">Control on every change · Answers 2 Predictability, 8 Version Stability, 9 Quality</p>
+<p class="lc-eyebrow">Answers 2 Predictability, 8 Version Stability, 9 Quality</p>
 <h3>F · Evaluate and pin</h3>
 <p class="lc-summary">A golden set built with domain experts gates every change, and the model version moves only when it passes.</p>
 <div class="t-fix-row"><b>Customer gets:</b> golden-set results, <code>pass^k</code> consistency (a case passes only if all <code>k</code> runs succeed; <a href="https://arxiv.org/abs/2406.12045" rel="noopener" target="_blank">Yao et al., ICLR 2025</a>), and failure slices; a pinned model ID and regression report before each cutover</div><div class="t-fix-row gcp"><b>On Google Cloud:</b> Gemini Enterprise Agent Platform (Agent Platform) evaluation service; pinned model version IDs; evaluation pipeline in CI</div>
@@ -1347,20 +1347,20 @@
 <p class="lc-details"><strong>Training caution.</strong> If you fine-tune or run reinforcement learning, keep the reasoning trace out of the reward signal so it stays useful for monitoring (<a href="https://arxiv.org/abs/2503.11926" rel="noopener" target="_blank">Baker et al., Mar 2025</a>).</p>
 </div>
 <div class="layer-card lc-chg" id="layer-g">
-<p class="lc-eyebrow">Control on every change · Answers 6 Reliability</p>
+<p class="lc-eyebrow">Answers 6 Reliability</p>
 <h3>G · Roll out gradually</h3>
 <p class="lc-summary">Shadow mode first, automation only when the numbers clear the bar, with a kill switch.</p>
-<div class="t-fix-row"><b>Customer gets:</b> shadow-mode comparison results; a kill switch</div><div class="t-fix-row gcp"><b>On Google Cloud:</b> Agent Platform evaluation service for shadow comparisons; a feature flag in the serving layer</div>
+<div class="t-fix-row"><b>Customer gets:</b> shadow-mode comparison results; a kill switch</div><div class="t-fix-row gcp"><b>On Google Cloud:</b> Agent Platform evaluation service for shadow comparisons; traffic splitting or a feature flag in Cloud Run</div>
 <p class="lc-details">Start on a low-risk, high-visibility wedge and earn promotion across stages: <code>Scoped Pilot → Shadow Mode</code> (running silently beside humans to compare outcomes) <code>→ Assisted Copilot → Partial Scoped Automation</code>, backed by an instant operational kill switch (<a href="https://martinfowler.com/articles/feature-toggles.html" rel="noopener" target="_blank">Hodgson, Oct 2017</a>).</p>
 </div>
 </div>
 
         <p>
-          <em>Figure 3</em> puts the "On Google Cloud" lines from the cards into the same picture as <em>Figure 2</em>.
+          <em>Figure 3</em> puts the "On Google Cloud" lines from the cards above into the same picture as <em>Figure 2</em>.
         </p>
 
 <div class="diagram-frame" id="fig-q1-gcp">
-  <svg viewBox="0 0 920 622" role="img" aria-label="The same seven layers on Google Cloud, lettered A to G in request-flow order. Inside a VPC Service Controls, CMEK (Cloud KMS), and Assured Workloads perimeter, a request is screened by Model Armor (A), grounded with RAG Engine on Agent Platform (B), handled by Gemini on Agent Platform or open weights from Model Garden, checked by Model Armor and your service on Cloud Run with structured output schemas (C), and routed by risk to your review queue with sign-offs logged to Cloud Logging (D), while Cloud Logging and Cloud Trace record every step (E). The Agent Platform evaluation service and pinned model version IDs gate every change (F), and shadow comparisons with a feature-flag kill switch govern graduated rollout (G).">
+  <svg viewBox="0 0 920 622" role="img" aria-label="The same seven layers on Google Cloud, lettered A to G in request-flow order. Inside a VPC Service Controls, CMEK (Cloud KMS), and Assured Workloads perimeter, a request is screened by Model Armor (A), grounded with RAG Engine on Agent Platform (B), handled by Gemini on Agent Platform or open weights from Model Garden, checked by Model Armor and your service on Cloud Run with structured output schemas (C), and routed by risk to the customer's review queue (Pub/Sub or Workflows) with sign-offs stored in Cloud SQL or Firestore (D), while Cloud Logging and Cloud Trace exported to BigQuery and Cloud Storage record every step for multi-month replay (E). The Agent Platform evaluation service and pinned model version IDs gate every change (F), and shadow comparisons with Cloud Run traffic splitting or a feature-flag kill switch govern graduated rollout (G).">
   <defs>
     <marker id="arr-q1g-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:var(--ink)"/>
@@ -1522,17 +1522,18 @@
 
     <!-- D: Route by risk -->
     <rect class="node-cyan" x="200" y="386" width="420" height="44" rx="9"/>
-    <use href="#icon-gcp-log" x="216" y="396" width="24" height="24"/>
+    <use href="#icon-gcp-run" x="216" y="396" width="24" height="24"/>
     <text class="t-b" x="250" y="405">D · Customer review queue</text>
-    <text class="t-s" x="250" y="422">sign-offs logged to Cloud Logging</text>
+    <text class="t-s" x="250" y="422">Pub/Sub or Workflows · sign-offs in Cloud SQL / Firestore</text>
 
     <!-- E: Log every step -->
     <rect class="node-cyan" x="640" y="138" width="226" height="292" rx="9"/>
-    <use href="#icon-gcp-log" x="723" y="236" width="26" height="26"/>
-    <use href="#icon-gcp-trace" x="757" y="236" width="26" height="26"/>
-    <text class="t-b t-c" x="753" y="284">E · Cloud Logging,</text>
-    <text class="t-b t-c" x="753" y="303">Cloud Trace</text>
-    <text class="t-s t-c" x="753" y="325">replayable months later</text>
+    <use href="#icon-gcp-log" x="723" y="232" width="26" height="26"/>
+    <use href="#icon-gcp-trace" x="757" y="232" width="26" height="26"/>
+    <text class="t-b t-c" x="753" y="280">E · Cloud Logging,</text>
+    <text class="t-b t-c" x="753" y="299">Cloud Trace</text>
+    <text class="t-s t-c" x="753" y="321">+ BigQuery sink &amp; Cloud Storage</text>
+    <text class="t-s t-c" x="753" y="339">for multi-month replay</text>
 
     <!-- Output -->
     <line class="flow" x1="410" y1="430" x2="410" y2="464" marker-end="url(#arr-q1g-ink)"/>
@@ -1548,12 +1549,12 @@
 
     <rect class="node-good" x="468" y="530" width="418" height="58" rx="9"/>
     <use href="#icon-gcp-ap" x="484" y="546" width="26" height="26"/>
-    <text class="t-b" x="520" y="553">G · Evaluation service + feature flag</text>
-    <text class="t-s" x="520" y="573">shadow comparisons · instant kill switch</text>
+    <text class="t-b" x="520" y="553">G · Evaluation service + Cloud Run</text>
+    <text class="t-s" x="520" y="573">shadow comparisons · feature-flag kill switch</text>
     <path d="M 634 530 V 408 H 624" style="fill:none;stroke:var(--good);stroke-width:2.2" marker-end="url(#arr-q1g-good)"/>
   </svg>
   <div class="fig-caption">
-    <span>Figure 3 — The same seven layers on Google Cloud. Each request is screened by Model Armor, grounded with RAG Engine, handled by Gemini, checked in your own service, and routed by risk, inside a VPC Service Controls and CMEK perimeter, with every step in Cloud Logging and Cloud Trace. The Agent Platform evaluation service gates every change and supports shadow-mode rollout.</span>
+    <span>Figure 3 — The same seven layers on Google Cloud. Each request is screened by Model Armor, grounded with RAG Engine, handled by Gemini, checked in your own service, and routed by risk to a customer review queue with sign-offs in Cloud SQL or Firestore, inside a VPC Service Controls and CMEK perimeter, with every step in Cloud Logging and Cloud Trace exported to BigQuery and Cloud Storage for multi-month replay. The Agent Platform evaluation service gates every change and pairs with Cloud Run feature flags for shadow-mode rollout.</span>
     <div class="legend-items">
       <span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> Opaque model</span>
       <span><i class="swatch-dot" style="background:var(--cyan-soft);border-color:var(--cyan)"></i> Checks on every request</span>
@@ -1627,7 +1628,7 @@
         <h2 id="sec-3">3. Keep the Decision Out of the Model</h2>
 
         <p>
-          Section 2's layers check the model's work. The stronger move is to give the model less to decide. When a model pulls a fact and its quote from a document, code can confirm the quote is in the source. When a model makes the decision itself, its reasons stay in activations no one can read (Section 1). So split each decision step: the model does the language work, and rules a person can read make the decision. One worked case shows why it matters.
+          Wrapping the model with input screening, citation checks, and audit logs still leaves the model in charge of the answer. The stronger move is to give the model less to decide. When a model pulls a fact and its quote from a document, code can confirm the quote is in the source. When a model makes the decision itself, its reasons stay in activations no one can read. So split each decision step: the model does the language work, and rules a person can read make the decision. One worked case shows why it matters.
         </p>
 
         <p>
@@ -1813,7 +1814,7 @@
           Building that trust starts by identifying which of the nine "black box" concerns (<em>Table 1</em>) and underlying risks drives the requirement, then wrapping the model in seven verifiable layers (<code>A</code>–<code>G</code>), five checks on every request and two controls on every change: a governed data perimeter and provenance record (<code>A</code>), source-grounded citations (<code>B</code>), deterministic output verification and rules in code (<code>C</code>), risk-based routing to accountable reviewers (<code>D</code>), replayable audit logs (<code>E</code>), co-owned golden-set evaluation and version pinning (<code>F</code>), and graduated rollout from shadow mode behind a kill switch (<code>G</code>). Applicable regulations and error cost decide which layers come first.
         </p>
         <p>
-          Alongside those layers, architecture limits how much of each decision the model makes at all. Choosing per step among the six options (<em>Table 3</em>)—especially the hybrid pattern where the model extracts quoted facts and deterministic code executes the policy rule—ensures that high-stakes outcomes are both explainable and defensible. On Google Cloud's <strong>Agent Platform</strong>, those layers map directly to VPC Service Controls, CMEK, and Model Armor for perimeter and screening, RAG Engine grounding over customer data stores, Cloud Run for deterministic rule checks, Cloud Logging and Cloud Trace for replay, and the Agent Platform evaluation service with explicit model version pinning.
+          Alongside those layers, architecture limits how much of each decision the model makes at all. Choosing per step among the six options (<em>Table 3</em>)—especially the hybrid pattern where the model extracts quoted facts and deterministic code executes the policy rule—ensures that high-stakes outcomes are both explainable and defensible. On Google Cloud's <strong>Agent Platform</strong>, those layers map directly to VPC Service Controls, CMEK, and Model Armor for perimeter and screening, RAG Engine grounding over customer data stores, Cloud Run for deterministic rule checks, Pub/Sub or Workflows with Cloud SQL or Firestore for risk-routed sign-offs, Cloud Logging, Cloud Trace, and a BigQuery sink for long-term replay, and the Agent Platform evaluation service with explicit model version pinning and Cloud Run feature flags for rollout.
         </p>
 
         <h2 id="sec-followups">Likely Follow-Up Questions</h2>
