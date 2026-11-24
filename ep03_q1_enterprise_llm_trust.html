@@ -925,26 +925,6 @@
           <li><a href="#sec-3"><strong>Match model autonomy to what code can verify:</strong></a> why modern AI agents safely handle open-ended planning, coding, and tool calls alongside deterministic checks, plus a worked prior-authorization example showing the hybrid split on regulated decisions.</li>
           <li><a href="#sec-4"><strong>Summary and follow-up questions:</strong></a> spoken wrap-up and likely interview follow-ups.</li>
         </ol>
-        <p><strong>Where this sits in the series:</strong> Episode 01 covers securing the agent-to-database connection (<a href="ep01_securing_agent_to_database.html">nine security layers <code>L1</code>–<code>L9</code></a>), and Episode 02 covers the system-design skeleton (<a href="ep02_designing_agentic_systems.html">four blocks and eleven questions <code>Q1</code>–<code>Q11</code></a>). This question adds the model itself: what stays opaque inside it, and seven layers (<code>A</code>–<code>G</code>) around it that draw on both episodes:</p>
-        <div class="nine-q-wrap" style="margin:12px 0 16px;">
-          <div class="nine-q-head">Series Bridge · Q1 Layers (A–G) vs. Episode 02 Blocks and Episode 01 Layers</div>
-          <div class="tbl-wrap">
-            <table>
-              <thead>
-                <tr><th>Q1 Layer</th><th>Episode 02 Block / Question</th><th>Episode 01 Layer</th></tr>
-              </thead>
-              <tbody>
-                <tr><td><b>A · Data perimeter</b></td><td>Safeguards (<code>Q10</code>)</td><td><code>L1</code>, <code>L2</code>, <code>L6</code>, <code>L7</code></td></tr>
-                <tr><td><b>B · Ground in customer sources</b></td><td>Workflow (<code>Q9</code>: read data in place)</td><td><code>L7</code></td></tr>
-                <tr><td><b>C · Check outputs in code</b></td><td>Workflow (<code>Q7</code> Verifier, <code>Q8</code> typed contracts)</td><td><code>L3</code>, <code>L4</code></td></tr>
-                <tr><td><b>D · Route by risk</b></td><td>Workflow (Act gate, human)</td><td><code>L8</code></td></tr>
-                <tr><td><b>E · Log every step</b></td><td>Safeguards (audit and eval store)</td><td><code>L9</code></td></tr>
-                <tr><td><b>F · Evaluate and pin</b></td><td>Safeguards (<code>Q11</code> offline evals)</td><td>Control plane (<code>ADK Eval</code>)</td></tr>
-                <tr><td><b>G · Roll out gradually</b></td><td>Safeguards (<code>Q11</code> rollout), Control Plane (<code>Q5</code> kill switch)</td><td><code>L9</code> (kill switch)</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
         <p>Next in Episode 03: <a href="ep03_q2_model_spectrum_economics.html">Question 02 · Open-Weight vs. Proprietary Models Across the Full Model Spectrum</a> (or view the <a href="ref/ai-interview-cheat-sheet.html">5-Question Master Cheat Sheet</a>).</p>
       </div>
     </div>
@@ -1324,8 +1304,8 @@
 <h3>B · Ground in customer sources</h3>
 <p class="lc-summary">Every answer cites the customer's own documents, or says it found nothing.</p>
 <div class="t-fix-row"><b>Customer gets:</b> verbatim source quotes with links; an explicit "not found in your documents" when evidence is missing</div><div class="t-fix-row gcp"><b>On Google Cloud:</b> <a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/overview" rel="noopener" target="_blank">Agent Search</a>, <a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/build/rag-engine/rag-overview" rel="noopener" target="_blank">RAG Engine</a>, or <a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/build/vector-search/overview" rel="noopener" target="_blank">Agent Retrieval / Vector Search</a> (Agent Platform); or in-place <a href="https://docs.cloud.google.com/bigquery/docs/vector-search-intro" rel="noopener" target="_blank">BigQuery</a> / <a href="https://docs.cloud.google.com/alloydb/docs/ai/work-with-embeddings" rel="noopener" target="_blank">AlloyDB</a> vector search, returning verifiable source URIs for clickable citations</div>
-<p class="lc-details">Pair retrieval with clickable inline citations linked to the customer's own documents, return structured JSON (<code>verbatim_quote</code>, <code>sources</code>, <code>assumptions</code>, <code>answer</code>), and return an explicit <em>"not found in your documents"</em> response whenever evidence is absent. Retrieval runs under the caller's verified identity, so citations never expose documents the caller cannot open (<a href="ep01_securing_agent_to_database.html">Episode 01</a>; <a href="ep03_q4_modern_rag_pairings.html">Question 04</a> covers retrieval and citation design in depth).</p>
-<p class="lc-details"><strong>Choosing a grounding backend.</strong> Use <strong>Agent Search</strong> for turnkey document ingestion with managed ACLs, or in-place <strong>BigQuery / AlloyDB vector search</strong> when data already lives there and governance matters more than millisecond latency: zero data movement, strict <a href="https://cloud.google.com/terms/service-terms" rel="noopener" target="_blank">Data Residency</a>, CMEK, and <a href="https://cloud.google.com/access-transparency/docs/supported-services" rel="noopener" target="_blank">Access Transparency (AXT)</a>. Use <a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/build/vector-search/overview" rel="noopener" target="_blank">Agent Retrieval</a> (formerly Vector Search 2.0) or Vector Search for high query volume at millisecond latency, and <a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/build/rag-engine/rag-overview" rel="noopener" target="_blank">RAG Engine</a> for custom chunking pipelines with no Data Residency or AXT requirement (see <a href="ep03_q4_modern_rag_pairings.html">Question 04</a> for the full tradeoff matrix).</p>
+<p class="lc-details">Pair retrieval with clickable inline citations linked to the customer's own documents, return structured JSON (<code>verbatim_quote</code>, <code>sources</code>, <code>assumptions</code>, <code>answer</code>), and return an explicit <em>"not found in your documents"</em> response whenever evidence is absent. Retrieval runs under the caller's verified identity, so citations never expose documents the caller cannot open (<a href="ep01_securing_agent_to_database.html">Episode 01</a>).</p>
+<p class="lc-details"><strong>Choosing a grounding backend.</strong> Use <strong>Agent Search</strong> for turnkey document ingestion with managed ACLs, or in-place <strong>BigQuery / AlloyDB vector search</strong> when data already lives there and governance matters more than millisecond latency: zero data movement, strict <a href="https://cloud.google.com/terms/service-terms" rel="noopener" target="_blank">Data Residency</a>, CMEK, and <a href="https://cloud.google.com/access-transparency/docs/supported-services" rel="noopener" target="_blank">Access Transparency (AXT)</a>. Use <a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/build/vector-search/overview" rel="noopener" target="_blank">Agent Retrieval</a> (formerly Vector Search 2.0) or Vector Search for high query volume at millisecond latency, and <a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/build/rag-engine/rag-overview" rel="noopener" target="_blank">RAG Engine</a> for custom chunking pipelines with no Data Residency or AXT requirement (<a href="ep03_q4_modern_rag_pairings.html">Question 04</a> covers retrieval and citation design).</p>
 </div>
 <div class="layer-card" id="layer-c">
 <p class="lc-eyebrow">Answers 1 Explainability, 2 Predictability</p>
@@ -1647,29 +1627,30 @@
         </p>
 
         <p>
-          <b>The case.</b> Under prior-authorization rules (California's <a href="https://sd13.senate.ca.gov/news/press-release/december-9-2024/landmark-law-prohibits-health-insurance-companies-using-ai-to" target="_blank" rel="noopener">SB 1120</a>, <a href="https://deloitte.com/us/en/industries/life-sciences-health-care/blogs/health-care/ai-could-help-health-plans-simplify-prior-auth-comply-with-regs.html" target="_blank" rel="noopener">Medicare's WISeR pilot</a>, and <a href="https://aamc.org/advocacy-policy/washington-highlights/cms-addresses-use-ai-medicare-advantage-plans" target="_blank" rel="noopener">CMS rules</a>), software may auto-approve clear cases while a licensed clinician must make any denial. Take a <a href="https://ldh.la.gov/assets/medicaid/MCPP/10.12.21/847_ACLA_Lumbar_Spine_MRI_2022_NIA_CG_044.pdf" target="_blank" rel="noopener">lumbar MRI policy</a> that approves coverage if either (a) six weeks of conservative care failed or (b) a neurological deficit is documented.
+          <b>The case.</b> Under prior-authorization rules (California's <a href="https://sd13.senate.ca.gov/news/press-release/december-9-2024/landmark-law-prohibits-health-insurance-companies-using-ai-to" target="_blank" rel="noopener">SB 1120</a>, <a href="https://deloitte.com/us/en/industries/life-sciences-health-care/blogs/health-care/ai-could-help-health-plans-simplify-prior-auth-comply-with-regs.html" target="_blank" rel="noopener">Medicare's WISeR pilot</a>, and <a href="https://aamc.org/advocacy-policy/washington-highlights/cms-addresses-use-ai-medicare-advantage-plans" target="_blank" rel="noopener">CMS rules</a>), software may auto-approve clear cases while a licensed clinician must make any decision to deny or delay care on medical-necessity grounds. Take a <a href="https://ldh.la.gov/assets/medicaid/MCPP/10.12.21/847_ACLA_Lumbar_Spine_MRI_2022_NIA_CG_044.pdf" target="_blank" rel="noopener">lumbar MRI policy</a> that approves coverage if either (a) six weeks of conservative care failed or (b) a neurological deficit is documented.
         </p>
 
         <p>
-          <strong>How the LLM helps—and how code checks it.</strong> In this split, the extractor runs as a toolless, single-call Quarantined LLM (<a href="ep02_designing_agentic_systems.html">Episode 02</a>), so untrusted clinical notes cannot trigger an action; it extracts structured facts, each paired with a verbatim quote from the chart:
+          <strong>How the LLM helps—and how code checks it.</strong> Real clinical notes rarely use exact policy phrasing: they mix overlapping treatment dates, abbreviations (<code>"PT"</code> for physical therapy, <code>"EHL 3/5"</code> for toe-extension weakness), clinical synonyms (<code>"foot drop"</code> for motor deficit), and negations (<code>"denies saddle anesthesia"</code>). In this split, a toolless, single-call Quarantined LLM (<a href="ep02_designing_agentic_systems.html">Episode 02</a>) normalizes those clinical terms into a fixed schema, pairing every claim with a verbatim quote and chart location:
         </p>
         <div class="code-card">
-          <div class="code-title">Extracted Chart Facts with Verbatim Quotes (Model Output)</div>
+          <div class="code-title">Normalized Chart Facts with Verbatim Quotes (Model Output)</div>
 <pre>{
-  <span class="hl-k">"conservative_therapy"</span>: {
-    <span class="hl-k">"type"</span>: <span class="hl-s">"over-the-counter ibuprofen"</span>,
+  <span class="hl-k">"conservative_care"</span>: {
     <span class="hl-k">"weeks"</span>: <span class="hl-n">3</span>,
+    <span class="hl-k">"date_ranges"</span>: [<span class="hl-s">"2026-10-01 to 2026-10-22"</span>],
+    <span class="hl-k">"page"</span>: <span class="hl-n">3</span>,
     <span class="hl-k">"quote"</span>: <span class="hl-s">"Ibuprofen 400 mg TID x 3 weeks, minimal relief"</span>
   },
-  <span class="hl-k">"neuro_deficit"</span>: {<span class="hl-k">"documented"</span>: <span class="hl-n">null</span>, <span class="hl-k">"quote"</span>: <span class="hl-n">null</span>}
+  <span class="hl-k">"neuro_deficit"</span>: {<span class="hl-k">"documented"</span>: <span class="hl-n">null</span>, <span class="hl-k">"page"</span>: <span class="hl-n">null</span>, <span class="hl-k">"quote"</span>: <span class="hl-n">null</span>}
 }</pre>
         </div>
         <p>
-          Code confirms each quote exists verbatim in the chart, then evaluates the policy criteria deterministically: (a) is three weeks against a six-week minimum, and (b) has no evidence either way. When a criterion is met with a verified quote, code can auto-approve with a complete audit trail. Here, criterion (a) falls short and (b) is still open, so code requests the neurological exam notes and, if they do not settle (b), routes the chart to a licensed clinician with every verified fact and policy criterion laid out side by side (<em>Figure 4</em>).
+          Deterministic code verifies every quote exists verbatim in the chart, checks date and threshold math, and evaluates <code>(a) OR (b)</code>. When either criterion is met with verified quotes, the system issues an <code>AUTO_APPROVE</code>. Here, <code>(a)</code> falls short (3 of 6 weeks) and <code>(b)</code> has missing evidence, so deterministic workflow code runs a read-only electronic health record (EHR) lookup for recent exam notes and re-runs extraction once—keeping the chart-reading LLM toolless so untrusted chart text cannot trigger unauthorized queries. If exam notes remain absent, code sends a targeted <code>PEND_FOR_EVIDENCE</code> request for the missing artifact without pausing the review deadline. Unmet or conflicting cases go to a licensed clinician with the verified facts side by side and no recommendation, so only clinicians issue denials (SB 1120), each with a specific reason (CMS-0057-F). <em>Figure 4</em> shows the flow.
         </p>
 
 <div class="diagram-frame" id="fig-q1-worked">
-  <svg viewBox="0 0 920 310" role="img" aria-label="Verifiable hybrid prior-authorization flow: the chart and policy enter, the model extracts structured facts with verbatim quotes, code verifies the quotes in the chart and applies policy criteria (a) and (b), and because (b) has missing evidence, code routes to PEND_FOR_EVIDENCE to request neuro exam notes followed by clinician review">
+  <svg viewBox="0 0 920 310" role="img" aria-label="Higher-automation hybrid prior-authorization flow: chart and policy enter, a toolless Quarantined LLM normalizes clinical facts with verbatim quotes, a Code Verifier and Policy Engine checks quotes and evaluates (a) OR (b) for touchless AUTO_APPROVE, triggers a read-only EHR lookup when evidence is missing, and routes unmet or unresolved cases neutrally to a licensed clinician">
   <defs>
     <marker id="arr-q1w-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M 0 1.5 L 9 5 L 0 8.5 z" style="fill:var(--ink)"/>
@@ -1680,44 +1661,47 @@
   </defs>
 
     <rect x="14" y="14" width="892" height="282" rx="14" style="fill:var(--panel-2);stroke:var(--line);stroke-width:1.75"/>
-    <text class="zl" x="34" y="42">VERIFIABLE HYBRID WORKFLOW · THE MODEL EXTRACTS, CODE CHECKS</text>
+    <text class="zl" x="34" y="42">VERIFIABLE HYBRID WORKFLOW · LLM NORMALIZES, CODE VERIFIES &amp; AUTOMATES</text>
 
     <!-- Row 1: left to right -->
-    <rect class="node-dim" x="34" y="68" width="146" height="64" rx="9"/>
-    <text class="t-b t-c" x="107" y="94">Chart + policy</text>
-    <text class="t-s t-c" x="107" y="115">clinical record</text>
-    <line class="flow" x1="180" y1="100" x2="210" y2="100" marker-end="url(#arr-q1w-ink)"/>
+    <rect class="node-dim" x="34" y="66" width="136" height="64" rx="9"/>
+    <text class="t-b t-c" x="102" y="92">Chart + policy</text>
+    <text class="t-s t-c" x="102" y="113">clinical record</text>
+    <line class="flow" x1="170" y1="98" x2="194" y2="98" marker-end="url(#arr-q1w-ink)"/>
 
-    <rect class="node-violet" x="214" y="68" width="196" height="64" rx="9"/>
-    <text class="t-b t-c" x="312" y="94">Model extracts</text>
-    <text class="t-s t-c" x="312" y="115">facts + verbatim quotes</text>
-    <line class="flow" x1="410" y1="100" x2="440" y2="100" marker-end="url(#arr-q1w-ink)"/>
+    <rect class="node-violet" x="196" y="66" width="234" height="64" rx="9"/>
+    <text class="t-b t-c" x="313" y="92">Quarantined LLM</text>
+    <text class="t-s t-c" x="313" y="113">normalizes + quotes (no tools)</text>
+    <line class="flow" x1="430" y1="98" x2="454" y2="98" marker-end="url(#arr-q1w-ink)"/>
 
-    <rect class="node-cyan" x="444" y="68" width="196" height="64" rx="9"/>
-    <text class="t-b t-c" x="542" y="94">Code verifies</text>
-    <text class="t-s t-c" x="542" y="115">quotes found in chart</text>
-    <line class="flow" x1="640" y1="100" x2="670" y2="100" marker-end="url(#arr-q1w-ink)"/>
+    <rect class="node-cyan" x="456" y="66" width="254" height="64" rx="9"/>
+    <text class="t-b t-c" x="583" y="92">Code Verifier &amp; Rule</text>
+    <text class="t-s t-c" x="583" y="113">checks quotes · applies (a) OR (b)</text>
+    <line class="flow-g" x1="710" y1="98" x2="734" y2="98" marker-end="url(#arr-q1w-good)"/>
 
-    <rect class="node-cyan" x="674" y="68" width="210" height="64" rx="9"/>
-    <text class="t-b t-c" x="779" y="94">Code applies rule</text>
-    <text class="t-s t-c" x="779" y="115">policy criteria (a) and (b)</text>
-    <line class="flow" x1="779" y1="132" x2="779" y2="162" marker-end="url(#arr-q1w-ink)"/>
+    <rect class="node-good" x="736" y="66" width="150" height="64" rx="9"/>
+    <text class="t-m-g t-c" x="811" y="93">AUTO_APPROVE</text>
+    <text class="t-s t-c" x="811" y="114">verified (a) or (b)</text>
 
-    <!-- Row 2: rule evaluation + outcome -->
-    <rect class="node-card" x="524" y="166" width="360" height="106" rx="9"/>
-    <text class="t-b" x="544" y="192">Rule: (a) OR (b) approves</text>
-    <text class="t-s" x="544" y="214">(a) ≥ 6 wks conservative care → 3 wks (not met)</text>
-    <text class="t-s" x="544" y="234">(b) neuro deficit → missing evidence</text>
-    <text class="t-s" x="544" y="254">Either met → AUTO_APPROVE · (b) open → PEND</text>
-    <line class="flow-g" x1="524" y1="219" x2="468" y2="219" marker-end="url(#arr-q1w-good)"/>
+    <!-- Down from Verifier to Row 2 -->
+    <line class="flow" x1="583" y1="130" x2="583" y2="168" marker-end="url(#arr-q1w-ink)"/>
 
-    <rect class="node-good" x="34" y="166" width="430" height="106" rx="9"/>
-    <text class="t-m-g t-c" x="249" y="196">PEND_FOR_EVIDENCE</text>
-    <text class="t-b t-c" x="249" y="222">Request missing exam notes</text>
-    <text class="t-s t-c" x="249" y="246">then licensed clinician review with verified facts</text>
+    <!-- Row 2: EHR lookup -> Clinician review -->
+    <rect class="node-cyan" x="504" y="172" width="382" height="100" rx="9"/>
+    <text class="t-b t-c" x="695" y="199">Missing evidence: read-only EHR lookup</text>
+    <text class="t-s t-c" x="695" y="223">fetch missing exam notes &amp; re-run once</text>
+    <text class="t-s t-c" x="695" y="245">still absent → send PEND_FOR_EVIDENCE</text>
+    <path d="M 540 172 V 150 H 313 V 134" style="fill:none;stroke:var(--cyan);stroke-width:2;stroke-dasharray:5 4" marker-end="url(#arr-q1w-ink)"/>
+    <text class="t-s t-c" x="426" y="145" style="font-size:11px;fill:var(--muted)">notes found</text>
+    <line class="flow-g" x1="504" y1="222" x2="468" y2="222" marker-end="url(#arr-q1w-good)"/>
+
+    <rect class="node-good" x="34" y="172" width="430" height="100" rx="9"/>
+    <text class="t-m-g t-c" x="249" y="199">LICENSED CLINICIAN REVIEW</text>
+    <text class="t-b t-c" x="249" y="224">Verified facts side by side</text>
+    <text class="t-s t-c" x="249" y="247">required when unmet (only clinicians deny)</text>
   </svg>
   <div class="fig-caption">
-    <span>Figure 4 — Verifiable prior-authorization workflow: model extraction followed by deterministic quote and policy checks.</span>
+    <span>Figure 4 — Hybrid workflow with automated evidence lookup: a toolless Quarantined LLM normalizes clinical facts with verbatim quotes, code verifies quotes and policy rules for AUTO_APPROVE or read-only EHR lookup, and clinicians review only unmet or unresolved cases.</span>
     <div class="legend-items">
       <span><i class="swatch-dot" style="background:var(--violet-soft);border-color:var(--violet)"></i> Model step</span>
       <span><i class="swatch-dot" style="background:var(--cyan-soft);border-color:var(--cyan)"></i> Code step</span>
@@ -1727,7 +1711,7 @@
 </div>
 
         <p>
-          <strong>What the member and the auditor get.</strong> If the clinician denies, a templated notice cites the exact policy clause and verified chart quotes. The auditor gets those same quoted facts with exact chart locations, the policy and pinned model versions, the clinician's sign-off (<code>D · Route by risk</code>), and the replayable trace with the model's thought summaries (or raw thinking tokens on open weights) (<code>E · Log every step</code>).
+          <strong>What the member and the auditor get.</strong> If the clinician denies, a templated notice cites the exact policy clause and verified chart quotes. The auditor gets those same quoted facts with exact chart locations, the policy and pinned model versions, the clinician's sign-off (<code>D · Route by risk</code>), and the replayable trace with verifier results and thought summaries (<code>E · Log every step</code>).
         </p>
 
         <p>
@@ -1766,6 +1750,27 @@
 
         <div class="closes">
           <span><b>Takeaway:</b> Diagnose which of the nine "black box" concerns applies, be candid that model weights and activations stay opaque, wrap the model in seven transparent system layers (data perimeter, grounding in customer sources, output checks in code, risk-based routing, step-level logging, golden-set evaluation with version pinning, and gradual rollout), use hybrid designs where code makes high-stakes calls on verified facts, and treat reasoning traces as supporting evidence.</span>
+        </div>
+
+        <p style="margin-top:20px;"><strong>Where this sits in the series:</strong> Episode 01 covers securing the agent-to-database connection (<a href="ep01_securing_agent_to_database.html">nine security layers <code>L1</code>–<code>L9</code></a>), and Episode 02 covers the system-design skeleton (<a href="ep02_designing_agentic_systems.html">four blocks and eleven questions <code>Q1</code>–<code>Q11</code></a>). This question adds the model itself: what stays opaque inside it, and seven layers (<code>A</code>–<code>G</code>) around it that draw on both episodes:</p>
+        <div class="nine-q-wrap" style="margin:12px 0 16px;">
+          <div class="nine-q-head">Series Bridge · Q1 Layers (A–G) vs. Episode 02 Blocks and Episode 01 Layers</div>
+          <div class="tbl-wrap">
+            <table>
+              <thead>
+                <tr><th>Q1 Layer</th><th>Episode 02 Block / Question</th><th>Episode 01 Layer</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><b>A · Data perimeter</b></td><td>Safeguards (<code>Q10</code>)</td><td><code>L1</code>, <code>L2</code>, <code>L6</code>, <code>L7</code></td></tr>
+                <tr><td><b>B · Ground in customer sources</b></td><td>Workflow (<code>Q9</code>: read data in place)</td><td><code>L7</code></td></tr>
+                <tr><td><b>C · Check outputs in code</b></td><td>Workflow (<code>Q7</code> Verifier, <code>Q8</code> typed contracts)</td><td><code>L3</code>, <code>L4</code></td></tr>
+                <tr><td><b>D · Route by risk</b></td><td>Workflow (Act gate, human)</td><td><code>L8</code></td></tr>
+                <tr><td><b>E · Log every step</b></td><td>Safeguards (audit and eval store)</td><td><code>L9</code></td></tr>
+                <tr><td><b>F · Evaluate and pin</b></td><td>Safeguards (<code>Q11</code> offline evals)</td><td>Control plane (<code>ADK Eval</code>)</td></tr>
+                <tr><td><b>G · Roll out gradually</b></td><td>Safeguards (<code>Q11</code> rollout), Control Plane (<code>Q5</code> kill switch)</td><td><code>L9</code> (kill switch)</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
